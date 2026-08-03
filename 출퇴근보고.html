@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>출퇴근 보고</title>
+<style>
+  :root{
+    --bg: #F6F5F2;
+    --ink: #1F2421;
+    --ink-soft: #5A6058;
+    --line: #DCD9D1;
+    --accent: #00B1CC;
+    --accent-soft: #E1F6FA;
+    --card: #FFFFFF;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin:0;
+    font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 48px 20px;
+  }
+  .wrap{ width:100%; max-width:400px; }
+  .eyebrow{
+    font-size:12px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    font-weight:700;
+    margin-bottom:6px;
+  }
+  h1{
+    font-size:22px;
+    margin:0 0 24px 0;
+    letter-spacing:-0.01em;
+  }
+  .card {
+    background: var(--card);
+    border:1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px;
+  }
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight:600;
+    color: var(--ink-soft);
+    margin-bottom: 7px;
+    margin-top: 18px;
+  }
+  label:first-of-type{ margin-top:0; }
+  .date-display {
+    padding: 11px 12px;
+    background: var(--accent-soft);
+    border-radius: 8px;
+    font-size: 15px;
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .toggle-group {
+    display: flex;
+    gap: 8px;
+  }
+  .toggle-btn {
+    flex: 1;
+    padding: 11px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--ink);
+    font-family: inherit;
+  }
+  .toggle-btn:hover{ border-color: var(--accent); }
+  .toggle-btn.active {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+  }
+  .hour-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+    gap:6px;
+    margin-bottom:8px;
+  }
+  .hour-grid button{
+    padding:8px 0;
+    border:1px solid var(--line);
+    border-radius:7px;
+    background:#fff;
+    color:var(--ink);
+    font-size:13px;
+    font-family:inherit;
+    font-variant-numeric:tabular-nums;
+    cursor:pointer;
+  }
+  .hour-grid button:hover{ border-color:var(--accent); }
+  .hour-grid button.active{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+    font-weight:700;
+  }
+  .min-toggle{
+    display:flex;
+    gap:6px;
+  }
+  .min-toggle button{
+    flex:1;
+    padding:9px 0;
+    border:1px solid var(--line);
+    border-radius:7px;
+    background:#fff;
+    color:var(--ink);
+    font-size:13px;
+    font-family:inherit;
+    cursor:pointer;
+  }
+  .min-toggle button:hover{ border-color:var(--accent); }
+  .min-toggle button.active{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+    font-weight:700;
+  }
+  .preview {
+    margin-top: 20px;
+    padding: 16px;
+    background: var(--accent-soft);
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight:600;
+    color: var(--ink);
+    min-height: 24px;
+    word-break: keep-all;
+  }
+  .copy-btn {
+    margin-top: 14px;
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: opacity 0.15s;
+  }
+  .copy-btn:hover{ opacity:0.92; }
+  .copy-btn.copied {
+    background: #2F9E5B;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">대학내일</div>
+  <h1>출퇴근 보고</h1>
+
+  <div class="card">
+    <label>날짜</label>
+    <div class="date-display" id="dateDisplay">-</div>
+
+    <label>시간</label>
+    <div class="hour-grid" id="hourGrid"></div>
+    <div class="min-toggle" id="minToggle">
+      <button type="button" data-min="0">:00</button>
+      <button type="button" data-min="30">:30</button>
+    </div>
+
+    <label>근무 형태</label>
+    <div class="toggle-group" id="locGroup">
+      <button class="toggle-btn active" data-loc="home">🏠 재택</button>
+      <button class="toggle-btn" data-loc="office">🏢 사무실</button>
+    </div>
+
+    <label>구분</label>
+    <div class="toggle-group" id="dirGroup">
+      <button class="toggle-btn active" data-dir="start">🌅 시작/출근</button>
+      <button class="toggle-btn" data-dir="end">🌙 종료/퇴근</button>
+    </div>
+
+    <div class="preview" id="preview">-</div>
+
+    <button class="copy-btn" id="copyBtn">문구 복사하기</button>
+  </div>
+</div>
+
+<script>
+  const days = ['일','월','화','수','목','금','토'];
+  const preview = document.getElementById('preview');
+  const copyBtn = document.getElementById('copyBtn');
+  const dateDisplay = document.getElementById('dateDisplay');
+  const hourGrid = document.getElementById('hourGrid');
+  const minToggle = document.getElementById('minToggle');
+  const locGroup = document.getElementById('locGroup');
+  const dirGroup = document.getElementById('dirGroup');
+
+  let currentLoc = 'home';   // home | office
+  let currentDir = 'start';  // start | end
+  const timeState = { hour: 9, min: 0 };
+
+  // 오늘 날짜 고정
+  const today = new Date();
+  const y = today.getFullYear();
+  const m = today.getMonth() + 1;
+  const d = today.getDate();
+  const dayName = days[today.getDay()];
+  dateDisplay.textContent = `${y}년 ${m}월 ${d}일 (${dayName})`;
+
+  // 시간 버튼: 6~28시, 시 버튼 + 00/30 토글
+  for (let h = 6; h <= 28; h++) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = h;
+    btn.dataset.hour = h;
+    if (h === timeState.hour) btn.classList.add('active');
+    btn.addEventListener('click', () => {
+      timeState.hour = h;
+      hourGrid.querySelectorAll('button').forEach(b => b.classList.toggle('active', parseInt(b.dataset.hour) === h));
+      buildText();
+    });
+    hourGrid.appendChild(btn);
+  }
+  minToggle.querySelectorAll('button').forEach(btn => {
+    if (parseInt(btn.dataset.min) === timeState.min) btn.classList.add('active');
+    btn.addEventListener('click', () => {
+      timeState.min = parseInt(btn.dataset.min);
+      minToggle.querySelectorAll('button').forEach(b => b.classList.toggle('active', b === btn));
+      buildText();
+    });
+  });
+
+  function typeLabel(loc, dir) {
+    if (loc === 'home' && dir === 'start') return '재택근무 시작합니다';
+    if (loc === 'home' && dir === 'end')   return '재택근무 종료합니다';
+    if (loc === 'office' && dir === 'start') return '출근합니다';
+    if (loc === 'office' && dir === 'end')   return '퇴근합니다';
+  }
+
+  function formatTime(h, m) {
+    return `${h}:${String(m).padStart(2,'0')}`;
+  }
+
+  function buildText() {
+    const timeStr = formatTime(timeState.hour, timeState.min);
+    const text = `${m}/${d}(${dayName}) ${timeStr} ${typeLabel(currentLoc, currentDir)}`;
+    preview.textContent = text;
+    return text;
+  }
+
+  locGroup.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      locGroup.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentLoc = btn.dataset.loc;
+      buildText();
+    });
+  });
+
+  dirGroup.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      dirGroup.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentDir = btn.dataset.dir;
+      buildText();
+    });
+  });
+
+  copyBtn.addEventListener('click', async () => {
+    const text = buildText();
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (e) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    copyBtn.textContent = '복사됐어요 ✓';
+    copyBtn.classList.add('copied');
+    setTimeout(() => {
+      copyBtn.textContent = '문구 복사하기';
+      copyBtn.classList.remove('copied');
+    }, 1200);
+  });
+
+  buildText();
+</script>
+</body>
+</html>

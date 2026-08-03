@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>대학내일 근태 도구</title>
+<style>
+  :root{
+    --bg: #F6F5F2;
+    --ink: #1F2421;
+    --ink-soft: #5A6058;
+    --line: #DCD9D1;
+    --accent: #00B1CC;
+    --accent-soft: #E1F6FA;
+    --card: #FFFFFF;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin:0;
+    font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 48px 20px;
+  }
+  .wrap{ width:100%; max-width:400px; }
+  .eyebrow{
+    font-size:12px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    font-weight:700;
+    margin-bottom:6px;
+  }
+  h1{
+    font-size:22px;
+    margin:0 0 4px 0;
+    letter-spacing:-0.01em;
+  }
+  .sub{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:0 0 28px 0;
+  }
+  .banner {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 14px;
+    text-decoration: none;
+    color: var(--ink);
+    transition: border-color 0.15s, transform 0.1s;
+  }
+  .banner:hover {
+    border-color: var(--accent);
+  }
+  .banner:active {
+    transform: scale(0.99);
+  }
+  .banner .icon {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    background: var(--accent-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+  }
+  .banner .text {
+    flex: 1;
+    min-width: 0;
+  }
+  .banner .title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 3px;
+  }
+  .banner .desc {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    line-height: 1.4;
+  }
+  .banner .arrow {
+    font-size: 18px;
+    color: var(--line);
+    flex-shrink: 0;
+  }
+  .banner:hover .arrow {
+    color: var(--accent);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">대학내일</div>
+  <h1>근태 도구</h1>
+  <p class="sub">필요한 도구를 눌러 바로 이동하세요</p>
+
+  <a class="banner" href="./출퇴근보고.html">
+    <div class="icon">📋</div>
+    <div class="text">
+      <div class="title">출퇴근 보고</div>
+      <div class="desc">재택/사무실 · 시작·출근 / 종료·퇴근 문구 만들어 복사</div>
+    </div>
+    <div class="arrow">›</div>
+  </a>
+
+  <a class="banner" href="./근무시간계산기.html">
+    <div class="icon">🕐</div>
+    <div class="text">
+      <div class="title">순 근무 시간 체크</div>
+      <div class="desc">날짜별 근무시간 기록하고 8시간 기준 상쇄 확인</div>
+    </div>
+    <div class="arrow">›</div>
+  </a>
+</div>
+</body>
+</html>
