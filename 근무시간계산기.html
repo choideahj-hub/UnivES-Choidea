@@ -1689,10 +1689,29 @@
   async function load(){
     statusMsg.textContent = '동기화 연결 중...';
     if(unsubscribeSync) unsubscribeSync();
+
+    // Firestore가 비어있는데 이 기기(브라우저)에 예전 localStorage 데이터가 남아있으면 1회 자동 이전
+    try{
+      const snap = await worklogDocRef.get();
+      const remoteEmpty = !snap.exists || !snap.data().entries || snap.data().entries.length === 0;
+      if(remoteEmpty){
+        const legacyRaw = localStorage.getItem('worklog-entries');
+        if(legacyRaw){
+          const legacyEntries = JSON.parse(legacyRaw);
+          if(Array.isArray(legacyEntries) && legacyEntries.length > 0){
+            await worklogDocRef.set({ entries: legacyEntries });
+            statusMsg.textContent = `이 기기에 남아있던 기록 ${legacyEntries.length}건을 클라우드로 옮겼어요`;
+          }
+        }
+      }
+    }catch(err){
+      console.error('이전 데이터 이전 중 오류', err);
+    }
+
     unsubscribeSync = worklogDocRef.onSnapshot(
       (doc)=>{
         entries = (doc.exists && doc.data().entries) ? doc.data().entries : [];
-        statusMsg.textContent = '';
+        if(!statusMsg.textContent.includes('옮겼어요')) statusMsg.textContent = '';
         render();
       },
       (err)=>{
