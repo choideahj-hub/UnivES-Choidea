@@ -524,6 +524,47 @@
     background:var(--danger);
     border-color:var(--danger);
   }
+  .group-summary-toggle{
+    width:100%;
+    padding:8px 0;
+    margin-bottom:8px;
+    border:1px solid var(--line);
+    border-radius:7px;
+    background:#fff;
+    color:var(--ink-soft);
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .group-summary-toggle:hover{ border-color:var(--accent); }
+  .group-summary{
+    display:none;
+    margin-bottom:12px;
+  }
+  .group-summary.show{ display:block; }
+  .group-summary-item{
+    background:var(--accent-soft);
+    border-radius:8px;
+    padding:9px 12px;
+    margin-bottom:6px;
+    font-size:12px;
+  }
+  .group-summary-item .gsum-members{
+    color:var(--ink);
+  }
+  .group-summary-item .gsum-total{
+    margin-top:3px;
+    font-weight:700;
+    color:#2F9E5B;
+    font-size:11.5px;
+  }
+  .group-summary-empty{
+    font-size:12px;
+    color:var(--ink-soft);
+    text-align:center;
+    padding:12px 0;
+  }
   .auto-match-btn{
     width:100%;
     padding:10px;
@@ -780,6 +821,8 @@
       <button type="button" data-filter="over">초과만</button>
       <button type="button" data-filter="under">단축만</button>
     </div>
+    <button type="button" id="groupSummaryToggle" class="group-summary-toggle">🧮 상쇄 내역 보기(검산용)</button>
+    <div id="groupSummary" class="group-summary"></div>
     <div id="entryList"><div class="empty">기록이 없습니다</div></div>
   </div>
 
@@ -817,6 +860,42 @@
       render();
     });
   });
+
+  const groupSummaryToggle = document.getElementById('groupSummaryToggle');
+  const groupSummaryEl = document.getElementById('groupSummary');
+  let groupSummaryOpen = false;
+  groupSummaryToggle.addEventListener('click', ()=>{
+    groupSummaryOpen = !groupSummaryOpen;
+    render();
+  });
+
+  function renderGroupSummary(){
+    groupSummaryToggle.textContent = groupSummaryOpen ? '🧮 상쇄 내역 접기' : '🧮 상쇄 내역 보기(검산용)';
+    groupSummaryEl.classList.toggle('show', groupSummaryOpen);
+    if(!groupSummaryOpen) return;
+
+    const scoped = monthFilter === 'all' ? entries : entries.filter(e=> monthKey(e.date) === monthFilter);
+    const grouped = scoped.filter(e=> e.groupId);
+    const byGroup = {};
+    grouped.forEach(e=> { (byGroup[e.groupId] = byGroup[e.groupId] || []).push(e); });
+    const groups = Object.values(byGroup)
+      .map(g=> g.slice().sort((a,b)=> a.date.localeCompare(b.date)))
+      .sort((a,b)=> a[0].date.localeCompare(b[0].date));
+
+    if(groups.length === 0){
+      groupSummaryEl.innerHTML = '<div class="group-summary-empty">확정된 상쇄 묶음이 없습니다</div>';
+      return;
+    }
+
+    groupSummaryEl.innerHTML = groups.map(g=>{
+      const sum = Math.round(g.reduce((s,e)=> s+e.diffH, 0) * 2) / 2;
+      const members = g.map(e=> `${formatMDDay(e.date)} ${formatDiff(e.diffH)}`).join(' + ');
+      return `<div class="group-summary-item">
+        <div class="gsum-members">${members}</div>
+        <div class="gsum-total">= ${formatDiff(sum)} ${sum === 0 ? '✓' : '⚠️ 검산 불일치'}</div>
+      </div>`;
+    }).join('');
+  }
 
   let entries = [];
   let selectedDates = new Set();
@@ -1453,6 +1532,7 @@
     diffFilterEl.querySelector('[data-filter="under"]').textContent = `단축만 (${undertimeDates.length})`;
 
     updatePairBar();
+    renderGroupSummary();
   }
 
   function updatePairBar(){
@@ -1515,7 +1595,7 @@
     if(groupsFormed > 0) await save();
 
     // 2순위(최후): 남은 것 중 주말·심야·공휴일까지 포함해야 맞는 조합은 수당 배율이 다를 수 있어
-    // 자동 확정하지 않고 선택만 해서 사용자가 확인 후 "짝으로 확정"을 누르도록 함
+    // 자동 확정하지 않고, 체크박스도 자동으로 선택하지 않음 — 필요하면 사용자가 직접 골라서 확정
     const remainingAll = entries.filter(e=> !e.groupId && e.diffH !== 0);
     const specialMatch = findZeroSumSubset(remainingAll, 4);
 
@@ -1524,8 +1604,8 @@
       msg = `일반 근무끼리 ${groupsFormed}건 조합(총 ${entriesResolved}건) 자동 상쇄 완료`;
     }
     if(specialMatch){
-      selectedDates = new Set(specialMatch.map(e=> e.date));
-      msg += (msg ? ' · ' : '') + '주말/심야/공휴일 포함 조합도 발견 — 수당 배율이 다르니 확정 전 확인해주세요';
+      const dateList = specialMatch.map(e=> formatMDDay(e.date)).join(', ');
+      msg += (msg ? ' · ' : '') + `주말/심야/공휴일 포함 조합 발견(${dateList}) — 수당 배율이 다를 수 있어 자동 선택하지 않았어요, 필요하면 체크박스로 직접 선택해 확정해주세요`;
     } else if(groupsFormed === 0){
       msg = '합이 0이 되는 조합을 찾지 못했습니다';
     }
