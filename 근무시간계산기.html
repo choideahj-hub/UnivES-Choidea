@@ -629,12 +629,14 @@
     display:flex;
     gap:6px;
     align-items:center;
+    margin-bottom:6px;
   }
+  .entry-reason.editing{ margin-bottom:0; }
   .entry-reason input{
     flex:1;
     min-width:0;
     padding:7px 9px;
-    border:1px solid var(--line);
+    border:1px solid var(--accent);
     border-radius:6px;
     font-size:12px;
     font-family:inherit;
@@ -645,33 +647,66 @@
     outline:2px solid var(--accent);
     outline-offset:1px;
   }
-  .entry-reason .copy-reason-btn{
+  .reason-preview{
+    flex:1;
+    min-width:0;
+    font-size:12px;
+    color:var(--ink-soft);
+    padding:2px 0;
+    word-break:break-word;
+    line-height:1.5;
+  }
+  .entry-actions{
+    display:flex;
+    gap:6px;
+  }
+  .entry-actions button{
     flex-shrink:0;
     padding:7px 10px;
     border-radius:6px;
-    border:1px solid var(--accent);
-    background:var(--accent-soft);
-    color:var(--accent);
     font-size:11.5px;
     font-weight:700;
     cursor:pointer;
     font-family:inherit;
     white-space:nowrap;
   }
-  .entry-reason .copy-reason-btn.copied{
+  .reason-edit-btn{
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--ink-soft);
+  }
+  .reason-save-btn{
+    flex-shrink:0;
+    padding:7px 12px;
+    border-radius:6px;
+    border:none;
+    background:var(--accent);
+    color:#fff;
+    font-size:12px;
+    font-weight:700;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .copy-reason-btn{
+    border:1px solid var(--accent);
+    background:var(--accent-soft);
+    color:var(--accent);
+  }
+  .copy-reason-btn.copied{
     background:#2F9E5B;
     border-color:#2F9E5B;
     color:#fff;
   }
-  .done-check{
-    display:flex;
-    align-items:center;
-    gap:4px;
-    font-size:11px;
+  .upload-done-btn{
+    border:1px solid var(--line);
+    background:#fff;
     color:var(--ink-soft);
-    flex-shrink:0;
-    white-space:nowrap;
-    cursor:pointer;
+    margin-left:auto;
+  }
+  .upload-done-btn.active{
+    border-color:#2F9E5B;
+    background:rgba(47,158,91,0.12);
+    color:#2F9E5B;
   }
   .entry.uploaded-done{ opacity:0.5; }
   .entry.uploaded-done .date,
@@ -785,6 +820,11 @@
 
   let entries = [];
   let selectedDates = new Set();
+  let editingReasonDates = new Set();
+
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, ch=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  }
   const now = new Date();
   let monthFilter = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`; // 'YYYY-MM' or 'all'
 
@@ -1222,6 +1262,7 @@
     entries.sort((a,b)=> a.date.localeCompare(b.date));
     // 선택 상태 중 삭제된 날짜 정리
     selectedDates.forEach(d=>{ if(!entries.find(e=>e.date===d)) selectedDates.delete(d); });
+    editingReasonDates.forEach(d=>{ if(!entries.find(e=>e.date===d)) editingReasonDates.delete(d); });
 
     // 월 라벨 갱신
     if(monthFilter === 'all'){
@@ -1262,23 +1303,35 @@
           ? `<span class="group-badge">묶음 상쇄완료</span><button class="ungroup" data-date="${e.date}">해제</button>`
           : '';
 
-        const doneCheckboxHtml = (!isGrouped && e.diffH !== 0)
-          ? `<label class="done-check"><input type="checkbox" class="upload-done" data-date="${e.date}" ${e.uploaded ? 'checked' : ''}> 완료</label>`
+        const doneBtnHtml = (!isGrouped && e.diffH !== 0)
+          ? `<button type="button" class="upload-done-btn${e.uploaded ? ' active' : ''}" data-date="${e.date}">${e.uploaded ? '완료 ✓' : '완료'}</button>`
           : '';
 
         let reasonRowHtml = '';
         if(e.diffH > 0){
-          reasonRowHtml = `
-            <div class="entry-reason">
-              <input type="text" class="reason-input" data-date="${e.date}" placeholder="업무 내역 입력" value="${(e.reason||'').replace(/"/g,'&quot;')}">
-              <button type="button" class="copy-reason-btn" data-date="${e.date}">[초과 근무] 복사</button>
-              ${doneCheckboxHtml}
-            </div>`;
+          const isEditing = editingReasonDates.has(e.date);
+          if(isEditing){
+            reasonRowHtml = `
+              <div class="entry-reason editing">
+                <input type="text" class="reason-input" data-date="${e.date}" value="${escapeHtml(e.reason || '[초과 근무] ')}">
+                <button type="button" class="reason-save-btn" data-date="${e.date}">저장</button>
+              </div>`;
+          } else {
+            reasonRowHtml = `
+              <div class="entry-reason">
+                <div class="reason-preview">${e.reason ? escapeHtml(e.reason) : '업무 내역 미입력'}</div>
+              </div>
+              <div class="entry-actions">
+                <button type="button" class="reason-edit-btn" data-date="${e.date}">입력·수정</button>
+                <button type="button" class="copy-reason-btn" data-date="${e.date}">복사</button>
+                ${doneBtnHtml}
+              </div>`;
+          }
         } else if(e.diffH < 0){
           reasonRowHtml = `
-            <div class="entry-reason">
-              <button type="button" class="copy-reason-btn" data-date="${e.date}" style="flex:1;">[단축 근무] 복사</button>
-              ${doneCheckboxHtml}
+            <div class="entry-actions">
+              <button type="button" class="copy-reason-btn" data-date="${e.date}">복사</button>
+              ${doneBtnHtml}
             </div>`;
         }
 
@@ -1307,18 +1360,42 @@
           render();
         });
       });
+      const commitReason = async (inp)=>{
+        const d = inp.dataset.date;
+        const e = entries.find(en=>en.date===d);
+        if(e){
+          let val = inp.value;
+          if(!val.startsWith('[초과 근무] ')) val = '[초과 근무] ' + val.replace(/^\[초과 근무\]\s*/, '');
+          e.reason = val;
+          await save();
+        }
+        editingReasonDates.delete(d);
+        render();
+      };
       entryList.querySelectorAll('.reason-input').forEach(inp=>{
-        inp.addEventListener('input', async ()=>{
-          const d = inp.dataset.date;
-          const e = entries.find(en=>en.date===d);
-          if(e){ e.reason = inp.value; await save(); }
+        // 자동 포커스 + 커서를 맨 끝으로 (편집 모드로 막 전환된 입력창)
+        inp.focus();
+        inp.setSelectionRange(inp.value.length, inp.value.length);
+        inp.addEventListener('keydown', (ev)=>{ if(ev.key === 'Enter'){ ev.preventDefault(); commitReason(inp); } });
+      });
+      entryList.querySelectorAll('.reason-edit-btn').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          editingReasonDates.add(btn.dataset.date);
+          render();
         });
       });
-      entryList.querySelectorAll('.upload-done').forEach(cb=>{
-        cb.addEventListener('change', async ()=>{
-          const d = cb.dataset.date;
+      entryList.querySelectorAll('.reason-save-btn').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const row = btn.closest('.entry-reason');
+          const inp = row.querySelector('.reason-input');
+          commitReason(inp);
+        });
+      });
+      entryList.querySelectorAll('.upload-done-btn').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          const d = btn.dataset.date;
           const e = entries.find(en=>en.date===d);
-          if(e){ e.uploaded = cb.checked; await save(); render(); }
+          if(e){ e.uploaded = !e.uploaded; await save(); render(); }
         });
       });
       entryList.querySelectorAll('.copy-reason-btn').forEach(btn=>{
@@ -1326,7 +1403,7 @@
           const d = btn.dataset.date;
           const e = entries.find(en=>en.date===d);
           if(!e) return;
-          const text = e.diffH > 0 ? `[초과 근무] ${e.reason || ''}` : '[단축 근무]';
+          const text = e.diffH > 0 ? (e.reason || '[초과 근무] ') : '[단축 근무]';
           try{
             await navigator.clipboard.writeText(text);
           }catch(err){
@@ -1446,7 +1523,9 @@
   // 최대 maxSize개까지의 조합 중 diffH 합이 0인 첫 조합을 찾는 간단한 탐색 (기록 수가 적어 브루트포스로 충분)
   function findZeroSumSubset(list, maxSize){
     const n = list.length;
-    for(let size=2; size<=Math.min(maxSize, n); size++){
+    // 작은 조합부터 찾으면 우연히 합이 0인 2개짜리가 먼저 걸려서, 실제로 필요한
+    // "1개+2개"처럼 더 많은 항목을 해소하는 조합을 놓칠 수 있음 → 큰 조합부터 우선 탐색
+    for(let size=Math.min(maxSize, n); size>=2; size--){
       const combo = [];
       function backtrack(start){
         if(combo.length === size){
