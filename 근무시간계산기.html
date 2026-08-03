@@ -565,6 +565,12 @@
     text-align:center;
     padding:12px 0;
   }
+  .group-summary-item.pending{
+    background:var(--danger-soft);
+  }
+  .gsum-total.pending{
+    color:var(--danger);
+  }
   .auto-match-btn{
     width:100%;
     padding:10px;
@@ -739,15 +745,15 @@
     color:#fff;
   }
   .upload-done-btn{
-    border:1px solid var(--line);
-    background:#fff;
-    color:var(--ink-soft);
+    border:1px solid #8B7FD6;
+    background:rgba(139,127,214,0.08);
+    color:#6C5CC4;
     margin-left:auto;
   }
   .upload-done-btn.active{
-    border-color:#2F9E5B;
-    background:rgba(47,158,91,0.12);
-    color:#2F9E5B;
+    border-color:#6C5CC4;
+    background:#6C5CC4;
+    color:#fff;
   }
   .entry.uploaded-done{ opacity:0.5; }
   .entry.uploaded-done .date,
@@ -882,12 +888,7 @@
       .map(g=> g.slice().sort((a,b)=> a.date.localeCompare(b.date)))
       .sort((a,b)=> a[0].date.localeCompare(b[0].date));
 
-    if(groups.length === 0){
-      groupSummaryEl.innerHTML = '<div class="group-summary-empty">확정된 상쇄 묶음이 없습니다</div>';
-      return;
-    }
-
-    groupSummaryEl.innerHTML = groups.map(g=>{
+    let html = groups.map(g=>{
       const sum = Math.round(g.reduce((s,e)=> s+e.diffH, 0) * 2) / 2;
       const members = g.map(e=> `${formatMDDay(e.date)} ${formatDiff(e.diffH)}`).join(' + ');
       return `<div class="group-summary-item">
@@ -895,6 +896,32 @@
         <div class="gsum-total">= ${formatDiff(sum)} ${sum === 0 ? '✓' : '⚠️ 검산 불일치'}</div>
       </div>`;
     }).join('');
+
+    // 합은 0이 되지만 주말/심야/공휴일이 껴서 아직 확정하지 않은 조합도 찾아서 보여줌 (검산용)
+    let remainingPool = scoped.filter(e=> !e.groupId && e.diffH !== 0);
+    let possible;
+    while((possible = findZeroSumSubset(remainingPool, 4))){
+      const sum = Math.round(possible.reduce((s,e)=> s+e.diffH, 0) * 2) / 2;
+      const members = possible.map(e=> `${formatMDDay(e.date)} ${formatDiff(e.diffH)}`).join(' + ');
+      const reasonTags = new Set();
+      possible.forEach(e=>{
+        if(isWeekend(e.date)) reasonTags.add('주말');
+        if(isNightShift(e)) reasonTags.add('심야');
+        if(e.isHoliday) reasonTags.add('공휴일');
+      });
+      const reasonText = reasonTags.size > 0 ? [...reasonTags].join('/') + '근무라' : '수당 배율이 달라서';
+      html += `<div class="group-summary-item pending">
+        <div class="gsum-members">${members}</div>
+        <div class="gsum-total pending">= ${formatDiff(sum)} · 🔸 ${reasonText} 합산하지 않았어요 — 확인 후 직접 확정해주세요</div>
+      </div>`;
+      remainingPool = remainingPool.filter(e=> !possible.some(p=> p.date === e.date));
+    }
+
+    if(!html){
+      groupSummaryEl.innerHTML = '<div class="group-summary-empty">확정된 상쇄 묶음이 없습니다</div>';
+      return;
+    }
+    groupSummaryEl.innerHTML = html;
   }
 
   let entries = [];
