@@ -23,56 +23,56 @@
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    padding: 48px 20px;
+    padding: 20px 16px;
   }
   .wrap{ width:100%; max-width:400px; }
   .eyebrow{
-    font-size:12px;
+    font-size:11px;
     letter-spacing:0.14em;
     text-transform:uppercase;
     color:var(--accent);
     font-weight:700;
-    margin-bottom:6px;
+    margin-bottom:3px;
   }
   h1{
-    font-size:22px;
-    margin:0 0 24px 0;
+    font-size:19px;
+    margin:0 0 12px 0;
     letter-spacing:-0.01em;
   }
   .card {
     background: var(--card);
     border:1px solid var(--line);
     border-radius: 14px;
-    padding: 22px;
+    padding: 16px;
   }
   label {
     display: block;
-    font-size: 13px;
+    font-size: 12px;
     font-weight:600;
     color: var(--ink-soft);
-    margin-bottom: 7px;
-    margin-top: 18px;
+    margin-bottom: 5px;
+    margin-top: 12px;
   }
   label:first-of-type{ margin-top:0; }
   .date-display {
-    padding: 11px 12px;
+    padding: 8px 12px;
     background: var(--accent-soft);
     border-radius: 8px;
-    font-size: 15px;
+    font-size: 14px;
     color: var(--ink);
     font-weight: 600;
   }
   .toggle-group {
     display: flex;
-    gap: 8px;
+    gap: 7px;
   }
   .toggle-btn {
     flex: 1;
-    padding: 11px;
+    padding: 9px;
     border: 1px solid var(--line);
     border-radius: 8px;
     background: #fff;
-    font-size: 14px;
+    font-size: 13px;
     cursor: pointer;
     transition: all 0.15s;
     color: var(--ink);
@@ -87,17 +87,17 @@
   }
   .hour-grid{
     display:grid;
-    grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
-    gap:6px;
-    margin-bottom:8px;
+    grid-template-columns: repeat(auto-fill, minmax(28px, 1fr));
+    gap:5px;
+    margin-bottom:6px;
   }
   .hour-grid button{
-    padding:8px 0;
+    padding:6px 0;
     border:1px solid var(--line);
-    border-radius:7px;
+    border-radius:6px;
     background:#fff;
     color:var(--ink);
-    font-size:13px;
+    font-size:12px;
     font-family:inherit;
     font-variant-numeric:tabular-nums;
     cursor:pointer;
@@ -111,16 +111,16 @@
   }
   .min-toggle{
     display:flex;
-    gap:6px;
+    gap:5px;
   }
   .min-toggle button{
     flex:1;
-    padding:9px 0;
+    padding:7px 0;
     border:1px solid var(--line);
-    border-radius:7px;
+    border-radius:6px;
     background:#fff;
     color:var(--ink);
-    font-size:13px;
+    font-size:12px;
     font-family:inherit;
     cursor:pointer;
   }
@@ -132,25 +132,25 @@
     font-weight:700;
   }
   .preview {
-    margin-top: 20px;
-    padding: 16px;
+    margin-top: 14px;
+    padding: 12px;
     background: var(--accent-soft);
-    border-radius: 10px;
-    font-size: 16px;
+    border-radius: 9px;
+    font-size: 14px;
     font-weight:600;
     color: var(--ink);
-    min-height: 24px;
+    min-height: 20px;
     word-break: keep-all;
   }
   .copy-btn {
-    margin-top: 14px;
+    margin-top: 10px;
     width: 100%;
-    padding: 13px;
+    padding: 11px;
     border: none;
     border-radius: 8px;
     background: var(--accent);
     color: #fff;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     cursor: pointer;
     font-family: inherit;
@@ -219,7 +219,7 @@
   dateDisplay.textContent = `${y}년 ${m}월 ${d}일 (${dayName})`;
 
   // 시간 버튼: 6~28시, 시 버튼 + 00/30 토글
-  for (let h = 6; h <= 28; h++) {
+  for (let h = 6; h <= 27; h++) {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.textContent = h;
