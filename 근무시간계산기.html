@@ -841,8 +841,14 @@
 
     lines.forEach(line=>{
       const dateMatch = line.match(/(\d{1,2})\s*\/\s*(\d{1,2})/);
-      const timeMatch = line.match(/(\d{1,2}):(\d{2})/);
-      if(!dateMatch || !timeMatch){
+      if(!dateMatch){
+        unparsed.push(line);
+        return;
+      }
+      // 괄호 안 내용("(수)" 요일, "(9:30 시작, ...)" 부가정보)은 본문 판단에서 제외
+      const bareLine = line.replace(/\([^)]*\)/g, '').trim();
+      const timeMatch = bareLine.match(/(\d{1,2}):(\d{2})/) || line.match(/(\d{1,2}):(\d{2})/);
+      if(!timeMatch){
         unparsed.push(line);
         return;
       }
@@ -855,8 +861,16 @@
       const d = dateData[dateKey];
       d.rawLines.push(line);
 
-      if(/시작합니다/.test(line)) d.startTime = eventTime;
-      if(/종료합니다|퇴근합니다/.test(line)) d.endTime = eventTime;
+      // "8:00-13:00"처럼 시간 범위를 그냥 붙여쓴 경우 우선 처리 (괄호 안 "추가 근무" 구간과 헷갈리지 않도록 괄호 제외한 본문에서만 탐색)
+      const rangeMatch = bareLine.match(/(\d{1,2}):(\d{2})\s*[~\-]\s*(\d{1,2}):(\d{2})/);
+      if(rangeMatch){
+        d.startTime = `${parseInt(rangeMatch[1])}:${rangeMatch[2]}`;
+        d.endTime = `${parseInt(rangeMatch[3])}:${rangeMatch[4]}`;
+      } else {
+        // 출근/직출/시작 = 시작, 퇴근/직퇴/종료 = 종료 (어근 매칭이라 "~합니다/~했습니다" 등 어미 무관하게 인식)
+        if(/시작|출근|직출/.test(bareLine)) d.startTime = eventTime;
+        if(/종료|퇴근|직퇴/.test(bareLine)) d.endTime = eventTime;
+      }
       if(/점심\s*없이|점없근/.test(line)) d.noLunch = true;
 
       const parenGroups = [...line.matchAll(/\(([^)]*)\)/g)].map(m=>m[1]);
@@ -937,7 +951,7 @@
   function renderParsePreview(unparsed){
     let html = '';
     if(parsedResults.length > 0){
-      html += `<div class="parse-preview"><div class="parse-summary">✅ EW 분석 완료! ${parsedResults.length}건 인식됨 — 연도는 ${new Date().getFullYear()}년으로 가정</div>`;
+      html += `<div class="parse-preview"><div class="parse-summary">✅ EW 분석 완료! ${parsedResults.length}건 인식됨 — ${new Date().getFullYear()}년 기준</div>`;
       parsedResults.slice().sort((a,b)=>a.date.localeCompare(b.date)).forEach(r=>{
         const conflict = entries.some(e=> e.date === r.date);
         const diffClass = r.diffH === 0 ? 'zero' : (r.diffH > 0 ? 'plus' : 'minus');
