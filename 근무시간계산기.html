@@ -842,8 +842,23 @@
   </div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script>
-  const STORAGE_KEY = 'worklog-entries';
+  const firebaseConfig = {
+    apiKey: "AIzaSyCpFYkfBS0o57Hs2QfqaHSKojRA7xf0mIo",
+    authDomain: "choidea-univ.firebaseapp.com",
+    projectId: "choidea-univ",
+    storageBucket: "choidea-univ.firebasestorage.app",
+    messagingSenderId: "814177175154",
+    appId: "1:814177175154:web:17eb4b40a09074ec93a4eb",
+    measurementId: "G-VS1CCG8GTR"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const worklogDocRef = db.collection('worklog').doc('entries');
+</script>
+<script>
 
   const entryList = document.getElementById('entryList');
   const statusMsg = document.getElementById('statusMsg');
@@ -1669,23 +1684,31 @@
 
 
 
+  let unsubscribeSync = null;
+
   async function load(){
-    try{
-      const raw = localStorage.getItem(STORAGE_KEY);
-      entries = raw ? JSON.parse(raw) : [];
-    }catch(err){
-      entries = [];
-      statusMsg.textContent = '저장된 기록을 불러오지 못했습니다';
-    }
-    render();
+    statusMsg.textContent = '동기화 연결 중...';
+    if(unsubscribeSync) unsubscribeSync();
+    unsubscribeSync = worklogDocRef.onSnapshot(
+      (doc)=>{
+        entries = (doc.exists && doc.data().entries) ? doc.data().entries : [];
+        statusMsg.textContent = '';
+        render();
+      },
+      (err)=>{
+        console.error(err);
+        statusMsg.textContent = '동기화 실패 — 인터넷 연결을 확인해주세요';
+      }
+    );
   }
 
   async function save(){
     try{
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+      await worklogDocRef.set({ entries });
       statusMsg.textContent = '';
     }catch(err){
-      statusMsg.textContent = '저장 실패 — 브라우저 저장공간을 확인해주세요';
+      console.error(err);
+      statusMsg.textContent = '저장 실패 — 인터넷 연결을 확인해주세요 (변경사항이 다른 기기에 반영되지 않았을 수 있어요)';
     }
   }
 
