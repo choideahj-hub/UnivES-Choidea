@@ -85,11 +85,64 @@
     color: #fff;
     font-weight: 700;
   }
+  .quick-label-row{
+    display:grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap:8px;
+    margin-bottom:5px;
+  }
+  .quick-label{
+    font-size:11px;
+    font-weight:700;
+    color:var(--ink-soft);
+    text-align:center;
+  }
+  .quick-hours{
+    display:grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap:8px;
+    margin-bottom:12px;
+  }
+  .quick-hours button{
+    padding:13px 2px;
+    border:1.5px solid var(--line);
+    border-radius:9px;
+    background:#fff;
+    color:var(--ink);
+    font-size:13px;
+    font-weight:700;
+    font-family:inherit;
+    font-variant-numeric:tabular-nums;
+    cursor:pointer;
+  }
+  .quick-hours button:hover{ border-color:var(--accent); }
+  .quick-hours button.active{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+    font-weight:700;
+  }
+  .quick-hours button.more-btn{
+    background:var(--accent-soft);
+    border-color:var(--accent-soft);
+    color:var(--accent);
+  }
+  .quick-hours button.more-btn:hover{
+    border-color:var(--accent);
+  }
+  .quick-hours button.more-btn.expanded{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+  }
+  .hour-grid.hidden{
+    display:none;
+  }
   .hour-grid{
     display:grid;
     grid-template-columns: repeat(auto-fill, minmax(28px, 1fr));
     gap:5px;
-    margin-bottom:6px;
+    margin-bottom:12px;
   }
   .hour-grid button{
     padding:6px 0;
@@ -111,18 +164,19 @@
   }
   .min-toggle{
     display:flex;
-    gap:5px;
+    gap:8px;
   }
   .min-toggle button{
     flex:1;
-    padding:7px 0;
+    padding:9px;
     border:1px solid var(--line);
-    border-radius:6px;
+    border-radius:8px;
     background:#fff;
     color:var(--ink);
-    font-size:12px;
+    font-size:13px;
     font-family:inherit;
     cursor:pointer;
+    transition: all 0.15s;
   }
   .min-toggle button:hover{ border-color:var(--accent); }
   .min-toggle button.active{
@@ -131,10 +185,23 @@
     color:#fff;
     font-weight:700;
   }
+  .result-divider{
+    border:none;
+    border-top:1px solid var(--line);
+    margin:22px 0 4px;
+  }
+  .result-label{
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-bottom:8px;
+  }
   .preview {
-    margin-top: 14px;
+    margin-top: 4px;
     padding: 12px;
-    background: var(--accent-soft);
+    background: #FFEFE8;
     border-radius: 9px;
     font-size: 14px;
     font-weight:600;
@@ -143,22 +210,25 @@
     word-break: keep-all;
   }
   .copy-btn {
-    margin-top: 10px;
+    margin-top: 14px;
     width: 100%;
-    padding: 11px;
+    padding: 16px;
     border: none;
-    border-radius: 8px;
-    background: var(--accent);
+    border-radius: 10px;
+    background: #FF6B4A;
     color: #fff;
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 700;
     cursor: pointer;
     font-family: inherit;
-    transition: opacity 0.15s;
+    box-shadow: 0 4px 14px rgba(255,107,74,0.35);
+    transition: opacity 0.15s, transform 0.1s;
   }
   .copy-btn:hover{ opacity:0.92; }
+  .copy-btn:active{ transform: scale(0.99); }
   .copy-btn.copied {
     background: #2F9E5B;
+    box-shadow: 0 4px 14px rgba(47,158,91,0.35);
   }
 </style>
 </head>
@@ -172,7 +242,8 @@
     <div class="date-display" id="dateDisplay">-</div>
 
     <label>시간</label>
-    <div class="hour-grid" id="hourGrid"></div>
+    <div class="quick-hours" id="quickHours"></div>
+    <div class="hour-grid hidden" id="hourGrid"></div>
     <div class="min-toggle" id="minToggle">
       <button type="button" data-min="0">:00</button>
       <button type="button" data-min="30">:30</button>
@@ -190,6 +261,8 @@
       <button class="toggle-btn" data-dir="end">🌙 종료/퇴근</button>
     </div>
 
+    <hr class="result-divider">
+    <div class="result-label">결과</div>
     <div class="preview" id="preview">-</div>
 
     <button class="copy-btn" id="copyBtn">문구 복사하기</button>
@@ -206,9 +279,43 @@
   const locGroup = document.getElementById('locGroup');
   const dirGroup = document.getElementById('dirGroup');
 
+  const quickHours = document.getElementById('quickHours');
+
   let currentLoc = 'home';   // home | office
   let currentDir = 'start';  // start | end
   const timeState = { hour: 9, min: 0 };
+
+  function selectHour(h){
+    timeState.hour = h;
+    document.querySelectorAll('#quickHours button, #hourGrid button').forEach(b=>{
+      b.classList.toggle('active', parseInt(b.dataset.hour) === h);
+    });
+    buildText();
+  }
+
+  // 자주 쓰는 시간: 8~10시(오전) / 17~19시(오후) + 더보기, 전부 같은 크기의 한 줄
+  const QUICK_GROUPS = [[8,9,10], [17,18,19]];
+  QUICK_GROUPS.forEach(hours => {
+    hours.forEach(h => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = `${h}시`;
+      btn.dataset.hour = h;
+      if (h === timeState.hour) btn.classList.add('active');
+      btn.addEventListener('click', () => selectHour(h));
+      quickHours.appendChild(btn);
+    });
+  });
+  const moreBtn = document.createElement('button');
+  moreBtn.type = 'button';
+  moreBtn.className = 'more-btn';
+  moreBtn.textContent = '더보기';
+  moreBtn.addEventListener('click', () => {
+    const isHidden = hourGrid.classList.toggle('hidden');
+    moreBtn.textContent = isHidden ? '더보기' : '접기';
+    moreBtn.classList.toggle('expanded', !isHidden);
+  });
+  quickHours.appendChild(moreBtn);
 
   // 오늘 날짜 고정
   const today = new Date();
@@ -218,18 +325,14 @@
   const dayName = days[today.getDay()];
   dateDisplay.textContent = `${y}년 ${m}월 ${d}일 (${dayName})`;
 
-  // 시간 버튼: 6~28시, 시 버튼 + 00/30 토글
+  // 전체 시간(6~27시) - "다른 시간 선택" 안에 작은 그리드로
   for (let h = 6; h <= 27; h++) {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.textContent = h;
     btn.dataset.hour = h;
     if (h === timeState.hour) btn.classList.add('active');
-    btn.addEventListener('click', () => {
-      timeState.hour = h;
-      hourGrid.querySelectorAll('button').forEach(b => b.classList.toggle('active', parseInt(b.dataset.hour) === h));
-      buildText();
-    });
+    btn.addEventListener('click', () => selectHour(h));
     hourGrid.appendChild(btn);
   }
   minToggle.querySelectorAll('button').forEach(btn => {
