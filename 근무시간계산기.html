@@ -1495,28 +1495,41 @@
     return endH >= 22;
   }
 
-  autoMatchBtn.addEventListener('click', ()=>{
-    const all = entries.filter(e=> !e.groupId && e.diffH !== 0);
-    // 1순위: 평일 + 심야·공휴일 아닌 일반 초과/단축근무끼리만 매칭 시도
-    const normalPool = all.filter(e=> !isWeekend(e.date) && !isNightShift(e) && !e.isHoliday);
-    let match = findZeroSumSubset(normalPool, 4);
-    let usedSpecial = false;
-
-    if(!match){
-      // 2순위(최후): 주말·심야·공휴일까지 포함해서 재시도
-      match = findZeroSumSubset(all, 4);
-      usedSpecial = true;
+  autoMatchBtn.addEventListener('click', async ()=>{
+    // 1순위: 평일 + 심야·공휴일 아닌 일반 근무끼리는 수당 배율 문제가 없으므로,
+    // 한 번의 클릭으로 찾을 수 있는 조합을 전부 찾아 바로 확정 (조합 하나 찾고 멈추지 않음)
+    let normalPool = entries.filter(e=> !e.groupId && e.diffH !== 0 && !isWeekend(e.date) && !isNightShift(e) && !e.isHoliday);
+    let groupsFormed = 0;
+    let entriesResolved = 0;
+    let match;
+    while((match = findZeroSumSubset(normalPool, 4))){
+      const gid = 'g' + Date.now() + Math.random().toString(36).slice(2, 6);
+      match.forEach(m=>{
+        const e = entries.find(en=> en.date === m.date);
+        if(e) e.groupId = gid;
+      });
+      groupsFormed++;
+      entriesResolved += match.length;
+      normalPool = normalPool.filter(e=> !match.some(m=> m.date === e.date));
     }
+    if(groupsFormed > 0) await save();
 
-    if(!match){
-      statusMsg.textContent = '합이 0이 되는 조합을 찾지 못했습니다';
-      return;
+    // 2순위(최후): 남은 것 중 주말·심야·공휴일까지 포함해야 맞는 조합은 수당 배율이 다를 수 있어
+    // 자동 확정하지 않고 선택만 해서 사용자가 확인 후 "짝으로 확정"을 누르도록 함
+    const remainingAll = entries.filter(e=> !e.groupId && e.diffH !== 0);
+    const specialMatch = findZeroSumSubset(remainingAll, 4);
+
+    let msg = '';
+    if(groupsFormed > 0){
+      msg = `일반 근무끼리 ${groupsFormed}건 조합(총 ${entriesResolved}건) 자동 상쇄 완료`;
     }
-    selectedDates = new Set(match.map(e=>e.date));
-    const includesSpecial = match.some(e=> isWeekend(e.date) || isNightShift(e) || e.isHoliday);
-    statusMsg.textContent = (usedSpecial && includesSpecial)
-      ? '일반 초과근무만으로는 못 찾아 주말/심야/공휴일근무를 포함했습니다 — 수당 배율이 다르니 확정 전 확인해주세요'
-      : '';
+    if(specialMatch){
+      selectedDates = new Set(specialMatch.map(e=> e.date));
+      msg += (msg ? ' · ' : '') + '주말/심야/공휴일 포함 조합도 발견 — 수당 배율이 다르니 확정 전 확인해주세요';
+    } else if(groupsFormed === 0){
+      msg = '합이 0이 되는 조합을 찾지 못했습니다';
+    }
+    statusMsg.textContent = msg;
     render();
   });
 
