@@ -596,8 +596,14 @@
   .entry-main{
     display:flex;
     align-items:center;
-    justify-content:space-between;
     gap:10px;
+  }
+  .entry-detail-row{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:8px;
+    padding-left:27px;
   }
   .entry.grouped{
     opacity:0.55;
@@ -633,8 +639,7 @@
   .entry .date{
     font-size:13px;
     font-weight:700;
-    width:68px;
-    flex-shrink:0;
+    flex:1;
   }
   .entry .detail{
     flex:1;
@@ -1460,13 +1465,15 @@
           <div class="entry-main">
             ${checkboxHtml}
             <div class="date">${formatMDDay(e.date)}</div>
+            <div class="diff ${diffClass}">${formatDiff(e.diffH)}</div>
+            <button class="del" data-date="${e.date}" title="삭제">×</button>
+          </div>
+          <div class="entry-detail-row">
             <div class="detail">
               <div class="times">${e.start}\u2013${e.end}</div>
               <div class="meta">${formatWorked(e.workedMin)}${e.noLunch ? ' · 점심 미차감' : ''}${e.breakTime > 0 ? ' · 휴게 ' + e.breakTime + 'h' : ''}${(e.isHoliday||isWeekend(e.date)) ? ' · 🎌휴일' : ''}</div>
             </div>
             ${groupBadgeHtml}
-            <div class="diff ${diffClass}">${formatDiff(e.diffH)}</div>
-            <button class="del" data-date="${e.date}" title="삭제">×</button>
           </div>
           ${reasonRowHtml}
         `;
