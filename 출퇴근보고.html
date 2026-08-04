@@ -29,7 +29,7 @@
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    padding: 20px 16px;
+    padding: 14px 16px;
   }
   .wrap{ width:100%; max-width:400px; }
   .eyebrow{
@@ -42,7 +42,7 @@
   }
   h1{
     font-size:19px;
-    margin:0 0 12px 0;
+    margin:0 0 8px 0;
     letter-spacing:-0.01em;
   }
   .title-emoji{
@@ -135,23 +135,24 @@
   .quick-hours{
     display:grid;
     grid-template-columns: repeat(7, 1fr);
-    gap:8px;
+    gap:5px;
     margin-bottom:16px;
   }
   .quick-hours.compact{
     grid-template-columns: repeat(4, 1fr);
   }
   .quick-hours button{
-    padding:9px 2px;
+    padding:9px 1px;
     border:1.5px solid var(--line);
     border-radius:9px;
     background:#fff;
     color:var(--ink);
-    font-size:13px;
+    font-size:12.5px;
     font-weight:700;
     font-family:inherit;
     font-variant-numeric:tabular-nums;
     cursor:pointer;
+    white-space:nowrap;
   }
   .quick-hours button:hover{ border-color:var(--accent); }
   .quick-hours button.active{
@@ -234,7 +235,7 @@
   .result-divider{
     border:none;
     border-top:1px solid var(--line);
-    margin:22px 0 4px;
+    margin:16px 0 4px;
   }
   .result-label{
     font-size:11px;
