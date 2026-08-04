@@ -250,11 +250,16 @@
   .parse-preview{
     margin-top:14px;
   }
-  .parse-summary{
+  .parse-header{
     font-size:13px;
     font-weight:700;
-    margin-bottom:8px;
+    padding:10px 12px;
+    margin-bottom:10px;
+    background:var(--accent-soft);
+    color:var(--ink);
+    border-radius:8px;
   }
+  .parse-list{ margin-bottom:2px; }
   .parse-row{
     display:flex;
     align-items:center;
@@ -277,6 +282,50 @@
     font-weight:700;
     flex-shrink:0;
   }
+  .parse-row.missing{
+    background:var(--accent-soft);
+    border-radius:8px;
+    padding:9px 10px;
+    margin-bottom:2px;
+    border-bottom:none;
+  }
+  .parse-row.leave{
+    background:rgba(232,162,74,0.10);
+    border-radius:8px;
+    padding:9px 10px;
+    margin-bottom:2px;
+    border-bottom:none;
+  }
+  .badge-holiday{
+    display:inline-block;
+    font-size:10px;
+    font-weight:700;
+    padding:2px 6px;
+    border-radius:999px;
+    background:rgba(232,162,74,0.16);
+    color:#B8792A;
+    margin-left:4px;
+  }
+  .badge-warn{
+    display:inline-block;
+    font-size:10px;
+    font-weight:700;
+    padding:2px 6px;
+    border-radius:999px;
+    background:var(--danger-soft);
+    color:var(--danger);
+    margin-left:4px;
+  }
+  .missing-add, .missing-skip{
+    font-size:11px;
+    padding:5px 8px;
+    border-radius:6px;
+    cursor:pointer;
+    font-family:inherit;
+    flex-shrink:0;
+  }
+  .missing-add{ border:1px solid var(--accent); background:var(--accent); color:#fff; }
+  .missing-skip{ border:1px solid var(--line); background:#fff; color:var(--ink-soft); }
   .parse-unparsed{
     margin-top:10px;
     padding:10px 12px;
@@ -286,19 +335,67 @@
     color:var(--danger);
     line-height:1.6;
   }
-  .parse-confirm-btn{
-    width:100%;
-    margin-top:12px;
-    padding:11px;
-    border:none;
+  .unparsed-fix-row{
+    margin-top:8px;
+    padding:10px 12px;
+    background:var(--danger-soft);
     border-radius:8px;
+  }
+  .unparsed-reason{
+    font-size:11px;
+    font-weight:700;
+    color:var(--danger);
+    margin-bottom:6px;
+  }
+  .unparsed-input-row{
+    display:flex;
+    gap:6px;
+    align-items:flex-start;
+  }
+  .unparsed-edit{
+    flex:1;
+    padding:8px 10px;
+    border:1px solid var(--line);
+    border-radius:7px;
+    font-size:12px;
+    font-family:inherit;
+    color:var(--ink);
+    background:#fff;
+    resize:vertical;
+    line-height:1.5;
+  }
+  .unparsed-edit:focus{
+    outline:2px solid var(--accent);
+    outline-offset:1px;
+  }
+  .unparsed-retry{
+    flex-shrink:0;
+    padding:8px 12px;
+    border:none;
+    border-radius:7px;
     background:var(--accent);
     color:#fff;
-    font-size:13px;
+    font-size:12px;
+    font-weight:700;
+    cursor:pointer;
+    font-family:inherit;
+    align-self:stretch;
+  }
+  .unparsed-retry:hover{ opacity:0.9; }
+  .parse-confirm-btn{
+    width:100%;
+    margin-top:14px;
+    padding:9px;
+    border:1px solid var(--accent);
+    border-radius:8px;
+    background:#fff;
+    color:var(--accent);
+    font-size:12.5px;
     font-weight:700;
     cursor:pointer;
     font-family:inherit;
   }
+  .parse-confirm-btn:hover{ background:var(--accent-soft); }
   button.primary{
     width:100%;
     margin-top:18px;
@@ -314,84 +411,6 @@
   }
   button.primary:hover{ opacity:0.92; }
   button.primary:disabled{ opacity:0.5; cursor:not-allowed; }
-
-  .summary{
-    background:var(--ink);
-    color:#fff;
-    border-radius:14px;
-    padding:24px;
-    text-align:center;
-    margin-bottom:16px;
-  }
-  .summary .face{
-    font-size:40px;
-    line-height:1;
-    margin-bottom:12px;
-  }
-  .summary .big-stats{
-    display:flex;
-    gap:12px;
-  }
-  .summary .big-stat{
-    flex:1;
-    background:rgba(255,255,255,0.06);
-    border-radius:12px;
-    padding:16px 8px;
-  }
-  .summary .big-stat-label{
-    font-size:12px;
-    letter-spacing:0.08em;
-    color:#9DAAA3;
-    margin-bottom:6px;
-  }
-  .summary .big-stat-value{
-    font-size:28px;
-    font-weight:700;
-    font-variant-numeric:tabular-nums;
-  }
-  .summary .big-stat.over .big-stat-value{ color:#E8C97A; }
-  .summary .big-stat.under .big-stat-value{ color:#8FB8E8; }
-  .summary .hint{
-    margin-top:14px;
-    font-size:12px;
-    color:#8B9691;
-  }
-  .summary .hint.warn{
-    color:#E8A08E;
-    font-weight:700;
-  }
-  .date-chips{
-    margin-top:12px;
-    text-align:left;
-  }
-  .date-chips:empty{ display:none; margin:0; }
-  .date-chips .chip-label{
-    font-size:11px;
-    font-weight:700;
-    color:#9DAAA3;
-    margin-bottom:6px;
-  }
-  .date-chips .chip-row{
-    display:flex;
-    flex-wrap:wrap;
-    gap:6px;
-  }
-  .date-chips .chip{
-    font-size:12px;
-    font-weight:700;
-    padding:5px 9px;
-    border-radius:999px;
-    font-variant-numeric:tabular-nums;
-    white-space:nowrap;
-  }
-  .date-chips .chip.over{
-    background:rgba(232,201,122,0.16);
-    color:#E8C97A;
-  }
-  .date-chips .chip.under{
-    background:rgba(232,160,142,0.16);
-    color:#E8A08E;
-  }
 
   .pair-bar{
     display:none;
@@ -505,6 +524,53 @@
     background:var(--danger);
     border-color:var(--danger);
   }
+  .group-summary-toggle{
+    width:100%;
+    padding:8px 0;
+    margin-bottom:8px;
+    border:1px solid var(--line);
+    border-radius:7px;
+    background:#fff;
+    color:var(--ink-soft);
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .group-summary-toggle:hover{ border-color:var(--accent); }
+  .group-summary{
+    display:none;
+    margin-bottom:12px;
+  }
+  .group-summary.show{ display:block; }
+  .group-summary-item{
+    background:var(--accent-soft);
+    border-radius:8px;
+    padding:9px 12px;
+    margin-bottom:6px;
+    font-size:12px;
+  }
+  .group-summary-item .gsum-members{
+    color:var(--ink);
+  }
+  .group-summary-item .gsum-total{
+    margin-top:3px;
+    font-weight:700;
+    color:#2F9E5B;
+    font-size:11.5px;
+  }
+  .group-summary-empty{
+    font-size:12px;
+    color:var(--ink-soft);
+    text-align:center;
+    padding:12px 0;
+  }
+  .group-summary-item.pending{
+    background:var(--danger-soft);
+  }
+  .gsum-total.pending{
+    color:var(--danger);
+  }
   .auto-match-btn{
     width:100%;
     padding:10px;
@@ -530,8 +596,14 @@
   .entry-main{
     display:flex;
     align-items:center;
-    justify-content:space-between;
     gap:10px;
+  }
+  .entry-detail-row{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:8px;
+    padding-left:27px;
   }
   .entry.grouped{
     opacity:0.55;
@@ -567,8 +639,7 @@
   .entry .date{
     font-size:13px;
     font-weight:700;
-    width:68px;
-    flex-shrink:0;
+    flex:1;
   }
   .entry .detail{
     flex:1;
@@ -610,12 +681,14 @@
     display:flex;
     gap:6px;
     align-items:center;
+    margin-bottom:6px;
   }
+  .entry-reason.editing{ margin-bottom:0; }
   .entry-reason input{
     flex:1;
     min-width:0;
     padding:7px 9px;
-    border:1px solid var(--line);
+    border:1px solid var(--accent);
     border-radius:6px;
     font-size:12px;
     font-family:inherit;
@@ -626,23 +699,72 @@
     outline:2px solid var(--accent);
     outline-offset:1px;
   }
-  .entry-reason .copy-reason-btn{
+  .reason-preview{
+    flex:1;
+    min-width:0;
+    font-size:12px;
+    color:var(--ink-soft);
+    padding:2px 0;
+    word-break:break-word;
+    line-height:1.5;
+  }
+  .entry-actions{
+    display:flex;
+    gap:6px;
+  }
+  .entry-actions button{
     flex-shrink:0;
     padding:7px 10px;
     border-radius:6px;
-    border:1px solid var(--accent);
-    background:var(--accent-soft);
-    color:var(--accent);
     font-size:11.5px;
     font-weight:700;
     cursor:pointer;
     font-family:inherit;
     white-space:nowrap;
   }
-  .entry-reason .copy-reason-btn.copied{
+  .reason-edit-btn{
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--ink-soft);
+  }
+  .reason-save-btn{
+    flex-shrink:0;
+    padding:7px 12px;
+    border-radius:6px;
+    border:none;
+    background:var(--accent);
+    color:#fff;
+    font-size:12px;
+    font-weight:700;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .copy-reason-btn{
+    border:1px solid var(--accent);
+    background:var(--accent-soft);
+    color:var(--accent);
+  }
+  .copy-reason-btn.copied{
     background:#2F9E5B;
     border-color:#2F9E5B;
     color:#fff;
+  }
+  .upload-done-btn{
+    border:1px solid #8B7FD6;
+    background:rgba(139,127,214,0.08);
+    color:#6C5CC4;
+    margin-left:auto;
+  }
+  .upload-done-btn.active{
+    border-color:#6C5CC4;
+    background:#6C5CC4;
+    color:#fff;
+  }
+  .entry.uploaded-done{ opacity:0.5; }
+  .entry.uploaded-done .date,
+  .entry.uploaded-done .times,
+  .entry.uploaded-done .diff{
+    text-decoration:line-through;
   }
   .empty{
     text-align:center;
@@ -681,23 +803,6 @@
   <h1>순 근무 시간 체크</h1>
   <p class="sub">일 8시간 기준 +/- 를 날짜별로 쌓아서 상쇄 확인</p>
 
-  <div class="summary">
-    <div class="face" id="summaryFace">😊</div>
-    <div class="big-stats">
-      <div class="big-stat over">
-        <div class="big-stat-label">초과 근무</div>
-        <div class="big-stat-value" id="overtimeValue">0h</div>
-      </div>
-      <div class="big-stat under">
-        <div class="big-stat-label">단축 근무</div>
-        <div class="big-stat-value" id="undertimeValue">0h</div>
-      </div>
-    </div>
-    <div class="date-chips" id="overtimeDates"></div>
-    <div class="date-chips" id="undertimeDates"></div>
-    <div class="hint" id="summaryHint">기록을 추가하면 계산됩니다</div>
-  </div>
-
   <div class="card">
     <div class="field">
       <label>📋 근무 내역을 알려주세요</label>
@@ -727,28 +832,40 @@
       <button type="button" data-filter="over">초과만</button>
       <button type="button" data-filter="under">단축만</button>
     </div>
+    <button type="button" id="groupSummaryToggle" class="group-summary-toggle">🧮 상쇄 내역 보기(검산용)</button>
+    <div id="groupSummary" class="group-summary"></div>
     <div id="entryList"><div class="empty">기록이 없습니다</div></div>
   </div>
 
   <div class="status" id="statusMsg"></div>
 
   <div class="footnote">
-    계산식 · 근무시간 = 종료−시작 − 점심 1시간(기본, "점심 없이"/"점없근" 있으면 미차감) − 휴게시간 · 시작 시각 없으면 9:00 시작, 주말은 점심 자동 미차감<br>
+    계산식 · 근무시간 = 종료−시작 − 점심 1시간(기본, "점심 없이"/"점없근" 있으면 미차감) − 휴게시간 · 시작 시각 없으면 9:00 시작<br>
+    주말·"공휴일" 표기는 점심 자동 미차감 + 자동 짝짓기 후순위 + 8시간 기준 비교 없이 일한 시간 전체가 그대로 초과근무로 계산<br>
     체크박스로 날짜를 골라 합이 0이 되면 "짝으로 확정" — 확정된 묶음은 위 초과/단축 합계에서 빠집니다.<br>
     <button id="clearAllBtn">전체 기록 초기화</button>
   </div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script>
-  const STORAGE_KEY = 'worklog-entries';
+  const firebaseConfig = {
+    apiKey: "AIzaSyCpFYkfBS0o57Hs2QfqaHSKojRA7xf0mIo",
+    authDomain: "choidea-univ.firebaseapp.com",
+    projectId: "choidea-univ",
+    storageBucket: "choidea-univ.firebasestorage.app",
+    messagingSenderId: "814177175154",
+    appId: "1:814177175154:web:17eb4b40a09074ec93a4eb",
+    measurementId: "G-VS1CCG8GTR"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const worklogDocRef = db.collection('worklog').doc('entries');
+</script>
+<script>
 
   const entryList = document.getElementById('entryList');
-  const summaryFace = document.getElementById('summaryFace');
-  const overtimeValue = document.getElementById('overtimeValue');
-  const undertimeValue = document.getElementById('undertimeValue');
-  const overtimeDatesEl = document.getElementById('overtimeDates');
-  const undertimeDatesEl = document.getElementById('undertimeDates');
-  const summaryHint = document.getElementById('summaryHint');
   const statusMsg = document.getElementById('statusMsg');
   const clearAllBtn = document.getElementById('clearAllBtn');
   const autoMatchBtn = document.getElementById('autoMatchBtn');
@@ -770,8 +887,70 @@
     });
   });
 
+  const groupSummaryToggle = document.getElementById('groupSummaryToggle');
+  const groupSummaryEl = document.getElementById('groupSummary');
+  let groupSummaryOpen = false;
+  groupSummaryToggle.addEventListener('click', ()=>{
+    groupSummaryOpen = !groupSummaryOpen;
+    render();
+  });
+
+  function renderGroupSummary(){
+    groupSummaryToggle.textContent = groupSummaryOpen ? '🧮 상쇄 내역 접기' : '🧮 상쇄 내역 보기(검산용)';
+    groupSummaryEl.classList.toggle('show', groupSummaryOpen);
+    if(!groupSummaryOpen) return;
+
+    const scoped = monthFilter === 'all' ? entries : entries.filter(e=> monthKey(e.date) === monthFilter);
+    const grouped = scoped.filter(e=> e.groupId);
+    const byGroup = {};
+    grouped.forEach(e=> { (byGroup[e.groupId] = byGroup[e.groupId] || []).push(e); });
+    const groups = Object.values(byGroup)
+      .map(g=> g.slice().sort((a,b)=> a.date.localeCompare(b.date)))
+      .sort((a,b)=> a[0].date.localeCompare(b[0].date));
+
+    let html = groups.map(g=>{
+      const sum = Math.round(g.reduce((s,e)=> s+e.diffH, 0) * 2) / 2;
+      const members = g.map(e=> `${formatMDDay(e.date)} ${formatDiff(e.diffH)}`).join(' + ');
+      return `<div class="group-summary-item">
+        <div class="gsum-members">${members}</div>
+        <div class="gsum-total">= ${formatDiff(sum)} ${sum === 0 ? '✓' : '⚠️ 검산 불일치'}</div>
+      </div>`;
+    }).join('');
+
+    // 합은 0이 되지만 주말/심야/공휴일이 껴서 아직 확정하지 않은 조합도 찾아서 보여줌 (검산용)
+    let remainingPool = scoped.filter(e=> !e.groupId && e.diffH !== 0);
+    let possible;
+    while((possible = findZeroSumSubset(remainingPool, 4))){
+      const sum = Math.round(possible.reduce((s,e)=> s+e.diffH, 0) * 2) / 2;
+      const members = possible.map(e=> `${formatMDDay(e.date)} ${formatDiff(e.diffH)}`).join(' + ');
+      const reasonTags = new Set();
+      possible.forEach(e=>{
+        if(isWeekend(e.date)) reasonTags.add('주말');
+        if(isNightShift(e)) reasonTags.add('심야');
+        if(e.isHoliday) reasonTags.add('공휴일');
+      });
+      const reasonText = reasonTags.size > 0 ? [...reasonTags].join('/') + '근무라' : '수당 배율이 달라서';
+      html += `<div class="group-summary-item pending">
+        <div class="gsum-members">${members}</div>
+        <div class="gsum-total pending">= ${formatDiff(sum)} · 🔸 ${reasonText} 합산하지 않았어요 — 확인 후 직접 확정해주세요</div>
+      </div>`;
+      remainingPool = remainingPool.filter(e=> !possible.some(p=> p.date === e.date));
+    }
+
+    if(!html){
+      groupSummaryEl.innerHTML = '<div class="group-summary-empty">확정된 상쇄 묶음이 없습니다</div>';
+      return;
+    }
+    groupSummaryEl.innerHTML = html;
+  }
+
   let entries = [];
   let selectedDates = new Set();
+  let editingReasonDates = new Set();
+
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, ch=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  }
   const now = new Date();
   let monthFilter = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`; // 'YYYY-MM' or 'all'
 
@@ -837,29 +1016,46 @@
     const lines = text.split('\n').map(l=>l.trim()).filter(l=>l.length>0);
     const dateData = {};
     const unparsed = [];
+    const leaves = [];
     const currentYear = new Date().getFullYear();
 
     lines.forEach(line=>{
       const dateMatch = line.match(/(\d{1,2})\s*\/\s*(\d{1,2})/);
       if(!dateMatch){
-        unparsed.push(line);
-        return;
-      }
-      // 괄호 안 내용("(수)" 요일, "(9:30 시작, ...)" 부가정보)은 본문 판단에서 제외
-      const bareLine = line.replace(/\([^)]*\)/g, '').trim();
-      const timeMatch = bareLine.match(/(\d{1,2}):(\d{2})/) || line.match(/(\d{1,2}):(\d{2})/);
-      if(!timeMatch){
-        unparsed.push(line);
+        unparsed.push({ raw: line, reason: '날짜를 찾지 못함', date: null });
         return;
       }
       const mo = parseInt(dateMatch[1]);
       const da = parseInt(dateMatch[2]);
       const dateKey = `${currentYear}-${String(mo).padStart(2,'0')}-${String(da).padStart(2,'0')}`;
+      // 날짜 바로 뒤 괄호에 적힌 요일("7/1(수)")이 실제 요일과 다르면 불일치로 표시 (날짜/요일 중 뭐가 틀렸는지는 알 수 없어 경고만)
+      let dowMismatch = null;
+      const afterDate = line.slice(dateMatch.index + dateMatch[0].length);
+      const dowInParen = afterDate.match(/^\s*\(([월화수목금토일])\)/);
+      if(dowInParen){
+        const actualDow = DAY_NAMES[new Date(dateKey + 'T00:00:00').getDay()];
+        if(dowInParen[1] !== actualDow){
+          dowMismatch = { stated: dowInParen[1], actual: actualDow };
+        }
+      }
+      // 괄호 안 내용("(수)" 요일, "(9:30 시작, ...)" 부가정보)은 본문 판단에서 제외
+      const bareLine = line.replace(/\([^)]*\)/g, '').trim();
+      const timeMatch = bareLine.match(/(\d{1,2}):(\d{2})/) || line.match(/(\d{1,2}):(\d{2})/);
+      if(!timeMatch){
+        if(/휴가|연차|반차/.test(bareLine)){
+          // 휴가는 원래 시각이 없는 게 정상 — 인식 실패가 아니라 "휴가로 표시"로 분리
+          leaves.push({ date: dateKey, raw: line, dowMismatch });
+        } else {
+          unparsed.push({ raw: line, reason: '시각을 찾지 못함', date: dateKey, dowMismatch });
+        }
+        return;
+      }
       const eventTime = `${parseInt(timeMatch[1])}:${timeMatch[2]}`;
 
-      if(!dateData[dateKey]) dateData[dateKey] = { startTime:null, endTime:null, breakH:0, noLunch:false, extraSegs:[], rawLines:[] };
+      if(!dateData[dateKey]) dateData[dateKey] = { startTime:null, endTime:null, breakH:0, noLunch:false, isHoliday:false, dowMismatch:null, extraSegs:[], rawLines:[] };
       const d = dateData[dateKey];
       d.rawLines.push(line);
+      if(dowMismatch && !d.dowMismatch) d.dowMismatch = dowMismatch;
 
       // "8:00-13:00"처럼 시간 범위를 그냥 붙여쓴 경우 우선 처리 (괄호 안 "추가 근무" 구간과 헷갈리지 않도록 괄호 제외한 본문에서만 탐색)
       const rangeMatch = bareLine.match(/(\d{1,2}):(\d{2})\s*[~\-]\s*(\d{1,2}):(\d{2})/);
@@ -872,9 +1068,10 @@
         if(/종료|퇴근|직퇴/.test(bareLine)) d.endTime = eventTime;
       }
       if(/점심\s*없이|점없근/.test(line)) d.noLunch = true;
+      if(/휴일/.test(line)) d.isHoliday = true;
 
       const parenGroups = [...line.matchAll(/\(([^)]*)\)/g)].map(m=>m[1]);
-      const p = parenGroups.find(g=> /시작|휴게|추가|없이|점없근/.test(g));
+      const p = parenGroups.find(g=> /시작|휴게|추가|없이|점없근|휴일/.test(g));
       if(p){
         const startInParen = p.match(/(\d{1,2}):(\d{2})\s*시작/);
         if(startInParen) d.startTime = `${parseInt(startInParen[1])}:${startInParen[2]}`;
@@ -885,6 +1082,7 @@
           d.extraSegs.push([`${parseInt(extraMatch[1])}:${extraMatch[2]}`, `${parseInt(extraMatch[3])}:${extraMatch[4]}`]);
         }
         if(/점심\s*없이|점없근/.test(p)) d.noLunch = true;
+        if(/휴일/.test(p)) d.isHoliday = true;
       }
     });
 
@@ -893,16 +1091,16 @@
       const d = dateData[dateKey];
       if(!d.startTime) d.startTime = '9:00'; // 시작 시각 없으면 9시 시작으로 간주
       if(!d.endTime){
-        unparsed.push(`${formatMDDay(dateKey)}: ${d.rawLines.join(' / ')} — 종료 시각을 찾지 못함`);
+        unparsed.push({ raw: d.rawLines.join('\n'), reason: `종료 시각을 찾지 못함`, date: dateKey, dowMismatch: d.dowMismatch });
         return;
       }
       const raw = toMinutes(d.endTime) - toMinutes(d.startTime);
       if(raw <= 0){
-        unparsed.push(`${formatMDDay(dateKey)}: ${d.rawLines.join(' / ')} — 종료가 시작보다 빠름`);
+        unparsed.push({ raw: d.rawLines.join('\n'), reason: `종료가 시작보다 빠름`, date: dateKey, dowMismatch: d.dowMismatch });
         return;
       }
       const weekend = isWeekend(dateKey);
-      const noLunch = d.noLunch || weekend; // 주말은 자동으로 점심 차감 안 함
+      const noLunch = d.noLunch || weekend || d.isHoliday; // 주말·공휴일은 자동으로 점심 차감 안 함
       const lunchDeduct = noLunch ? 0 : 60;
       const breakDeduct = d.breakH * 60;
       let extraMin = 0;
@@ -913,26 +1111,31 @@
       });
       const workedMin = raw - lunchDeduct - breakDeduct + extraMin;
       const workedH = Math.round((workedMin/60)*2)/2;
-      const diffH = Math.round((workedH - 8)*2)/2;
+      // 평일은 8시간 기준 대비 증감, 주말·공휴일은 '8시간 근무를 하는 날'이 아니므로 일한 시간 전체가 그대로 초과근무
+      const diffH = (weekend || d.isHoliday) ? workedH : Math.round((workedH - 8)*2)/2;
       results.push({
         date: dateKey, start: d.startTime, end: d.endTime,
-        noLunch: noLunch, breakTime: d.breakH,
-        workedMin, workedH, diffH, groupId: null, reason: '',
+        noLunch: noLunch, breakTime: d.breakH, isHoliday: d.isHoliday, dowMismatch: d.dowMismatch,
+        workedMin, workedH, diffH, groupId: null, reason: '', uploaded: false,
         note: extraNote.trim()
       });
     });
 
-    return { results, unparsed };
+    return { results, unparsed, leaves };
   }
 
   let missingDates = [];
+  let leaveMarks = [];
 
   function dateRangeArray(minKey, maxKey){
     const days = [];
     let cur = new Date(minKey + 'T00:00:00');
     const end = new Date(maxKey + 'T00:00:00');
     while(cur <= end){
-      days.push(cur.toISOString().slice(0,10));
+      const y = cur.getFullYear();
+      const m = String(cur.getMonth()+1).padStart(2,'0');
+      const dd = String(cur.getDate()).padStart(2,'0');
+      days.push(`${y}-${m}-${dd}`); // toISOString은 UTC 변환 과정에서 시간대에 따라 하루 밀리는 버그가 있어 로컬 값으로 직접 조합
       cur.setDate(cur.getDate() + 1);
     }
     return days;
@@ -942,55 +1145,191 @@
     // 9~18시, 점심 1시간 차감 = 8시간 (기본 근무, 증감 0)
     return {
       date: dateKey, start: '9:00', end: '18:00',
-      noLunch: false, breakTime: 0,
+      noLunch: false, breakTime: 0, isHoliday: false, dowMismatch: null,
       workedMin: 480, workedH: 8, diffH: 0,
-      groupId: null, reason: '', note: ''
+      groupId: null, reason: '', uploaded: false, note: ''
     };
   }
 
-  function renderParsePreview(unparsed){
-    let html = '';
-    if(parsedResults.length > 0){
-      html += `<div class="parse-preview"><div class="parse-summary">✅ EW 분석 완료! ${parsedResults.length}건 인식됨 — ${new Date().getFullYear()}년 기준</div>`;
-      parsedResults.slice().sort((a,b)=>a.date.localeCompare(b.date)).forEach(r=>{
-        const conflict = entries.some(e=> e.date === r.date);
-        const diffClass = r.diffH === 0 ? 'zero' : (r.diffH > 0 ? 'plus' : 'minus');
-        html += `
-          <div class="parse-row">
-            <div class="pdate">${formatMDDay(r.date)}</div>
-            <div class="pdetail">${r.start}\u2013${r.end}${r.breakTime>0?' · 휴게 '+r.breakTime+'h':''}${r.noLunch?' · 점심미차감':''}${r.note?' · '+r.note:''}</div>
-            <div class="pdiff ${diffClass}">${formatDiff(r.diffH)}</div>
-            ${conflict ? '<div class="pconflict">덮어씀</div>' : ''}
-          </div>`;
-      });
-      html += `<button class="parse-confirm-btn" id="parseConfirmBtn">${parsedResults.length}건 일괄 추가</button>`;
-      html += `</div>`;
-    }
-    if(missingDates.length > 0){
-      html += `<div class="parse-unparsed" style="background:var(--accent-soft); color:var(--ink);">
-        ⚠️ 기록 없는 평일 ${missingDates.length}건 (주말 제외 — 공휴일은 직접 걸러주세요)</div>`;
-      missingDates.forEach(d=>{
-        html += `
-          <div class="parse-row">
-            <div class="pdate">${formatMDDay(d)}</div>
-            <div class="pdetail">기록 없음</div>
-            <div style="display:flex; gap:6px; flex-shrink:0;">
-              <button type="button" class="missing-add" data-date="${d}" style="font-size:11px; padding:5px 8px; border-radius:6px; border:1px solid var(--accent); background:var(--accent); color:#fff; cursor:pointer; font-family:inherit;">9~18 추가</button>
-              <button type="button" class="missing-skip" data-date="${d}" style="font-size:11px; padding:5px 8px; border-radius:6px; border:1px solid var(--line); background:#fff; color:var(--ink-soft); cursor:pointer; font-family:inherit;">건너뛰기(휴가 등)</button>
-            </div>
-          </div>`;
-      });
-    }
-    if(unparsed && unparsed.length > 0){
-      html += `<div class="parse-unparsed">인식 못한 줄 (직접 확인해주세요)<br>${unparsed.map(u=>'· '+u).join('<br>')}</div>`;
-    }
-    if(parsedResults.length === 0 && missingDates.length === 0 && (!unparsed || unparsed.length === 0)){
-      html = '<div class="parse-unparsed">인식된 내용이 없습니다</div>';
-    }
-    parsePreview.innerHTML = html;
+  let unparsedItems = [];
 
-    const confirmBtn = document.getElementById('parseConfirmBtn');
-    if(confirmBtn){
+  function buildParsedRow(r){
+    const conflict = entries.some(e=> e.date === r.date);
+    const diffClass = r.diffH === 0 ? 'zero' : (r.diffH > 0 ? 'plus' : 'minus');
+    const row = document.createElement('div');
+    row.className = 'parse-row';
+    row.innerHTML = `
+      <div class="pdate">${formatMDDay(r.date)}</div>
+      <div class="pdetail">${r.start}\u2013${r.end}${r.breakTime>0?' · 휴게 '+r.breakTime+'h':''}${r.noLunch?' · 점심미차감':''}${r.note?' · '+r.note:''}${(r.isHoliday||isWeekend(r.date))?' <span class="badge-holiday">🎌휴일</span>':''}${r.dowMismatch?` <span class="badge-warn">⚠️ ${r.dowMismatch.stated}요일로 적으셨는데 실제로는 ${r.dowMismatch.actual}요일이에요</span>`:''}</div>
+      <div class="pdiff ${diffClass}">${formatDiff(r.diffH)}</div>
+      ${conflict ? '<div class="pconflict">덮어씀</div>' : ''}
+    `;
+    return row;
+  }
+
+  function buildMissingRow(d){
+    const row = document.createElement('div');
+    row.className = 'parse-row missing';
+    row.innerHTML = `
+      <div class="pdate">${formatMDDay(d)}</div>
+      <div class="pdetail">⚠️ 기록 없음</div>
+    `;
+    const btnWrap = document.createElement('div');
+    btnWrap.style.cssText = 'display:flex; gap:6px; flex-shrink:0;';
+    const addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.className = 'missing-add';
+    addBtn.textContent = '9~18 추가';
+    addBtn.addEventListener('click', ()=>{
+      parsedResults.push(makeStandardEntry(d));
+      missingDates = missingDates.filter(md=> md !== d);
+      renderParsePreview();
+    });
+    const skipBtn = document.createElement('button');
+    skipBtn.type = 'button';
+    skipBtn.className = 'missing-skip';
+    skipBtn.textContent = '건너뛰기(휴가 등)';
+    skipBtn.addEventListener('click', ()=>{
+      missingDates = missingDates.filter(md=> md !== d);
+      renderParsePreview();
+    });
+    btnWrap.appendChild(addBtn);
+    btnWrap.appendChild(skipBtn);
+    row.appendChild(btnWrap);
+    return row;
+  }
+
+  // 인식 못한 줄: 텍스트를 직접 고쳐서 그 줄만 다시 분석할 수 있는 인라인 편집 UI (DOM으로 안전하게 생성)
+  function buildUnparsedFixRow(item){
+    const row = document.createElement('div');
+    row.className = 'unparsed-fix-row';
+
+    const reasonEl = document.createElement('div');
+    reasonEl.className = 'unparsed-reason';
+    reasonEl.textContent = (item.date ? formatMDDay(item.date) + ' · ' : '') + (item.reason || '인식 실패')
+      + (item.dowMismatch ? ` · ⚠️ ${item.dowMismatch.stated}요일로 적으셨는데 실제로는 ${item.dowMismatch.actual}요일이에요` : '');
+    row.appendChild(reasonEl);
+
+    const inputRow = document.createElement('div');
+    inputRow.className = 'unparsed-input-row';
+
+    const ta = document.createElement('textarea');
+    ta.className = 'unparsed-edit';
+    ta.rows = item.raw.split('\n').length;
+    ta.value = item.raw;
+    inputRow.appendChild(ta);
+
+    const retryBtn = document.createElement('button');
+    retryBtn.type = 'button';
+    retryBtn.className = 'unparsed-retry';
+    retryBtn.textContent = '재분석';
+    retryBtn.addEventListener('click', ()=>{
+      const fixedText = ta.value.trim();
+      if(!fixedText) return;
+      const realIdx = unparsedItems.indexOf(item);
+      const { results: fixedResults, unparsed: stillUnparsed, leaves: fixedLeaves } = parsePastedText(fixedText);
+      if(fixedResults.length > 0){
+        // 성공 — parsedResults에 병합하고 이 항목 제거
+        fixedResults.forEach(r=>{
+          const existIdx = parsedResults.findIndex(p=> p.date === r.date);
+          if(existIdx >= 0) parsedResults[existIdx] = r; else parsedResults.push(r);
+        });
+        unparsedItems.splice(realIdx, 1);
+      } else if(fixedLeaves.length > 0){
+        // 휴가로 인식됨 — leaveMarks로 이동
+        fixedLeaves.forEach(l=>{
+          if(!leaveMarks.some(x=> x.date === l.date)) leaveMarks.push(l);
+        });
+        unparsedItems.splice(realIdx, 1);
+      } else {
+        // 여전히 실패 — 사유만 갱신
+        const reason = stillUnparsed[0] ? stillUnparsed[0].reason : '여전히 인식 실패';
+        const date = stillUnparsed[0] ? stillUnparsed[0].date : item.date;
+        unparsedItems[realIdx] = { raw: fixedText, reason, date };
+      }
+      renderParsePreview();
+    });
+    inputRow.appendChild(retryBtn);
+    row.appendChild(inputRow);
+    return row;
+  }
+
+  function buildLeaveRow(item){
+    const row = document.createElement('div');
+    row.className = 'parse-row leave';
+    row.innerHTML = `
+      <div class="pdate">${formatMDDay(item.date)}</div>
+      <div class="pdetail">🏖️ 휴가로 표시됨 · 근무기록 없이 넘어감${item.dowMismatch?` · <span class="badge-warn">⚠️ ${item.dowMismatch.stated}요일로 적으셨는데 실제로는 ${item.dowMismatch.actual}요일이에요</span>`:''}</div>
+    `;
+    const undoBtn = document.createElement('button');
+    undoBtn.type = 'button';
+    undoBtn.className = 'missing-skip';
+    undoBtn.textContent = '취소';
+    undoBtn.addEventListener('click', ()=>{
+      leaveMarks = leaveMarks.filter(l=> l.date !== item.date);
+      unparsedItems.push({ raw: item.raw, reason: '시각을 찾지 못함', date: item.date });
+      renderParsePreview();
+    });
+    row.appendChild(undoBtn);
+    return row;
+  }
+
+  function renderParsePreview(){
+    parsePreview.innerHTML = '';
+    const totalCount = parsedResults.length + missingDates.length + unparsedItems.length + leaveMarks.length;
+    if(totalCount === 0){
+      parsePreview.innerHTML = '<div class="parse-unparsed">인식된 내용이 없습니다</div>';
+      return;
+    }
+
+    const container = document.createElement('div');
+    container.className = 'parse-preview';
+
+    const header = document.createElement('div');
+    header.className = 'parse-header';
+    header.textContent = `✅ EW 분석 완료! ${parsedResults.length}건 인식됨 — ${new Date().getFullYear()}년 기준`;
+    container.appendChild(header);
+
+    // 날짜 자체를 못 찾은 줄 — 순서상 배치가 불가능하므로 맨 먼저 따로 보여줌
+    const datelessUnparsed = unparsedItems.filter(u=> !u.date);
+    if(datelessUnparsed.length > 0){
+      const note = document.createElement('div');
+      note.className = 'parse-unparsed';
+      note.textContent = `날짜를 알 수 없는 줄 ${datelessUnparsed.length}건 — 아래에서 직접 고쳐 "재분석"을 눌러주세요`;
+      container.appendChild(note);
+      datelessUnparsed.forEach(item=> container.appendChild(buildUnparsedFixRow(item)));
+    }
+
+    // 나머지는 전부 날짜순 한 리스트로: 정상 인식 / 빈 평일 / 날짜는 있지만 깨진 줄
+    const dateSet = new Set();
+    parsedResults.forEach(r=> dateSet.add(r.date));
+    missingDates.forEach(d=> dateSet.add(d));
+    unparsedItems.forEach(u=> { if(u.date) dateSet.add(u.date); });
+    leaveMarks.forEach(l=> dateSet.add(l.date));
+    const sortedDates = [...dateSet].sort();
+
+    if(sortedDates.length > 0){
+      const list = document.createElement('div');
+      list.className = 'parse-list';
+      sortedDates.forEach(date=>{
+        const result = parsedResults.find(r=> r.date === date);
+        if(result){ list.appendChild(buildParsedRow(result)); return; }
+        const leaveItem = leaveMarks.find(l=> l.date === date);
+        if(leaveItem){ list.appendChild(buildLeaveRow(leaveItem)); return; }
+        const brokenItem = unparsedItems.find(u=> u.date === date);
+        if(brokenItem){ list.appendChild(buildUnparsedFixRow(brokenItem)); return; }
+        if(missingDates.includes(date)){ list.appendChild(buildMissingRow(date)); }
+      });
+      container.appendChild(list);
+    }
+
+    // 확인이 끝난 다음 실행하는 동작이라 서브 버튼 느낌으로 맨 아래에
+    if(parsedResults.length > 0){
+      const confirmBtn = document.createElement('button');
+      confirmBtn.type = 'button';
+      confirmBtn.className = 'parse-confirm-btn';
+      confirmBtn.id = 'parseConfirmBtn';
+      confirmBtn.textContent = `${parsedResults.length}건 일괄 추가`;
       confirmBtn.addEventListener('click', async ()=>{
         const conflictCount = parsedResults.filter(r=> entries.some(e=>e.date===r.date)).length;
         if(conflictCount > 0){
@@ -1009,26 +1348,16 @@
         await save();
         parsedResults = [];
         missingDates = [];
+        unparsedItems = [];
+        leaveMarks = [];
         pasteInput.value = '';
         parsePreview.innerHTML = '';
         render();
       });
+      container.appendChild(confirmBtn);
     }
-    parsePreview.querySelectorAll('.missing-add').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        const d = btn.dataset.date;
-        parsedResults.push(makeStandardEntry(d));
-        missingDates = missingDates.filter(md=> md !== d);
-        renderParsePreview(unparsed);
-      });
-    });
-    parsePreview.querySelectorAll('.missing-skip').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        const d = btn.dataset.date;
-        missingDates = missingDates.filter(md=> md !== d);
-        renderParsePreview(unparsed);
-      });
-    });
+
+    parsePreview.appendChild(container);
   }
 
   parseBtn.addEventListener('click', ()=>{
@@ -1037,25 +1366,29 @@
       parsePreview.innerHTML = '';
       return;
     }
-    const { results, unparsed } = parsePastedText(text);
+    const { results, unparsed, leaves } = parsePastedText(text);
     parsedResults = results;
+    unparsedItems = unparsed;
+    leaveMarks = leaves;
 
-    // 빈 평일 체크: 이번에 인식된 날짜 범위 안에서, 주말이 아니면서 기존/신규 기록 어디에도 없는 날짜
+    // 빈 평일 체크: 이번에 인식된 날짜 범위 안에서, 주말이 아니면서 기존/신규 기록·오류줄·휴가표시 어디에도 없는 날짜
     missingDates = [];
-    if(results.length > 0){
-      const allDates = results.map(r=>r.date).sort();
+    const datedUnparsed = unparsed.filter(u=> u.date);
+    const allDates = [...results.map(r=>r.date), ...datedUnparsed.map(u=>u.date), ...leaves.map(l=>l.date)].sort();
+    if(allDates.length > 0){
       const minD = allDates[0], maxD = allDates[allDates.length-1];
-      const covered = new Set([...entries.map(e=>e.date), ...results.map(r=>r.date)]);
+      const covered = new Set([...entries.map(e=>e.date), ...results.map(r=>r.date), ...datedUnparsed.map(u=>u.date), ...leaves.map(l=>l.date)]);
       missingDates = dateRangeArray(minD, maxD).filter(d=> !covered.has(d) && !isWeekend(d));
     }
 
-    renderParsePreview(unparsed);
+    renderParsePreview();
   });
 
   function render(){
     entries.sort((a,b)=> a.date.localeCompare(b.date));
     // 선택 상태 중 삭제된 날짜 정리
     selectedDates.forEach(d=>{ if(!entries.find(e=>e.date===d)) selectedDates.delete(d); });
+    editingReasonDates.forEach(d=>{ if(!entries.find(e=>e.date===d)) editingReasonDates.delete(d); });
 
     // 월 라벨 갱신
     if(monthFilter === 'all'){
@@ -1088,7 +1421,7 @@
         const diffClass = e.diffH === 0 ? 'zero' : (e.diffH > 0 ? 'plus' : 'minus');
         const isGrouped = !!e.groupId;
         const div = document.createElement('div');
-        div.className = 'entry' + (isGrouped ? ' grouped' : '');
+        div.className = 'entry' + (isGrouped ? ' grouped' : '') + (e.uploaded ? ' uploaded-done' : '');
         const checkboxHtml = (!isGrouped && e.diffH !== 0)
           ? `<input type="checkbox" class="pair-check" data-date="${e.date}" ${selectedDates.has(e.date) ? 'checked' : ''}>`
           : '';
@@ -1096,17 +1429,35 @@
           ? `<span class="group-badge">묶음 상쇄완료</span><button class="ungroup" data-date="${e.date}">해제</button>`
           : '';
 
+        const doneBtnHtml = (!isGrouped && e.diffH !== 0)
+          ? `<button type="button" class="upload-done-btn${e.uploaded ? ' active' : ''}" data-date="${e.date}">${e.uploaded ? '완료 ✓' : '완료'}</button>`
+          : '';
+
         let reasonRowHtml = '';
         if(e.diffH > 0){
-          reasonRowHtml = `
-            <div class="entry-reason">
-              <input type="text" class="reason-input" data-date="${e.date}" placeholder="업무 내역 입력" value="${(e.reason||'').replace(/"/g,'&quot;')}">
-              <button type="button" class="copy-reason-btn" data-date="${e.date}">[초과 근무] 복사</button>
-            </div>`;
+          const isEditing = editingReasonDates.has(e.date);
+          if(isEditing){
+            reasonRowHtml = `
+              <div class="entry-reason editing">
+                <input type="text" class="reason-input" data-date="${e.date}" value="${escapeHtml(e.reason || '[초과 근무] ')}">
+                <button type="button" class="reason-save-btn" data-date="${e.date}">저장</button>
+              </div>`;
+          } else {
+            reasonRowHtml = `
+              <div class="entry-reason">
+                <div class="reason-preview">${e.reason ? escapeHtml(e.reason) : '업무 내역 미입력'}</div>
+              </div>
+              <div class="entry-actions">
+                <button type="button" class="reason-edit-btn" data-date="${e.date}">입력·수정</button>
+                <button type="button" class="copy-reason-btn" data-date="${e.date}">복사</button>
+                ${doneBtnHtml}
+              </div>`;
+          }
         } else if(e.diffH < 0){
           reasonRowHtml = `
-            <div class="entry-reason">
-              <button type="button" class="copy-reason-btn" data-date="${e.date}" style="flex:1;">[단축 근무] 복사</button>
+            <div class="entry-actions">
+              <button type="button" class="copy-reason-btn" data-date="${e.date}">복사</button>
+              ${doneBtnHtml}
             </div>`;
         }
 
@@ -1114,13 +1465,15 @@
           <div class="entry-main">
             ${checkboxHtml}
             <div class="date">${formatMDDay(e.date)}</div>
-            <div class="detail">
-              <div class="times">${e.start}\u2013${e.end}</div>
-              <div class="meta">${formatWorked(e.workedMin)}${e.noLunch ? ' · 점심 미차감' : ''}${e.breakTime > 0 ? ' · 휴게 ' + e.breakTime + 'h' : ''}</div>
-            </div>
-            ${groupBadgeHtml}
             <div class="diff ${diffClass}">${formatDiff(e.diffH)}</div>
             <button class="del" data-date="${e.date}" title="삭제">×</button>
+          </div>
+          <div class="entry-detail-row">
+            <div class="detail">
+              <div class="times">${e.start}\u2013${e.end}</div>
+              <div class="meta">${formatWorked(e.workedMin)}${e.noLunch ? ' · 점심 미차감' : ''}${e.breakTime > 0 ? ' · 휴게 ' + e.breakTime + 'h' : ''}${(e.isHoliday||isWeekend(e.date)) ? ' · 🎌휴일' : ''}</div>
+            </div>
+            ${groupBadgeHtml}
           </div>
           ${reasonRowHtml}
         `;
@@ -1135,11 +1488,42 @@
           render();
         });
       });
+      const commitReason = async (inp)=>{
+        const d = inp.dataset.date;
+        const e = entries.find(en=>en.date===d);
+        if(e){
+          let val = inp.value;
+          if(!val.startsWith('[초과 근무] ')) val = '[초과 근무] ' + val.replace(/^\[초과 근무\]\s*/, '');
+          e.reason = val;
+          await save();
+        }
+        editingReasonDates.delete(d);
+        render();
+      };
       entryList.querySelectorAll('.reason-input').forEach(inp=>{
-        inp.addEventListener('input', async ()=>{
-          const d = inp.dataset.date;
+        // 자동 포커스 + 커서를 맨 끝으로 (편집 모드로 막 전환된 입력창)
+        inp.focus();
+        inp.setSelectionRange(inp.value.length, inp.value.length);
+        inp.addEventListener('keydown', (ev)=>{ if(ev.key === 'Enter'){ ev.preventDefault(); commitReason(inp); } });
+      });
+      entryList.querySelectorAll('.reason-edit-btn').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          editingReasonDates.add(btn.dataset.date);
+          render();
+        });
+      });
+      entryList.querySelectorAll('.reason-save-btn').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const row = btn.closest('.entry-reason');
+          const inp = row.querySelector('.reason-input');
+          commitReason(inp);
+        });
+      });
+      entryList.querySelectorAll('.upload-done-btn').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          const d = btn.dataset.date;
           const e = entries.find(en=>en.date===d);
-          if(e){ e.reason = inp.value; await save(); }
+          if(e){ e.uploaded = !e.uploaded; await save(); render(); }
         });
       });
       entryList.querySelectorAll('.copy-reason-btn').forEach(btn=>{
@@ -1147,7 +1531,7 @@
           const d = btn.dataset.date;
           const e = entries.find(en=>en.date===d);
           if(!e) return;
-          const text = e.diffH > 0 ? `[초과 근무] ${e.reason || ''}` : '[단축 근무]';
+          const text = e.diffH > 0 ? (e.reason || '[초과 근무] ') : '[단축 근무]';
           try{
             await navigator.clipboard.writeText(text);
           }catch(err){
@@ -1189,42 +1573,15 @@
     // → 서로 다른 곳(초과=근태사이트, 단축=휴가등록)에 올려야 해서 각각 gross로 표시
     const scopedEntries = monthFilter === 'all' ? entries : entries.filter(e => monthKey(e.date) === monthFilter);
     const unresolved = scopedEntries.filter(e=> !e.groupId);
-    const overtimeH = Math.round(unresolved.filter(e=> e.diffH > 0).reduce((sum,e)=> sum+e.diffH, 0) * 2) / 2;
-    const undertimeH = Math.round(unresolved.filter(e=> e.diffH < 0).reduce((sum,e)=> sum+Math.abs(e.diffH), 0) * 2) / 2;
-
-    overtimeValue.textContent = `${overtimeH}h`;
-    undertimeValue.textContent = `${undertimeH}h`;
-    summaryFace.textContent = faceForDiff(scopedEntries.length === 0 ? 0 : overtimeH);
-    summaryHint.classList.toggle('warn', undertimeH > 0);
-
     const overtimeDates = unresolved.filter(e=> e.diffH > 0).sort((a,b)=> a.date.localeCompare(b.date));
     const undertimeDates = unresolved.filter(e=> e.diffH < 0).sort((a,b)=> a.date.localeCompare(b.date));
-
-    overtimeDatesEl.innerHTML = overtimeDates.length === 0 ? '' : `
-      <div class="chip-label">초과 올릴 날짜 (${overtimeDates.length}건)</div>
-      <div class="chip-row">${overtimeDates.map(e=> `<span class="chip over">${formatMDDay(e.date)} ${formatDiff(e.diffH)}</span>`).join('')}</div>`;
-
-    undertimeDatesEl.innerHTML = undertimeDates.length === 0 ? '' : `
-      <div class="chip-label">휴가 등록할 날짜 (${undertimeDates.length}건)</div>
-      <div class="chip-row">${undertimeDates.map(e=> `<span class="chip under">${formatMDDay(e.date)} ${formatDiff(e.diffH)}</span>`).join('')}</div>`;
 
     diffFilterEl.querySelector('[data-filter="all"]').textContent = '전체';
     diffFilterEl.querySelector('[data-filter="over"]').textContent = `초과만 (${overtimeDates.length})`;
     diffFilterEl.querySelector('[data-filter="under"]').textContent = `단축만 (${undertimeDates.length})`;
 
-    if(scopedEntries.length === 0){
-      summaryHint.textContent = monthFilter === 'all' ? '기록을 추가하면 계산됩니다' : '이 달엔 기록이 없습니다';
-    } else if(overtimeH === 0 && undertimeH === 0 && unresolved.length > 0){
-      summaryHint.textContent = `미확정 ${unresolved.length}건 모두 8시간 근무 — 올릴 시간 없음`;
-    } else if(undertimeH > 0){
-      summaryHint.textContent = `⚠️ 단축 대기 ${undertimeH}h 있음 — 휴가 등록 검토 필요`;
-    } else if(unresolved.length === 0){
-      summaryHint.textContent = `${scopedEntries.length}건 묶음 처리 완료`;
-    } else {
-      summaryHint.textContent = `미확정 ${unresolved.length}건 · 확정 ${scopedEntries.length - unresolved.length}건`;
-    }
-
     updatePairBar();
+    renderGroupSummary();
   }
 
   function updatePairBar(){
@@ -1267,35 +1624,50 @@
     return endH >= 22;
   }
 
-  autoMatchBtn.addEventListener('click', ()=>{
-    const all = entries.filter(e=> !e.groupId && e.diffH !== 0);
-    // 1순위: 평일 + 심야 아닌 일반 초과/단축근무끼리만 매칭 시도
-    const normalPool = all.filter(e=> !isWeekend(e.date) && !isNightShift(e));
-    let match = findZeroSumSubset(normalPool, 4);
-    let usedSpecial = false;
-
-    if(!match){
-      // 2순위(최후): 주말·심야근무까지 포함해서 재시도
-      match = findZeroSumSubset(all, 4);
-      usedSpecial = true;
+  autoMatchBtn.addEventListener('click', async ()=>{
+    // 1순위: 평일 + 심야·공휴일 아닌 일반 근무끼리는 수당 배율 문제가 없으므로,
+    // 한 번의 클릭으로 찾을 수 있는 조합을 전부 찾아 바로 확정 (조합 하나 찾고 멈추지 않음)
+    let normalPool = entries.filter(e=> !e.groupId && e.diffH !== 0 && !isWeekend(e.date) && !isNightShift(e) && !e.isHoliday);
+    let groupsFormed = 0;
+    let entriesResolved = 0;
+    let match;
+    while((match = findZeroSumSubset(normalPool, 4))){
+      const gid = 'g' + Date.now() + Math.random().toString(36).slice(2, 6);
+      match.forEach(m=>{
+        const e = entries.find(en=> en.date === m.date);
+        if(e) e.groupId = gid;
+      });
+      groupsFormed++;
+      entriesResolved += match.length;
+      normalPool = normalPool.filter(e=> !match.some(m=> m.date === e.date));
     }
+    if(groupsFormed > 0) await save();
 
-    if(!match){
-      statusMsg.textContent = '합이 0이 되는 조합을 찾지 못했습니다';
-      return;
+    // 2순위(최후): 남은 것 중 주말·심야·공휴일까지 포함해야 맞는 조합은 수당 배율이 다를 수 있어
+    // 자동 확정하지 않고, 체크박스도 자동으로 선택하지 않음 — 필요하면 사용자가 직접 골라서 확정
+    const remainingAll = entries.filter(e=> !e.groupId && e.diffH !== 0);
+    const specialMatch = findZeroSumSubset(remainingAll, 4);
+
+    let msg = '';
+    if(groupsFormed > 0){
+      msg = `일반 근무끼리 ${groupsFormed}건 조합(총 ${entriesResolved}건) 자동 상쇄 완료`;
     }
-    selectedDates = new Set(match.map(e=>e.date));
-    const includesSpecial = match.some(e=> isWeekend(e.date) || isNightShift(e));
-    statusMsg.textContent = (usedSpecial && includesSpecial)
-      ? '일반 초과근무만으로는 못 찾아 주말/심야근무를 포함했습니다 — 수당 배율이 다르니 확정 전 확인해주세요'
-      : '';
+    if(specialMatch){
+      const dateList = specialMatch.map(e=> formatMDDay(e.date)).join(', ');
+      msg += (msg ? ' · ' : '') + `주말/심야/공휴일 포함 조합 발견(${dateList}) — 수당 배율이 다를 수 있어 자동 선택하지 않았어요, 필요하면 체크박스로 직접 선택해 확정해주세요`;
+    } else if(groupsFormed === 0){
+      msg = '합이 0이 되는 조합을 찾지 못했습니다';
+    }
+    statusMsg.textContent = msg;
     render();
   });
 
   // 최대 maxSize개까지의 조합 중 diffH 합이 0인 첫 조합을 찾는 간단한 탐색 (기록 수가 적어 브루트포스로 충분)
   function findZeroSumSubset(list, maxSize){
     const n = list.length;
-    for(let size=2; size<=Math.min(maxSize, n); size++){
+    // 작은 조합부터 찾으면 우연히 합이 0인 2개짜리가 먼저 걸려서, 실제로 필요한
+    // "1개+2개"처럼 더 많은 항목을 해소하는 조합을 놓칠 수 있음 → 큰 조합부터 우선 탐색
+    for(let size=Math.min(maxSize, n); size>=2; size--){
       const combo = [];
       function backtrack(start){
         if(combo.length === size){
@@ -1319,32 +1691,50 @@
 
 
 
-  function faceForDiff(diff){
-    if(diff <= 0) return '😊';
-    if(diff <= 1) return '🙂';
-    if(diff <= 2) return '😐';
-    if(diff <= 3) return '😕';
-    if(diff <= 4) return '😟';
-    return '😢';
-  }
+  let unsubscribeSync = null;
 
   async function load(){
+    statusMsg.textContent = '동기화 연결 중...';
+    if(unsubscribeSync) unsubscribeSync();
+
+    // Firestore가 비어있는데 이 기기(브라우저)에 예전 localStorage 데이터가 남아있으면 1회 자동 이전
     try{
-      const raw = localStorage.getItem(STORAGE_KEY);
-      entries = raw ? JSON.parse(raw) : [];
+      const snap = await worklogDocRef.get();
+      const remoteEmpty = !snap.exists || !snap.data().entries || snap.data().entries.length === 0;
+      if(remoteEmpty){
+        const legacyRaw = localStorage.getItem('worklog-entries');
+        if(legacyRaw){
+          const legacyEntries = JSON.parse(legacyRaw);
+          if(Array.isArray(legacyEntries) && legacyEntries.length > 0){
+            await worklogDocRef.set({ entries: legacyEntries });
+            statusMsg.textContent = `이 기기에 남아있던 기록 ${legacyEntries.length}건을 클라우드로 옮겼어요`;
+          }
+        }
+      }
     }catch(err){
-      entries = [];
-      statusMsg.textContent = '저장된 기록을 불러오지 못했습니다';
+      console.error('이전 데이터 이전 중 오류', err);
     }
-    render();
+
+    unsubscribeSync = worklogDocRef.onSnapshot(
+      (doc)=>{
+        entries = (doc.exists && doc.data().entries) ? doc.data().entries : [];
+        if(!statusMsg.textContent.includes('옮겼어요')) statusMsg.textContent = '';
+        render();
+      },
+      (err)=>{
+        console.error(err);
+        statusMsg.textContent = '동기화 실패 — 인터넷 연결을 확인해주세요';
+      }
+    );
   }
 
   async function save(){
     try{
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+      await worklogDocRef.set({ entries });
       statusMsg.textContent = '';
     }catch(err){
-      statusMsg.textContent = '저장 실패 — 브라우저 저장공간을 확인해주세요';
+      console.error(err);
+      statusMsg.textContent = '저장 실패 — 인터넷 연결을 확인해주세요 (변경사항이 다른 기기에 반영되지 않았을 수 있어요)';
     }
   }
 
