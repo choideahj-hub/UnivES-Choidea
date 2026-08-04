@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>근무시간 계산기</title>
+<style>
+  :root{
+    --bg: #F6F5F2;
+    --ink: #1F2421;
+    --ink-soft: #5A6058;
+    --line: #DCD9D1;
+    --accent: #00B1CC;
+    --accent-soft: #E1F6FA;
+    --card: #FFFFFF;
+    --danger: #B3543F;
+    --danger-soft: #F5E9E5;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    padding:48px 20px;
+  }
+  .wrap{ width:100%; max-width:480px; }
+  .eyebrow{
+    font-size:12px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    font-weight:700;
+    margin-bottom:6px;
+  }
+  h1{
+    font-size:22px;
+    margin:0 0 4px 0;
+    letter-spacing:-0.01em;
+  }
+  .sub{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:0 0 24px 0;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:22px;
+    margin-bottom:16px;
+  }
+  .field{ margin-bottom:16px; }
+  .field:last-child{ margin-bottom:0; }
+  label{
+    display:block;
+    font-size:13px;
+    font-weight:600;
+    color:var(--ink-soft);
+    margin-bottom:7px;
+  }
+  input[type="time"], input[type="date"], select{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    font-size:15px;
+    font-family:inherit;
+    background:#fff;
+    color:var(--ink);
+  }
+  input:focus, select:focus{
+    outline:2px solid var(--accent);
+    outline-offset:1px;
+  }
+  .row2{ display:flex; gap:10px; }
+  .row2 > div{ flex:1; }
+  .checkbox-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:11px 14px;
+    background:var(--accent-soft);
+    border-radius:8px;
+    cursor:pointer;
+  }
+  .checkbox-row input{ width:17px; height:17px; accent-color:var(--accent); cursor:pointer; }
+  .checkbox-row span{ font-size:14px; color:var(--ink); }
+  .date-nav{
+    display:flex;
+    gap:8px;
+    align-items:stretch;
+  }
+  .date-nav button{
+    width:44px;
+    flex-shrink:0;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:#fff;
+    color:var(--ink);
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .date-nav button:hover{ border-color:var(--accent); color:var(--accent); }
+  .date-nav input[type="date"]{
+    flex:1;
+    text-align:center;
+  }
+  .hour-rows{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    margin-bottom:8px;
+  }
+  .hour-row{
+    display:flex;
+    gap:6px;
+  }
+  .hour-row button{
+    flex:1;
+    padding:10px 0;
+    border:1px solid var(--line);
+    border-radius:7px;
+    background:#fff;
+    color:var(--ink);
+    font-size:14px;
+    font-family:inherit;
+    font-variant-numeric:tabular-nums;
+    cursor:pointer;
+  }
+  .hour-row button:hover{ border-color:var(--accent); }
+  .hour-row button.landmark{
+    font-weight:800;
+    border-color:var(--accent);
+    color:var(--accent);
+  }
+  .hour-row button.active{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+    font-weight:700;
+  }
+  .break-grid button.custom-btn{
+    background:var(--accent-soft);
+    border-color:var(--accent-soft);
+    color:var(--accent);
+  }
+  .break-grid button.custom-btn:hover{
+    border-color:var(--accent);
+  }
+  .break-grid button.custom-btn.active{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+  }
+  .break-custom{
+    position:relative;
+    margin-top:8px;
+  }
+  .break-custom input{
+    width:100%;
+    padding:11px 44px 11px 12px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    font-size:14px;
+    font-family:inherit;
+    color:var(--ink);
+    background:#fff;
+  }
+  .break-custom input:focus{
+    outline:2px solid var(--accent);
+    outline-offset:1px;
+    border-color:var(--accent);
+  }
+  .break-custom .unit{
+    position:absolute;
+    right:14px;
+    top:50%;
+    transform:translateY(-50%);
+    font-size:13px;
+    color:var(--ink-soft);
+    pointer-events:none;
+  }
+  .break-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+    gap:6px;
+  }
+  .break-grid button{
+    padding:9px 2px;
+    border:1px solid var(--line);
+    border-radius:7px;
+    background:#fff;
+    color:var(--ink);
+    font-size:12.5px;
+    font-family:inherit;
+    font-variant-numeric:tabular-nums;
+    cursor:pointer;
+  }
+  .break-grid button:hover{ border-color:var(--accent); }
+  .break-grid button.active{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+    font-weight:700;
+  }
+  .min-toggle{
+    display:flex;
+    gap:6px;
+  }
+  .min-toggle button{
+    flex:1;
+    padding:9px 0;
+    border:1px solid var(--line);
+    border-radius:7px;
+    background:#fff;
+    color:var(--ink);
+    font-size:13px;
+    font-family:inherit;
+    cursor:pointer;
+  }
+  .min-toggle button:hover{ border-color:var(--accent); }
+  .min-toggle button.active{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+    font-weight:700;
+  }
+  textarea{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    font-size:13px;
+    font-family:inherit;
+    background:#fff;
+    color:var(--ink);
+    resize:vertical;
+    line-height:1.5;
+  }
+  textarea:focus{
+    outline:2px solid var(--accent);
+    outline-offset:1px;
+  }
+  .parse-preview{
+    margin-top:14px;
+  }
+  .parse-summary{
+    font-size:13px;
+    font-weight:700;
+    margin-bottom:8px;
+  }
+  .parse-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:9px 2px;
+    border-bottom:1px solid var(--line);
+    gap:8px;
+    font-size:12.5px;
+  }
+  .parse-row:last-child{ border-bottom:none; }
+  .parse-row .pdate{ font-weight:700; width:56px; flex-shrink:0; }
+  .parse-row .pdetail{ flex:1; color:var(--ink-soft); min-width:0; }
+  .parse-row .pdiff{ font-weight:700; flex-shrink:0; font-variant-numeric:tabular-nums; }
+  .parse-row .pdiff.plus{ color:var(--accent); }
+  .parse-row .pdiff.minus{ color:var(--danger); }
+  .parse-row .pdiff.zero{ color:var(--ink-soft); }
+  .parse-row .pconflict{
+    font-size:10px;
+    color:var(--danger);
+    font-weight:700;
+    flex-shrink:0;
+  }
+  .parse-unparsed{
+    margin-top:10px;
+    padding:10px 12px;
+    background:var(--danger-soft);
+    border-radius:8px;
+    font-size:12px;
+    color:var(--danger);
+    line-height:1.6;
+  }
+  .parse-confirm-btn{
+    width:100%;
+    margin-top:12px;
+    padding:11px;
+    border:none;
+    border-radius:8px;
+    background:var(--accent);
+    color:#fff;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  button.primary{
+    width:100%;
+    margin-top:18px;
+    padding:12px;
+    border:none;
+    border-radius:8px;
+    background:var(--accent);
+    color:#fff;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  button.primary:hover{ opacity:0.92; }
+  button.primary:disabled{ opacity:0.5; cursor:not-allowed; }
+
+  .summary{
+    background:var(--ink);
+    color:#fff;
+    border-radius:14px;
+    padding:24px;
+    text-align:center;
+    margin-bottom:16px;
+  }
+  .summary .face{
+    font-size:40px;
+    line-height:1;
+    margin-bottom:12px;
+  }
+  .summary .big-stats{
+    display:flex;
+    gap:12px;
+  }
+  .summary .big-stat{
+    flex:1;
+    background:rgba(255,255,255,0.06);
+    border-radius:12px;
+    padding:16px 8px;
+  }
+  .summary .big-stat-label{
+    font-size:12px;
+    letter-spacing:0.08em;
+    color:#9DAAA3;
+    margin-bottom:6px;
+  }
+  .summary .big-stat-value{
+    font-size:28px;
+    font-weight:700;
+    font-variant-numeric:tabular-nums;
+  }
+  .summary .big-stat.over .big-stat-value{ color:#E8C97A; }
+  .summary .big-stat.under .big-stat-value{ color:#8FB8E8; }
+  .summary .hint{
+    margin-top:14px;
+    font-size:12px;
+    color:#8B9691;
+  }
+  .summary .hint.warn{
+    color:#E8A08E;
+    font-weight:700;
+  }
+  .date-chips{
+    margin-top:12px;
+    text-align:left;
+  }
+  .date-chips:empty{ display:none; margin:0; }
+  .date-chips .chip-label{
+    font-size:11px;
+    font-weight:700;
+    color:#9DAAA3;
+    margin-bottom:6px;
+  }
+  .date-chips .chip-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+  .date-chips .chip{
+    font-size:12px;
+    font-weight:700;
+    padding:5px 9px;
+    border-radius:999px;
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+  }
+  .date-chips .chip.over{
+    background:rgba(232,201,122,0.16);
+    color:#E8C97A;
+  }
+  .date-chips .chip.under{
+    background:rgba(232,160,142,0.16);
+    color:#E8A08E;
+  }
+
+  .pair-bar{
+    display:none;
+    background:var(--accent-soft);
+    border:1px solid var(--accent);
+    border-radius:10px;
+    padding:12px 14px;
+    margin-bottom:12px;
+    font-size:13px;
+  }
+  .pair-bar.show{ display:block; }
+  .pair-bar .pair-status{
+    font-weight:700;
+    margin-bottom:8px;
+  }
+  .pair-bar .pair-status.ok{ color:var(--accent); }
+  .pair-bar .pair-actions{
+    display:flex;
+    gap:8px;
+  }
+  .pair-bar button{
+    flex:1;
+    padding:9px;
+    border-radius:7px;
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--ink);
+    font-size:12.5px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .pair-bar button.confirm{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+  }
+  .pair-bar button:disabled{
+    opacity:0.4;
+    cursor:not-allowed;
+  }
+  .month-nav{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:14px;
+  }
+  .month-nav button{
+    border:1px solid var(--line);
+    border-radius:7px;
+    background:#fff;
+    color:var(--ink);
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .month-nav #monthPrev, .month-nav #monthNext{
+    width:32px;
+    height:32px;
+    flex-shrink:0;
+  }
+  .month-nav #monthPrev:hover, .month-nav #monthNext:hover{ border-color:var(--accent); color:var(--accent); }
+  .month-nav button:disabled{ opacity:0.3; cursor:not-allowed; }
+  .month-label{
+    flex:1;
+    text-align:center;
+    font-size:14px;
+    font-weight:700;
+  }
+  .month-nav #monthAllBtn{
+    padding:7px 10px;
+    font-size:11.5px;
+    color:var(--ink-soft);
+    flex-shrink:0;
+  }
+  .month-nav #monthAllBtn.active{
+    background:var(--accent-soft);
+    border-color:var(--accent);
+    color:var(--accent);
+    font-weight:700;
+  }
+  .diff-filter{
+    display:flex;
+    gap:6px;
+    margin-bottom:12px;
+  }
+  .diff-filter button{
+    flex:1;
+    padding:8px 0;
+    border:1px solid var(--line);
+    border-radius:7px;
+    background:#fff;
+    color:var(--ink-soft);
+    font-size:12.5px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .diff-filter button:hover{ border-color:var(--accent); }
+  .diff-filter button.active{
+    background:var(--ink);
+    border-color:var(--ink);
+    color:#fff;
+  }
+  .diff-filter button.active[data-filter="over"]{
+    background:#C9A227;
+    border-color:#C9A227;
+  }
+  .diff-filter button.active[data-filter="under"]{
+    background:var(--danger);
+    border-color:var(--danger);
+  }
+  .auto-match-btn{
+    width:100%;
+    padding:10px;
+    margin-bottom:12px;
+    border-radius:8px;
+    border:1px dashed var(--accent);
+    background:var(--accent-soft);
+    color:var(--accent);
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .auto-match-btn:hover{ opacity:0.85; }
+
+  .entry{
+    display:flex;
+    flex-direction:column;
+    padding:14px 4px;
+    border-bottom:1px solid var(--line);
+    gap:8px;
+  }
+  .entry-main{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .entry.grouped{
+    opacity:0.55;
+  }
+  .entry .pair-check{
+    width:17px;
+    height:17px;
+    accent-color:var(--accent);
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  .entry .group-badge{
+    font-size:10.5px;
+    font-weight:700;
+    color:var(--accent);
+    background:var(--accent-soft);
+    padding:2px 6px;
+    border-radius:5px;
+    flex-shrink:0;
+  }
+  .entry .ungroup{
+    background:none;
+    border:none;
+    color:var(--ink-soft);
+    font-size:10.5px;
+    text-decoration:underline;
+    cursor:pointer;
+    padding:2px;
+    flex-shrink:0;
+    font-family:inherit;
+  }
+  .entry:last-child{ border-bottom:none; }
+  .entry .date{
+    font-size:13px;
+    font-weight:700;
+    width:68px;
+    flex-shrink:0;
+  }
+  .entry .detail{
+    flex:1;
+    min-width:0;
+  }
+  .entry .detail .times{
+    font-size:13px;
+    color:var(--ink);
+    font-variant-numeric:tabular-nums;
+  }
+  .entry .detail .meta{
+    font-size:11.5px;
+    color:var(--ink-soft);
+    margin-top:2px;
+  }
+  .entry .diff{
+    font-size:15px;
+    font-weight:700;
+    font-variant-numeric:tabular-nums;
+    flex-shrink:0;
+    min-width:44px;
+    text-align:right;
+  }
+  .entry .diff.zero{ color:var(--ink-soft); }
+  .entry .diff.plus{ color:var(--accent); }
+  .entry .diff.minus{ color:var(--danger); }
+  .entry .del{
+    background:none;
+    border:none;
+    color:var(--ink-soft);
+    font-size:18px;
+    cursor:pointer;
+    padding:2px 6px;
+    flex-shrink:0;
+    line-height:1;
+  }
+  .entry .del:hover{ color:var(--danger); }
+  .entry-reason{
+    display:flex;
+    gap:6px;
+    align-items:center;
+  }
+  .entry-reason input{
+    flex:1;
+    min-width:0;
+    padding:7px 9px;
+    border:1px solid var(--line);
+    border-radius:6px;
+    font-size:12px;
+    font-family:inherit;
+    color:var(--ink);
+    background:#fff;
+  }
+  .entry-reason input:focus{
+    outline:2px solid var(--accent);
+    outline-offset:1px;
+  }
+  .entry-reason .copy-reason-btn{
+    flex-shrink:0;
+    padding:7px 10px;
+    border-radius:6px;
+    border:1px solid var(--accent);
+    background:var(--accent-soft);
+    color:var(--accent);
+    font-size:11.5px;
+    font-weight:700;
+    cursor:pointer;
+    font-family:inherit;
+    white-space:nowrap;
+  }
+  .entry-reason .copy-reason-btn.copied{
+    background:#2F9E5B;
+    border-color:#2F9E5B;
+    color:#fff;
+  }
+  .empty{
+    text-align:center;
+    color:var(--ink-soft);
+    font-size:13px;
+    padding:24px 0;
+  }
+  .footnote{
+    margin-top:14px;
+    font-size:11.5px;
+    color:var(--ink-soft);
+    text-align:center;
+    line-height:1.6;
+  }
+  .footnote button{
+    background:none;
+    border:none;
+    color:var(--danger);
+    font-size:11.5px;
+    text-decoration:underline;
+    cursor:pointer;
+    font-family:inherit;
+    padding:0;
+  }
+  .status{
+    text-align:center;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    padding:8px 0;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">대학내일</div>
+  <h1>순 근무 시간 체크</h1>
+  <p class="sub">일 8시간 기준 +/- 를 날짜별로 쌓아서 상쇄 확인</p>
+
+  <div class="summary">
+    <div class="face" id="summaryFace">😊</div>
+    <div class="big-stats">
+      <div class="big-stat over">
+        <div class="big-stat-label">초과 근무</div>
+        <div class="big-stat-value" id="overtimeValue">0h</div>
+      </div>
+      <div class="big-stat under">
+        <div class="big-stat-label">단축 근무</div>
+        <div class="big-stat-value" id="undertimeValue">0h</div>
+      </div>
+    </div>
+    <div class="date-chips" id="overtimeDates"></div>
+    <div class="date-chips" id="undertimeDates"></div>
+    <div class="hint" id="summaryHint">기록을 추가하면 계산됩니다</div>
+  </div>
+
+  <div class="card">
+    <div class="field">
+      <label>📋 근무 내역을 알려주세요</label>
+      <textarea id="pasteInput" rows="5" placeholder="예시&#10;7/1(수) 24:00 재택근무 종료합니다 (9:30 시작, 1시간 휴게)&#10;7/2(목) 18:00 퇴근합니다 (9:30 시작, 22:00~24:30 추가 근무)&#10;7/4(토) 11:00 재택근무 시작합니다&#10;7/4(토) 12:00 재택근무 종료합니다"></textarea>
+    </div>
+    <button class="primary" id="parseBtn" type="button">EW 올릴 준비 완료!</button>
+    <div id="parsePreview"></div>
+  </div>
+
+  <div class="card" id="listCard">
+    <div class="month-nav">
+      <button type="button" id="monthPrev">‹</button>
+      <div class="month-label" id="monthLabel">–</div>
+      <button type="button" id="monthNext">›</button>
+      <button type="button" id="monthAllBtn">전체보기</button>
+    </div>
+    <button class="auto-match-btn" id="autoMatchBtn">🔍 자동으로 상쇄 짝 찾기</button>
+    <div class="pair-bar" id="pairBar">
+      <div class="pair-status" id="pairStatus">0건 선택 · 합계 0h</div>
+      <div class="pair-actions">
+        <button type="button" id="pairCancelBtn">선택 해제</button>
+        <button type="button" class="confirm" id="pairConfirmBtn" disabled>짝으로 확정</button>
+      </div>
+    </div>
+    <div class="diff-filter" id="diffFilter">
+      <button type="button" data-filter="all" class="active">전체</button>
+      <button type="button" data-filter="over">초과만</button>
+      <button type="button" data-filter="under">단축만</button>
+    </div>
+    <div id="entryList"><div class="empty">기록이 없습니다</div></div>
+  </div>
+
+  <div class="status" id="statusMsg"></div>
+
+  <div class="footnote">
+    계산식 · 근무시간 = 종료−시작 − 점심 1시간(기본, "점심 없이"/"점없근" 있으면 미차감) − 휴게시간 · 시작 시각 없으면 9:00 시작, 주말은 점심 자동 미차감<br>
+    체크박스로 날짜를 골라 합이 0이 되면 "짝으로 확정" — 확정된 묶음은 위 초과/단축 합계에서 빠집니다.<br>
+    <button id="clearAllBtn">전체 기록 초기화</button>
+  </div>
+</div>
+
+<script>
+  const STORAGE_KEY = 'worklog-entries';
+
+  const entryList = document.getElementById('entryList');
+  const summaryFace = document.getElementById('summaryFace');
+  const overtimeValue = document.getElementById('overtimeValue');
+  const undertimeValue = document.getElementById('undertimeValue');
+  const overtimeDatesEl = document.getElementById('overtimeDates');
+  const undertimeDatesEl = document.getElementById('undertimeDates');
+  const summaryHint = document.getElementById('summaryHint');
+  const statusMsg = document.getElementById('statusMsg');
+  const clearAllBtn = document.getElementById('clearAllBtn');
+  const autoMatchBtn = document.getElementById('autoMatchBtn');
+  const pairBar = document.getElementById('pairBar');
+  const pairStatus = document.getElementById('pairStatus');
+  const pairCancelBtn = document.getElementById('pairCancelBtn');
+  const pairConfirmBtn = document.getElementById('pairConfirmBtn');
+  const monthPrev = document.getElementById('monthPrev');
+  const monthNext = document.getElementById('monthNext');
+  const monthLabel = document.getElementById('monthLabel');
+  const monthAllBtn = document.getElementById('monthAllBtn');
+  const diffFilterEl = document.getElementById('diffFilter');
+  let diffFilter = 'all'; // 'all' | 'over' | 'under'
+  diffFilterEl.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      diffFilter = btn.dataset.filter;
+      diffFilterEl.querySelectorAll('button').forEach(b=> b.classList.toggle('active', b===btn));
+      render();
+    });
+  });
+
+  let entries = [];
+  let selectedDates = new Set();
+  const now = new Date();
+  let monthFilter = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`; // 'YYYY-MM' or 'all'
+
+  function shiftMonth(delta){
+    if(monthFilter === 'all') return;
+    const [y, m] = monthFilter.split('-').map(Number);
+    const d = new Date(y, m-1+delta, 1);
+    monthFilter = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    render();
+  }
+  monthPrev.addEventListener('click', ()=> shiftMonth(-1));
+  monthNext.addEventListener('click', ()=> shiftMonth(1));
+  monthAllBtn.addEventListener('click', ()=>{
+    monthFilter = monthFilter === 'all'
+      ? `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`
+      : 'all';
+    render();
+  });
+
+  function toMinutes(t){
+    const [h,m] = t.split(':').map(Number);
+    return h*60+m;
+  }
+
+  function formatMD(dateStr){
+    const [, mo, d] = dateStr.split('-');
+    return `${parseInt(mo)}/${parseInt(d)}`;
+  }
+
+  const DAY_NAMES = ['일','월','화','수','목','금','토'];
+  function formatMDDay(dateStr){
+    const dayIdx = new Date(dateStr + 'T00:00:00').getDay();
+    return `${formatMD(dateStr)}(${DAY_NAMES[dayIdx]})`;
+  }
+  function monthKey(dateStr){
+    return dateStr.slice(0,7); // YYYY-MM
+  }
+  function isWeekend(dateStr){
+    const dayIdx = new Date(dateStr + 'T00:00:00').getDay();
+    return dayIdx === 0 || dayIdx === 6;
+  }
+
+  function formatDiff(diffH){
+    if(diffH === 0) return '0h';
+    const sign = diffH > 0 ? '+' : '-';
+    const abs = Math.abs(diffH);
+    return `${sign}${abs}h`;
+  }
+
+  function formatWorked(min){
+    const h = Math.floor(min/60);
+    const m = Math.round(min%60);
+    return m === 0 ? `${h}시간` : `${h}시간 ${m}분`;
+  }
+
+  // ===== 텍스트 붙여넣기 파싱 =====
+  const pasteInput = document.getElementById('pasteInput');
+  const parseBtn = document.getElementById('parseBtn');
+  const parsePreview = document.getElementById('parsePreview');
+  let parsedResults = [];
+
+  function parsePastedText(text){
+    const lines = text.split('\n').map(l=>l.trim()).filter(l=>l.length>0);
+    const dateData = {};
+    const unparsed = [];
+    const currentYear = new Date().getFullYear();
+
+    lines.forEach(line=>{
+      const dateMatch = line.match(/(\d{1,2})\s*\/\s*(\d{1,2})/);
+      if(!dateMatch){
+        unparsed.push(line);
+        return;
+      }
+      // 괄호 안 내용("(수)" 요일, "(9:30 시작, ...)" 부가정보)은 본문 판단에서 제외
+      const bareLine = line.replace(/\([^)]*\)/g, '').trim();
+      const timeMatch = bareLine.match(/(\d{1,2}):(\d{2})/) || line.match(/(\d{1,2}):(\d{2})/);
+      if(!timeMatch){
+        unparsed.push(line);
+        return;
+      }
+      const mo = parseInt(dateMatch[1]);
+      const da = parseInt(dateMatch[2]);
+      const dateKey = `${currentYear}-${String(mo).padStart(2,'0')}-${String(da).padStart(2,'0')}`;
+      const eventTime = `${parseInt(timeMatch[1])}:${timeMatch[2]}`;
+
+      if(!dateData[dateKey]) dateData[dateKey] = { startTime:null, endTime:null, breakH:0, noLunch:false, extraSegs:[], rawLines:[] };
+      const d = dateData[dateKey];
+      d.rawLines.push(line);
+
+      // "8:00-13:00"처럼 시간 범위를 그냥 붙여쓴 경우 우선 처리 (괄호 안 "추가 근무" 구간과 헷갈리지 않도록 괄호 제외한 본문에서만 탐색)
+      const rangeMatch = bareLine.match(/(\d{1,2}):(\d{2})\s*[~\-]\s*(\d{1,2}):(\d{2})/);
+      if(rangeMatch){
+        d.startTime = `${parseInt(rangeMatch[1])}:${rangeMatch[2]}`;
+        d.endTime = `${parseInt(rangeMatch[3])}:${rangeMatch[4]}`;
+      } else {
+        // 출근/직출/시작 = 시작, 퇴근/직퇴/종료 = 종료 (어근 매칭이라 "~합니다/~했습니다" 등 어미 무관하게 인식)
+        if(/시작|출근|직출/.test(bareLine)) d.startTime = eventTime;
+        if(/종료|퇴근|직퇴/.test(bareLine)) d.endTime = eventTime;
+      }
+      if(/점심\s*없이|점없근/.test(line)) d.noLunch = true;
+
+      const parenGroups = [...line.matchAll(/\(([^)]*)\)/g)].map(m=>m[1]);
+      const p = parenGroups.find(g=> /시작|휴게|추가|없이|점없근/.test(g));
+      if(p){
+        const startInParen = p.match(/(\d{1,2}):(\d{2})\s*시작/);
+        if(startInParen) d.startTime = `${parseInt(startInParen[1])}:${startInParen[2]}`;
+        const breakInParen = p.match(/(\d+(?:\.\d+)?)\s*(?:시간)?\s*휴게/);
+        if(breakInParen) d.breakH += parseFloat(breakInParen[1]);
+        const extraMatch = p.match(/(\d{1,2}):(\d{2})\s*[~\-]\s*(\d{1,2}):(\d{2})\s*추가\s*근무/);
+        if(extraMatch){
+          d.extraSegs.push([`${parseInt(extraMatch[1])}:${extraMatch[2]}`, `${parseInt(extraMatch[3])}:${extraMatch[4]}`]);
+        }
+        if(/점심\s*없이|점없근/.test(p)) d.noLunch = true;
+      }
+    });
+
+    const results = [];
+    Object.keys(dateData).sort().forEach(dateKey=>{
+      const d = dateData[dateKey];
+      if(!d.startTime) d.startTime = '9:00'; // 시작 시각 없으면 9시 시작으로 간주
+      if(!d.endTime){
+        unparsed.push(`${formatMDDay(dateKey)}: ${d.rawLines.join(' / ')} — 종료 시각을 찾지 못함`);
+        return;
+      }
+      const raw = toMinutes(d.endTime) - toMinutes(d.startTime);
+      if(raw <= 0){
+        unparsed.push(`${formatMDDay(dateKey)}: ${d.rawLines.join(' / ')} — 종료가 시작보다 빠름`);
+        return;
+      }
+      const weekend = isWeekend(dateKey);
+      const noLunch = d.noLunch || weekend; // 주말은 자동으로 점심 차감 안 함
+      const lunchDeduct = noLunch ? 0 : 60;
+      const breakDeduct = d.breakH * 60;
+      let extraMin = 0;
+      let extraNote = '';
+      d.extraSegs.forEach(([s,e])=>{
+        const em = toMinutes(e) - toMinutes(s);
+        if(em > 0){ extraMin += em; extraNote += ` +추가근무(${s}\u2013${e})`; }
+      });
+      const workedMin = raw - lunchDeduct - breakDeduct + extraMin;
+      const workedH = Math.round((workedMin/60)*2)/2;
+      const diffH = Math.round((workedH - 8)*2)/2;
+      results.push({
+        date: dateKey, start: d.startTime, end: d.endTime,
+        noLunch: noLunch, breakTime: d.breakH,
+        workedMin, workedH, diffH, groupId: null, reason: '',
+        note: extraNote.trim()
+      });
+    });
+
+    return { results, unparsed };
+  }
+
+  let missingDates = [];
+
+  function dateRangeArray(minKey, maxKey){
+    const days = [];
+    let cur = new Date(minKey + 'T00:00:00');
+    const end = new Date(maxKey + 'T00:00:00');
+    while(cur <= end){
+      days.push(cur.toISOString().slice(0,10));
+      cur.setDate(cur.getDate() + 1);
+    }
+    return days;
+  }
+
+  function makeStandardEntry(dateKey){
+    // 9~18시, 점심 1시간 차감 = 8시간 (기본 근무, 증감 0)
+    return {
+      date: dateKey, start: '9:00', end: '18:00',
+      noLunch: false, breakTime: 0,
+      workedMin: 480, workedH: 8, diffH: 0,
+      groupId: null, reason: '', note: ''
+    };
+  }
+
+  function renderParsePreview(unparsed){
+    let html = '';
+    if(parsedResults.length > 0){
+      html += `<div class="parse-preview"><div class="parse-summary">✅ EW 분석 완료! ${parsedResults.length}건 인식됨 — ${new Date().getFullYear()}년 기준</div>`;
+      parsedResults.slice().sort((a,b)=>a.date.localeCompare(b.date)).forEach(r=>{
+        const conflict = entries.some(e=> e.date === r.date);
+        const diffClass = r.diffH === 0 ? 'zero' : (r.diffH > 0 ? 'plus' : 'minus');
+        html += `
+          <div class="parse-row">
+            <div class="pdate">${formatMDDay(r.date)}</div>
+            <div class="pdetail">${r.start}\u2013${r.end}${r.breakTime>0?' · 휴게 '+r.breakTime+'h':''}${r.noLunch?' · 점심미차감':''}${r.note?' · '+r.note:''}</div>
+            <div class="pdiff ${diffClass}">${formatDiff(r.diffH)}</div>
+            ${conflict ? '<div class="pconflict">덮어씀</div>' : ''}
+          </div>`;
+      });
+      html += `<button class="parse-confirm-btn" id="parseConfirmBtn">${parsedResults.length}건 일괄 추가</button>`;
+      html += `</div>`;
+    }
+    if(missingDates.length > 0){
+      html += `<div class="parse-unparsed" style="background:var(--accent-soft); color:var(--ink);">
+        ⚠️ 기록 없는 평일 ${missingDates.length}건 (주말 제외 — 공휴일은 직접 걸러주세요)</div>`;
+      missingDates.forEach(d=>{
+        html += `
+          <div class="parse-row">
+            <div class="pdate">${formatMDDay(d)}</div>
+            <div class="pdetail">기록 없음</div>
+            <div style="display:flex; gap:6px; flex-shrink:0;">
+              <button type="button" class="missing-add" data-date="${d}" style="font-size:11px; padding:5px 8px; border-radius:6px; border:1px solid var(--accent); background:var(--accent); color:#fff; cursor:pointer; font-family:inherit;">9~18 추가</button>
+              <button type="button" class="missing-skip" data-date="${d}" style="font-size:11px; padding:5px 8px; border-radius:6px; border:1px solid var(--line); background:#fff; color:var(--ink-soft); cursor:pointer; font-family:inherit;">건너뛰기(휴가 등)</button>
+            </div>
+          </div>`;
+      });
+    }
+    if(unparsed && unparsed.length > 0){
+      html += `<div class="parse-unparsed">인식 못한 줄 (직접 확인해주세요)<br>${unparsed.map(u=>'· '+u).join('<br>')}</div>`;
+    }
+    if(parsedResults.length === 0 && missingDates.length === 0 && (!unparsed || unparsed.length === 0)){
+      html = '<div class="parse-unparsed">인식된 내용이 없습니다</div>';
+    }
+    parsePreview.innerHTML = html;
+
+    const confirmBtn = document.getElementById('parseConfirmBtn');
+    if(confirmBtn){
+      confirmBtn.addEventListener('click', async ()=>{
+        const conflictCount = parsedResults.filter(r=> entries.some(e=>e.date===r.date)).length;
+        if(conflictCount > 0){
+          const ok = confirm(`${conflictCount}건은 기존 기록을 덮어씁니다. 계속할까요?`);
+          if(!ok) return;
+        }
+        parsedResults.forEach(r=>{
+          const idx = entries.findIndex(e=> e.date === r.date);
+          if(idx >= 0){
+            if(entries[idx].reason && !r.reason) r.reason = entries[idx].reason;
+            entries[idx] = r;
+          } else {
+            entries.push(r);
+          }
+        });
+        await save();
+        parsedResults = [];
+        missingDates = [];
+        pasteInput.value = '';
+        parsePreview.innerHTML = '';
+        render();
+      });
+    }
+    parsePreview.querySelectorAll('.missing-add').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const d = btn.dataset.date;
+        parsedResults.push(makeStandardEntry(d));
+        missingDates = missingDates.filter(md=> md !== d);
+        renderParsePreview(unparsed);
+      });
+    });
+    parsePreview.querySelectorAll('.missing-skip').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const d = btn.dataset.date;
+        missingDates = missingDates.filter(md=> md !== d);
+        renderParsePreview(unparsed);
+      });
+    });
+  }
+
+  parseBtn.addEventListener('click', ()=>{
+    const text = pasteInput.value;
+    if(!text.trim()){
+      parsePreview.innerHTML = '';
+      return;
+    }
+    const { results, unparsed } = parsePastedText(text);
+    parsedResults = results;
+
+    // 빈 평일 체크: 이번에 인식된 날짜 범위 안에서, 주말이 아니면서 기존/신규 기록 어디에도 없는 날짜
+    missingDates = [];
+    if(results.length > 0){
+      const allDates = results.map(r=>r.date).sort();
+      const minD = allDates[0], maxD = allDates[allDates.length-1];
+      const covered = new Set([...entries.map(e=>e.date), ...results.map(r=>r.date)]);
+      missingDates = dateRangeArray(minD, maxD).filter(d=> !covered.has(d) && !isWeekend(d));
+    }
+
+    renderParsePreview(unparsed);
+  });
+
+  function render(){
+    entries.sort((a,b)=> a.date.localeCompare(b.date));
+    // 선택 상태 중 삭제된 날짜 정리
+    selectedDates.forEach(d=>{ if(!entries.find(e=>e.date===d)) selectedDates.delete(d); });
+
+    // 월 라벨 갱신
+    if(monthFilter === 'all'){
+      monthLabel.textContent = '전체 기간';
+      monthAllBtn.classList.add('active');
+      monthAllBtn.textContent = '월별 보기';
+      monthPrev.disabled = true;
+      monthNext.disabled = true;
+    } else {
+      const [y, m] = monthFilter.split('-').map(Number);
+      monthLabel.textContent = `${y}년 ${m}월`;
+      monthAllBtn.classList.remove('active');
+      monthAllBtn.textContent = '전체보기';
+      monthPrev.disabled = false;
+      monthNext.disabled = false;
+    }
+
+    let visibleEntries = monthFilter === 'all' ? entries : entries.filter(e => monthKey(e.date) === monthFilter);
+    if(diffFilter === 'over') visibleEntries = visibleEntries.filter(e=> !e.groupId && e.diffH > 0);
+    if(diffFilter === 'under') visibleEntries = visibleEntries.filter(e=> !e.groupId && e.diffH < 0);
+
+    if(visibleEntries.length === 0){
+      const emptyMsg = diffFilter === 'over' ? '초과 근무 기록이 없습니다'
+        : diffFilter === 'under' ? '단축 근무 기록이 없습니다'
+        : (entries.length === 0 ? '기록이 없습니다' : '이 달엔 기록이 없습니다');
+      entryList.innerHTML = `<div class="empty">${emptyMsg}</div>`;
+    } else {
+      entryList.innerHTML = '';
+      visibleEntries.forEach(e=>{
+        const diffClass = e.diffH === 0 ? 'zero' : (e.diffH > 0 ? 'plus' : 'minus');
+        const isGrouped = !!e.groupId;
+        const div = document.createElement('div');
+        div.className = 'entry' + (isGrouped ? ' grouped' : '');
+        const checkboxHtml = (!isGrouped && e.diffH !== 0)
+          ? `<input type="checkbox" class="pair-check" data-date="${e.date}" ${selectedDates.has(e.date) ? 'checked' : ''}>`
+          : '';
+        const groupBadgeHtml = isGrouped
+          ? `<span class="group-badge">묶음 상쇄완료</span><button class="ungroup" data-date="${e.date}">해제</button>`
+          : '';
+
+        let reasonRowHtml = '';
+        if(e.diffH > 0){
+          reasonRowHtml = `
+            <div class="entry-reason">
+              <input type="text" class="reason-input" data-date="${e.date}" placeholder="업무 내역 입력" value="${(e.reason||'').replace(/"/g,'&quot;')}">
+              <button type="button" class="copy-reason-btn" data-date="${e.date}">[초과 근무] 복사</button>
+            </div>`;
+        } else if(e.diffH < 0){
+          reasonRowHtml = `
+            <div class="entry-reason">
+              <button type="button" class="copy-reason-btn" data-date="${e.date}" style="flex:1;">[단축 근무] 복사</button>
+            </div>`;
+        }
+
+        div.innerHTML = `
+          <div class="entry-main">
+            ${checkboxHtml}
+            <div class="date">${formatMDDay(e.date)}</div>
+            <div class="detail">
+              <div class="times">${e.start}\u2013${e.end}</div>
+              <div class="meta">${formatWorked(e.workedMin)}${e.noLunch ? ' · 점심 미차감' : ''}${e.breakTime > 0 ? ' · 휴게 ' + e.breakTime + 'h' : ''}</div>
+            </div>
+            ${groupBadgeHtml}
+            <div class="diff ${diffClass}">${formatDiff(e.diffH)}</div>
+            <button class="del" data-date="${e.date}" title="삭제">×</button>
+          </div>
+          ${reasonRowHtml}
+        `;
+        entryList.appendChild(div);
+      });
+      entryList.querySelectorAll('.del').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          const d = btn.dataset.date;
+          selectedDates.delete(d);
+          entries = entries.filter(e=> e.date !== d);
+          await save();
+          render();
+        });
+      });
+      entryList.querySelectorAll('.reason-input').forEach(inp=>{
+        inp.addEventListener('input', async ()=>{
+          const d = inp.dataset.date;
+          const e = entries.find(en=>en.date===d);
+          if(e){ e.reason = inp.value; await save(); }
+        });
+      });
+      entryList.querySelectorAll('.copy-reason-btn').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          const d = btn.dataset.date;
+          const e = entries.find(en=>en.date===d);
+          if(!e) return;
+          const text = e.diffH > 0 ? `[초과 근무] ${e.reason || ''}` : '[단축 근무]';
+          try{
+            await navigator.clipboard.writeText(text);
+          }catch(err){
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+          }
+          const original = btn.textContent;
+          btn.textContent = '복사됨 ✓';
+          btn.classList.add('copied');
+          setTimeout(()=>{ btn.textContent = original; btn.classList.remove('copied'); }, 1200);
+        });
+      });
+      entryList.querySelectorAll('.pair-check').forEach(cb=>{
+        cb.addEventListener('change', ()=>{
+          const d = cb.dataset.date;
+          if(cb.checked) selectedDates.add(d); else selectedDates.delete(d);
+          updatePairBar();
+        });
+      });
+      entryList.querySelectorAll('.ungroup').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          const d = btn.dataset.date;
+          const e = entries.find(en=>en.date===d);
+          if(!e) return;
+          const gid = e.groupId;
+          entries.forEach(en=>{ if(en.groupId===gid) en.groupId=null; });
+          await save();
+          render();
+        });
+      });
+    }
+
+    // 초과/단축 근무는 "묶음(상쇄완료)"로 확정되지 않은 기록 중, 선택한 월 기준 (전체보기 시엔 전체 기간)
+    // 짝짓기는 합이 정확히 0인 조합만 확정하므로, 미확정 목록엔 초과분과 단축분이 동시에 남아있을 수 있음
+    // → 서로 다른 곳(초과=근태사이트, 단축=휴가등록)에 올려야 해서 각각 gross로 표시
+    const scopedEntries = monthFilter === 'all' ? entries : entries.filter(e => monthKey(e.date) === monthFilter);
+    const unresolved = scopedEntries.filter(e=> !e.groupId);
+    const overtimeH = Math.round(unresolved.filter(e=> e.diffH > 0).reduce((sum,e)=> sum+e.diffH, 0) * 2) / 2;
+    const undertimeH = Math.round(unresolved.filter(e=> e.diffH < 0).reduce((sum,e)=> sum+Math.abs(e.diffH), 0) * 2) / 2;
+
+    overtimeValue.textContent = `${overtimeH}h`;
+    undertimeValue.textContent = `${undertimeH}h`;
+    summaryFace.textContent = faceForDiff(scopedEntries.length === 0 ? 0 : overtimeH);
+    summaryHint.classList.toggle('warn', undertimeH > 0);
+
+    const overtimeDates = unresolved.filter(e=> e.diffH > 0).sort((a,b)=> a.date.localeCompare(b.date));
+    const undertimeDates = unresolved.filter(e=> e.diffH < 0).sort((a,b)=> a.date.localeCompare(b.date));
+
+    overtimeDatesEl.innerHTML = overtimeDates.length === 0 ? '' : `
+      <div class="chip-label">초과 올릴 날짜 (${overtimeDates.length}건)</div>
+      <div class="chip-row">${overtimeDates.map(e=> `<span class="chip over">${formatMDDay(e.date)} ${formatDiff(e.diffH)}</span>`).join('')}</div>`;
+
+    undertimeDatesEl.innerHTML = undertimeDates.length === 0 ? '' : `
+      <div class="chip-label">휴가 등록할 날짜 (${undertimeDates.length}건)</div>
+      <div class="chip-row">${undertimeDates.map(e=> `<span class="chip under">${formatMDDay(e.date)} ${formatDiff(e.diffH)}</span>`).join('')}</div>`;
+
+    diffFilterEl.querySelector('[data-filter="all"]').textContent = '전체';
+    diffFilterEl.querySelector('[data-filter="over"]').textContent = `초과만 (${overtimeDates.length})`;
+    diffFilterEl.querySelector('[data-filter="under"]').textContent = `단축만 (${undertimeDates.length})`;
+
+    if(scopedEntries.length === 0){
+      summaryHint.textContent = monthFilter === 'all' ? '기록을 추가하면 계산됩니다' : '이 달엔 기록이 없습니다';
+    } else if(overtimeH === 0 && undertimeH === 0 && unresolved.length > 0){
+      summaryHint.textContent = `미확정 ${unresolved.length}건 모두 8시간 근무 — 올릴 시간 없음`;
+    } else if(undertimeH > 0){
+      summaryHint.textContent = `⚠️ 단축 대기 ${undertimeH}h 있음 — 휴가 등록 검토 필요`;
+    } else if(unresolved.length === 0){
+      summaryHint.textContent = `${scopedEntries.length}건 묶음 처리 완료`;
+    } else {
+      summaryHint.textContent = `미확정 ${unresolved.length}건 · 확정 ${scopedEntries.length - unresolved.length}건`;
+    }
+
+    updatePairBar();
+  }
+
+  function updatePairBar(){
+    if(selectedDates.size === 0){
+      pairBar.classList.remove('show');
+      return;
+    }
+    pairBar.classList.add('show');
+    const selectedEntries = entries.filter(e=> selectedDates.has(e.date));
+    const sum = Math.round(selectedEntries.reduce((s,e)=> s+e.diffH, 0) * 2) / 2;
+    pairStatus.textContent = `${selectedEntries.length}건 선택 · 합계 ${formatDiff(sum)}`;
+    pairStatus.classList.toggle('ok', sum === 0);
+    pairConfirmBtn.disabled = !(sum === 0 && selectedEntries.length >= 2);
+  }
+
+  pairCancelBtn.addEventListener('click', ()=>{
+    selectedDates.clear();
+    render();
+  });
+
+  pairConfirmBtn.addEventListener('click', async ()=>{
+    const gid = 'g' + Date.now();
+    entries.forEach(e=>{ if(selectedDates.has(e.date)) e.groupId = gid; });
+    selectedDates.clear();
+    await save();
+    render();
+
+    // 확정 후에도 단축 대기분이 남아있으면(초과와 무관하게) 휴가 등록 알림
+    const scoped = monthFilter === 'all' ? entries : entries.filter(e => monthKey(e.date) === monthFilter);
+    const stillUnresolved = scoped.filter(e=> !e.groupId);
+    const remainingUndertime = Math.round(stillUnresolved.filter(e=> e.diffH < 0).reduce((sum,e)=> sum+Math.abs(e.diffH), 0) * 2) / 2;
+    if(remainingUndertime > 0){
+      alert(`짝 확정 후에도 단축 대기 ${remainingUndertime}h가 남아있어요.\n부족한 시간만큼 휴가 등록을 검토해주세요.`);
+    }
+  });
+
+  function isNightShift(e){
+    // 종료 시각이 22시(오후 10시) 이후면 심야근무로 간주
+    const endH = parseInt(e.end.split(':')[0]);
+    return endH >= 22;
+  }
+
+  autoMatchBtn.addEventListener('click', ()=>{
+    const all = entries.filter(e=> !e.groupId && e.diffH !== 0);
+    // 1순위: 평일 + 심야 아닌 일반 초과/단축근무끼리만 매칭 시도
+    const normalPool = all.filter(e=> !isWeekend(e.date) && !isNightShift(e));
+    let match = findZeroSumSubset(normalPool, 4);
+    let usedSpecial = false;
+
+    if(!match){
+      // 2순위(최후): 주말·심야근무까지 포함해서 재시도
+      match = findZeroSumSubset(all, 4);
+      usedSpecial = true;
+    }
+
+    if(!match){
+      statusMsg.textContent = '합이 0이 되는 조합을 찾지 못했습니다';
+      return;
+    }
+    selectedDates = new Set(match.map(e=>e.date));
+    const includesSpecial = match.some(e=> isWeekend(e.date) || isNightShift(e));
+    statusMsg.textContent = (usedSpecial && includesSpecial)
+      ? '일반 초과근무만으로는 못 찾아 주말/심야근무를 포함했습니다 — 수당 배율이 다르니 확정 전 확인해주세요'
+      : '';
+    render();
+  });
+
+  // 최대 maxSize개까지의 조합 중 diffH 합이 0인 첫 조합을 찾는 간단한 탐색 (기록 수가 적어 브루트포스로 충분)
+  function findZeroSumSubset(list, maxSize){
+    const n = list.length;
+    for(let size=2; size<=Math.min(maxSize, n); size++){
+      const combo = [];
+      function backtrack(start){
+        if(combo.length === size){
+          const sum = Math.round(combo.reduce((s,e)=> s+e.diffH, 0) * 2) / 2;
+          if(sum === 0) return combo.slice();
+          return null;
+        }
+        for(let i=start; i<n; i++){
+          combo.push(list[i]);
+          const found = backtrack(i+1);
+          if(found) return found;
+          combo.pop();
+        }
+        return null;
+      }
+      const result = backtrack(0);
+      if(result) return result;
+    }
+    return null;
+  }
+
+
+
+  function faceForDiff(diff){
+    if(diff <= 0) return '😊';
+    if(diff <= 1) return '🙂';
+    if(diff <= 2) return '😐';
+    if(diff <= 3) return '😕';
+    if(diff <= 4) return '😟';
+    return '😢';
+  }
+
+  async function load(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      entries = raw ? JSON.parse(raw) : [];
+    }catch(err){
+      entries = [];
+      statusMsg.textContent = '저장된 기록을 불러오지 못했습니다';
+    }
+    render();
+  }
+
+  async function save(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+      statusMsg.textContent = '';
+    }catch(err){
+      statusMsg.textContent = '저장 실패 — 브라우저 저장공간을 확인해주세요';
+    }
+  }
+
+  clearAllBtn.addEventListener('click', async ()=>{
+    if(!confirm('전체 기록을 삭제할까요? 되돌릴 수 없습니다.')) return;
+    entries = [];
+    await save();
+    render();
+  });
+
+  load();
+</script>
+</body>
+</html>
