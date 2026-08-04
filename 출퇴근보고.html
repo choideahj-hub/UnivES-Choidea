@@ -208,6 +208,18 @@
     color: var(--ink);
     min-height: 20px;
     word-break: keep-all;
+    white-space: pre-line;
+    line-height: 1.6;
+  }
+  .next-day-section.hidden{ display:none; }
+  .next-day-label{
+    padding: 8px 12px;
+    background: var(--accent-soft);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 12px;
   }
   .copy-btn {
     margin-top: 14px;
@@ -261,6 +273,25 @@
       <button class="toggle-btn" data-dir="end">🌙 종료/퇴근</button>
     </div>
 
+    <div id="nextDaySection" class="next-day-section hidden">
+      <hr class="result-divider" style="margin:16px 0 12px;">
+      <div class="next-day-label" id="nextDayLabel">다음 근무일: -</div>
+
+      <label>다음 근무일 출근 시간</label>
+      <div class="quick-hours" id="quickHoursNext"></div>
+      <div class="hour-grid hidden" id="hourGridNext"></div>
+      <div class="min-toggle" id="minToggleNext">
+        <button type="button" data-min="0">:00</button>
+        <button type="button" data-min="30">:30</button>
+      </div>
+
+      <label>다음 근무일 근무 형태</label>
+      <div class="toggle-group" id="locGroupNext">
+        <button class="toggle-btn active" data-loc="home">🏠 재택</button>
+        <button class="toggle-btn" data-loc="office">🏢 사무실</button>
+      </div>
+    </div>
+
     <hr class="result-divider">
     <div class="result-label">결과</div>
     <div class="preview" id="preview">-</div>
@@ -274,48 +305,17 @@
   const preview = document.getElementById('preview');
   const copyBtn = document.getElementById('copyBtn');
   const dateDisplay = document.getElementById('dateDisplay');
-  const hourGrid = document.getElementById('hourGrid');
-  const minToggle = document.getElementById('minToggle');
   const locGroup = document.getElementById('locGroup');
   const dirGroup = document.getElementById('dirGroup');
-
-  const quickHours = document.getElementById('quickHours');
+  const nextDaySection = document.getElementById('nextDaySection');
+  const nextDayLabel = document.getElementById('nextDayLabel');
+  const locGroupNext = document.getElementById('locGroupNext');
 
   let currentLoc = 'home';   // home | office
   let currentDir = 'start';  // start | end
+  let nextLoc = 'home';      // 다음 근무일 근무 형태
   const timeState = { hour: 9, min: 0 };
-
-  function selectHour(h){
-    timeState.hour = h;
-    document.querySelectorAll('#quickHours button, #hourGrid button').forEach(b=>{
-      b.classList.toggle('active', parseInt(b.dataset.hour) === h);
-    });
-    buildText();
-  }
-
-  // 자주 쓰는 시간: 8~10시(오전) / 17~19시(오후) + 더보기, 전부 같은 크기의 한 줄
-  const QUICK_GROUPS = [[8,9,10], [17,18,19]];
-  QUICK_GROUPS.forEach(hours => {
-    hours.forEach(h => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.textContent = `${h}시`;
-      btn.dataset.hour = h;
-      if (h === timeState.hour) btn.classList.add('active');
-      btn.addEventListener('click', () => selectHour(h));
-      quickHours.appendChild(btn);
-    });
-  });
-  const moreBtn = document.createElement('button');
-  moreBtn.type = 'button';
-  moreBtn.className = 'more-btn';
-  moreBtn.textContent = '더보기';
-  moreBtn.addEventListener('click', () => {
-    const isHidden = hourGrid.classList.toggle('hidden');
-    moreBtn.textContent = isHidden ? '더보기' : '접기';
-    moreBtn.classList.toggle('expanded', !isHidden);
-  });
-  quickHours.appendChild(moreBtn);
+  const nextTimeState = { hour: 9, min: 0 };
 
   // 오늘 날짜 고정
   const today = new Date();
@@ -325,24 +325,76 @@
   const dayName = days[today.getDay()];
   dateDisplay.textContent = `${y}년 ${m}월 ${d}일 (${dayName})`;
 
-  // 전체 시간(6~27시) - "다른 시간 선택" 안에 작은 그리드로
-  for (let h = 6; h <= 27; h++) {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.textContent = h;
-    btn.dataset.hour = h;
-    if (h === timeState.hour) btn.classList.add('active');
-    btn.addEventListener('click', () => selectHour(h));
-    hourGrid.appendChild(btn);
+  // 다음 근무일 계산: 금요일에 퇴근하면 다음 근무일은 그 다음 주 월요일 (주말 스킵)
+  function getNextWorkDate(base){
+    const nd = new Date(base);
+    nd.setDate(nd.getDate() + (base.getDay() === 5 ? 3 : 1));
+    return nd;
   }
-  minToggle.querySelectorAll('button').forEach(btn => {
-    if (parseInt(btn.dataset.min) === timeState.min) btn.classList.add('active');
-    btn.addEventListener('click', () => {
-      timeState.min = parseInt(btn.dataset.min);
-      minToggle.querySelectorAll('button').forEach(b => b.classList.toggle('active', b === btn));
-      buildText();
+  const nextWorkDate = getNextWorkDate(today);
+  const nm = nextWorkDate.getMonth() + 1;
+  const nd_ = nextWorkDate.getDate();
+  const nDayName = days[nextWorkDate.getDay()];
+  nextDayLabel.textContent = `다음 근무일: ${nm}/${nd_}(${nDayName})${today.getDay()===5 ? ' — 금요일이라 다음 주 월요일로 자동 계산' : ''}`;
+
+  // 시간 선택기(자주 쓰는 시간 + 더보기 그리드 + 분 토글)를 세팅하는 공용 함수
+  function setupTimePicker(quickHoursEl, hourGridEl, minToggleEl, state, onChange){
+    const QUICK_GROUPS = [[8,9,10], [17,18,19]];
+    function selectHour(h){
+      state.hour = h;
+      quickHoursEl.querySelectorAll('button[data-hour]').forEach(b=> b.classList.toggle('active', parseInt(b.dataset.hour) === h));
+      hourGridEl.querySelectorAll('button[data-hour]').forEach(b=> b.classList.toggle('active', parseInt(b.dataset.hour) === h));
+      onChange();
+    }
+    QUICK_GROUPS.forEach(hours=>{
+      hours.forEach(h=>{
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = `${h}시`;
+        btn.dataset.hour = h;
+        if(h === state.hour) btn.classList.add('active');
+        btn.addEventListener('click', ()=> selectHour(h));
+        quickHoursEl.appendChild(btn);
+      });
     });
-  });
+    const moreBtn = document.createElement('button');
+    moreBtn.type = 'button';
+    moreBtn.className = 'more-btn';
+    moreBtn.textContent = '더보기';
+    moreBtn.addEventListener('click', ()=>{
+      const isHidden = hourGridEl.classList.toggle('hidden');
+      moreBtn.textContent = isHidden ? '더보기' : '접기';
+      moreBtn.classList.toggle('expanded', !isHidden);
+    });
+    quickHoursEl.appendChild(moreBtn);
+
+    for(let h=6; h<=27; h++){
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = h;
+      btn.dataset.hour = h;
+      if(h === state.hour) btn.classList.add('active');
+      btn.addEventListener('click', ()=> selectHour(h));
+      hourGridEl.appendChild(btn);
+    }
+    minToggleEl.querySelectorAll('button').forEach(btn=>{
+      if(parseInt(btn.dataset.min) === state.min) btn.classList.add('active');
+      btn.addEventListener('click', ()=>{
+        state.min = parseInt(btn.dataset.min);
+        minToggleEl.querySelectorAll('button').forEach(b=> b.classList.toggle('active', b === btn));
+        onChange();
+      });
+    });
+  }
+
+  setupTimePicker(
+    document.getElementById('quickHours'), document.getElementById('hourGrid'), document.getElementById('minToggle'),
+    timeState, buildText
+  );
+  setupTimePicker(
+    document.getElementById('quickHoursNext'), document.getElementById('hourGridNext'), document.getElementById('minToggleNext'),
+    nextTimeState, buildText
+  );
 
   function typeLabel(loc, dir) {
     if (loc === 'home' && dir === 'start') return '재택근무 시작합니다';
@@ -357,7 +409,11 @@
 
   function buildText() {
     const timeStr = formatTime(timeState.hour, timeState.min);
-    const text = `${m}/${d}(${dayName}) ${timeStr} ${typeLabel(currentLoc, currentDir)}`;
+    let text = `${m}/${d}(${dayName}) ${timeStr} ${typeLabel(currentLoc, currentDir)}`;
+    if(currentDir === 'end'){
+      const nextTimeStr = formatTime(nextTimeState.hour, nextTimeState.min);
+      text += `\n${nm}/${nd_}(${nDayName}) ${nextTimeStr} ${typeLabel(nextLoc, 'start')}`;
+    }
     preview.textContent = text;
     return text;
   }
@@ -371,11 +427,21 @@
     });
   });
 
+  locGroupNext.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      locGroupNext.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      nextLoc = btn.dataset.loc;
+      buildText();
+    });
+  });
+
   dirGroup.querySelectorAll('.toggle-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       dirGroup.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       currentDir = btn.dataset.dir;
+      nextDaySection.classList.toggle('hidden', currentDir !== 'end');
       buildText();
     });
   });
