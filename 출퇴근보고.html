@@ -15,6 +15,12 @@
     --card: #FFFFFF;
   }
   * { box-sizing: border-box; }
+  .hidden{ display:none !important; }
+  .hint{
+    font-weight:400;
+    color:var(--ink-soft);
+    opacity:0.75;
+  }
   body {
     margin:0;
     font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
@@ -39,6 +45,16 @@
     margin:0 0 12px 0;
     letter-spacing:-0.01em;
   }
+  .title-emoji{
+    display:inline-block;
+    animation: titleBounce 1.6s ease-in-out infinite;
+  }
+  @keyframes titleBounce{
+    0%, 100%{ transform: translateY(0) rotate(0deg); }
+    25%{ transform: translateY(-3px) rotate(-6deg); }
+    50%{ transform: translateY(0) rotate(0deg); }
+    75%{ transform: translateY(-2px) rotate(6deg); }
+  }
   .card {
     background: var(--card);
     border:1px solid var(--line);
@@ -50,8 +66,8 @@
     font-size: 12px;
     font-weight:600;
     color: var(--ink-soft);
-    margin-bottom: 5px;
-    margin-top: 12px;
+    margin-bottom: 8px;
+    margin-top: 16px;
   }
   label:first-of-type{ margin-top:0; }
   .date-display {
@@ -66,6 +82,12 @@
     display: flex;
     gap: 7px;
   }
+  .toggle-group.wrap-2{
+    flex-wrap: wrap;
+  }
+  .toggle-group.wrap-2 .toggle-btn{
+    flex: 1 1 calc(50% - 3.5px);
+  }
   .toggle-btn {
     flex: 1;
     padding: 9px;
@@ -77,6 +99,7 @@
     transition: all 0.15s;
     color: var(--ink);
     font-family: inherit;
+    white-space: nowrap;
   }
   .toggle-btn:hover{ border-color: var(--accent); }
   .toggle-btn.active {
@@ -84,6 +107,18 @@
     background: var(--accent);
     color: #fff;
     font-weight: 700;
+  }
+  #dirGroup .toggle-btn[data-dir="start"].active{
+    border-color: #F2A93B;
+    background: #F2A93B;
+  }
+  #dirGroup .toggle-btn[data-dir="break"].active{
+    border-color: #8B7FD6;
+    background: #8B7FD6;
+  }
+  #dirGroup .toggle-btn[data-dir="end"].active{
+    border-color: #FF6B4A;
+    background: #FF6B4A;
   }
   .quick-label-row{
     display:grid;
@@ -101,10 +136,13 @@
     display:grid;
     grid-template-columns: repeat(7, 1fr);
     gap:8px;
-    margin-bottom:12px;
+    margin-bottom:16px;
+  }
+  .quick-hours.compact{
+    grid-template-columns: repeat(4, 1fr);
   }
   .quick-hours button{
-    padding:13px 2px;
+    padding:9px 2px;
     border:1.5px solid var(--line);
     border-radius:9px;
     background:#fff;
@@ -135,6 +173,14 @@
     border-color:var(--accent);
     color:#fff;
   }
+  .next-day-section .quick-hours button.more-btn{
+    background:#fff;
+    border-color:var(--accent);
+  }
+  .next-day-section .quick-hours button.more-btn.expanded{
+    background:var(--accent);
+    color:#fff;
+  }
   .hour-grid.hidden{
     display:none;
   }
@@ -142,7 +188,7 @@
     display:grid;
     grid-template-columns: repeat(auto-fill, minmax(28px, 1fr));
     gap:5px;
-    margin-bottom:12px;
+    margin-bottom:16px;
   }
   .hour-grid button{
     padding:6px 0;
@@ -200,29 +246,180 @@
   }
   .preview {
     margin-top: 4px;
-    padding: 12px;
+    padding: 16px;
     background: #FFEFE8;
+    border-left: 4px solid #FF6B4A;
     border-radius: 9px;
-    font-size: 14px;
-    font-weight:600;
+    font-size: 17px;
+    font-weight:800;
     color: var(--ink);
     min-height: 20px;
     word-break: keep-all;
     white-space: pre-line;
-    line-height: 1.6;
+    line-height: 1.55;
+    letter-spacing: -0.01em;
+    transition: background 0.25s ease, border-color 0.25s ease;
+  }
+  .preview.dir-start{
+    background: #FFF6E0;
+    border-left-color: #F2A93B;
+  }
+  .preview.dir-break{
+    background: #EFEBFB;
+    border-left-color: #8B7FD6;
+  }
+  .preview.dir-end{
+    background: #FFEFE8;
+    border-left-color: #FF6B4A;
+  }
+  @keyframes previewPop{
+    0%{ opacity:0.3; transform: translateY(5px) scale(0.99); }
+    100%{ opacity:1; transform: translateY(0) scale(1); }
+  }
+  .preview.animate{
+    animation: previewPop 0.28s cubic-bezier(.2,.8,.3,1);
+  }
+  @keyframes copyPop{
+    0%{ transform: scale(1); }
+    45%{ transform: scale(1.045); }
+    100%{ transform: scale(1); }
+  }
+  .copy-btn.copied{
+    animation: copyPop 0.32s ease;
+  }
+  @keyframes dirSwitchPop{
+    0%{ transform: scale(0.94); }
+    100%{ transform: scale(1); }
+  }
+  .toggle-btn.active{
+    animation: dirSwitchPop 0.18s ease;
   }
   .next-day-section.hidden{ display:none; }
+  .break-section.hidden{ display:none; }
+  .chapter-box{
+    padding:16px;
+    border-radius:10px;
+    margin-top:16px;
+  }
+  .chapter-box.hidden{ display:none; }
+  .chapter-box label,
+  .break-section label,
+  .next-day-section label{
+    margin-top:16px;
+  }
+  .chapter-box label:first-of-type,
+  .break-section label:first-of-type,
+  .next-day-section label:first-of-type{
+    margin-top:16px;
+  }
+  .chapter-box > label:first-child,
+  .break-section > label:first-child,
+  .next-day-section > label:first-child{
+    margin-top:0;
+  }
+  .time-box{
+    background:#EEF3F1;
+    border:1px solid #B9D2CA;
+  }
+  .break-section{
+    margin-top:16px;
+    padding:16px;
+    background:#F3F1EC;
+    border:1px solid var(--line);
+    border-radius:10px;
+  }
+  .next-day-section{
+    margin-top:16px;
+    padding:16px;
+    background:var(--accent-soft);
+    border:1px solid var(--accent);
+    border-radius:10px;
+  }
+  .break-section label,
+  .next-day-section label{
+    margin-top:16px;
+  }
+  .section-title{
+    display:flex;
+    align-items:center;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-bottom:16px;
+  }
+  .section-title.next{ color:var(--accent); }
+  .step-num{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:16px;
+    height:16px;
+    border-radius:50%;
+    background:var(--ink-soft);
+    color:#fff;
+    font-size:10px;
+    font-weight:800;
+    margin-right:6px;
+    flex-shrink:0;
+  }
+  .step-num.next{ background:var(--accent); }
+  #breakSection{
+    padding-top:10px;
+    padding-bottom:10px;
+  }
+  #breakSection .section-title{
+    margin-bottom:8px;
+  }
+  #breakSection label{
+    margin-top:8px;
+    margin-bottom:4px;
+  }
+  #breakSection label:first-of-type{
+    margin-top:0;
+  }
   .next-day-label{
-    padding: 8px 12px;
-    background: var(--accent-soft);
-    border-radius: 8px;
-    font-size: 13px;
-    color: var(--accent);
-    font-weight: 700;
-    margin-bottom: 12px;
+    font-size:15px;
+    color:var(--accent);
+    font-weight:800;
+    margin-bottom:4px;
+  }
+  .edit-label{
+    font-size:11px;
+    font-weight:500;
+    color:var(--ink-soft);
+    margin-top:2px;
+    margin-bottom:4px;
+  }
+  .edit-label .hint{
+    text-decoration:underline;
+    text-underline-offset:2px;
+  }
+  .custom-input.compact-input{
+    margin-top:0;
+    padding:6px 10px;
+    font-size:12px;
+    max-width:170px;
+  }
+  .custom-input{
+    width:100%;
+    margin-top:10px;
+    padding:9px 12px;
+    border:1px solid var(--accent);
+    border-radius:8px;
+    font-size:13px;
+    font-family:inherit;
+    color:var(--ink);
+    background:#fff;
+  }
+  .custom-input.hidden{ display:none; }
+  .custom-input:focus{
+    outline:2px solid var(--accent);
+    outline-offset:1px;
   }
   .copy-btn {
-    margin-top: 14px;
+    margin-top: 16px;
     width: 100%;
     padding: 16px;
     border: none;
@@ -234,7 +431,37 @@
     cursor: pointer;
     font-family: inherit;
     box-shadow: 0 4px 14px rgba(255,107,74,0.35);
-    transition: opacity 0.15s, transform 0.1s;
+    transition: opacity 0.15s, transform 0.1s, background 0.25s ease, box-shadow 0.25s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .copy-icon{
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+  }
+  .copy-icon.pop{
+    animation: copyIconPop 0.4s cubic-bezier(.3,1.6,.4,1);
+  }
+  @keyframes copyIconPop{
+    0%{ transform: scale(1) rotate(0deg); }
+    40%{ transform: scale(1.35) rotate(-10deg); }
+    70%{ transform: scale(0.95) rotate(4deg); }
+    100%{ transform: scale(1) rotate(0deg); }
+  }
+  .copy-btn.dir-start{
+    background: #F2A93B;
+    box-shadow: 0 4px 14px rgba(242,169,59,0.35);
+  }
+  .copy-btn.dir-break{
+    background: #8B7FD6;
+    box-shadow: 0 4px 14px rgba(139,127,214,0.35);
+  }
+  .copy-btn.dir-end{
+    background: #FF6B4A;
+    box-shadow: 0 4px 14px rgba(255,107,74,0.35);
   }
   .copy-btn:hover{ opacity:0.92; }
   .copy-btn:active{ transform: scale(0.99); }
@@ -242,50 +469,122 @@
     background: #2F9E5B;
     box-shadow: 0 4px 14px rgba(47,158,91,0.35);
   }
+  .footnote{
+    margin-top:14px;
+    padding:0 4px;
+    font-size:10.5px;
+    line-height:1.7;
+    color:var(--ink-soft);
+    opacity:0.75;
+    text-align:center;
+  }
+  .footnote b{ color:var(--ink); font-weight:700; }
+  .footnote .credit{
+    display:inline-block;
+    margin-top:8px;
+    font-size:10px;
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="eyebrow">대학내일</div>
-  <h1>출퇴근 보고</h1>
+  <h1>출퇴근 보고 <span class="title-emoji">💼</span></h1>
 
   <div class="card">
     <label>날짜</label>
     <div class="date-display" id="dateDisplay">-</div>
 
-    <label>시간</label>
-    <div class="quick-hours" id="quickHours"></div>
-    <div class="hour-grid hidden" id="hourGrid"></div>
-    <div class="min-toggle" id="minToggle">
-      <button type="button" data-min="0">:00</button>
-      <button type="button" data-min="30">:30</button>
-    </div>
-
-    <label>근무 형태</label>
-    <div class="toggle-group" id="locGroup">
-      <button class="toggle-btn active" data-loc="home">🏠 재택</button>
-      <button class="toggle-btn" data-loc="office">🏢 사무실</button>
-    </div>
-
     <label>구분</label>
     <div class="toggle-group" id="dirGroup">
       <button class="toggle-btn active" data-dir="start">🌅 시작/출근</button>
+      <button class="toggle-btn" data-dir="break">☕ 휴게</button>
       <button class="toggle-btn" data-dir="end">🌙 종료/퇴근</button>
     </div>
 
-    <div id="nextDaySection" class="next-day-section hidden">
-      <hr class="result-divider" style="margin:16px 0 12px;">
-      <div class="next-day-label" id="nextDayLabel">다음 근무일: -</div>
+    <div id="mainTimeSection" class="chapter-box time-box">
+      <div class="section-title" id="mainTimeSectionTitle"><span class="step-num">1</span>출근 시간</div>
+      <label>시간</label>
+      <div class="quick-hours" id="quickHours"></div>
+      <div class="hour-grid hidden" id="hourGrid"></div>
+      <div class="min-toggle" id="minToggle">
+        <button type="button" data-min="0">:00</button>
+        <button type="button" data-min="30">:30</button>
+      </div>
 
-      <label>다음 근무일 출근 시간</label>
-      <div class="quick-hours" id="quickHoursNext"></div>
+      <div id="locSection">
+        <label>근무 형태</label>
+        <div class="toggle-group" id="locGroup">
+          <button class="toggle-btn active" data-loc="home">🏠 재택</button>
+          <button class="toggle-btn" data-loc="office">🏢 사무실</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="midBreakSection" class="break-section hidden">
+      <div class="section-title">☕ 휴게 상세</div>
+      <label>종류</label>
+      <div class="toggle-group" id="midBreakTypeGroup">
+        <button class="toggle-btn active" data-type="general">휴게</button>
+        <button class="toggle-btn" data-type="lunch">점심</button>
+      </div>
+
+      <div id="midBreakDurationWrap">
+        <label>휴게 시간</label>
+        <div class="toggle-group" id="midBreakDurationGroup">
+          <button class="toggle-btn active" data-break="0.5">0.5h</button>
+          <button class="toggle-btn" data-break="1">1h</button>
+          <button class="toggle-btn" data-break="1.5">1.5h</button>
+          <button class="toggle-btn" data-break="2">2h</button>
+          <button class="toggle-btn" data-break="custom" id="midBreakCustomBtn">직접</button>
+        </div>
+        <input type="number" id="midBreakCustomInput" class="custom-input hidden" step="0.5" min="0" placeholder="휴게 시간(h) 입력">
+      </div>
+
+      <div id="midBreakTransitionWrap">
+        <label>휴게 후 근무 위치</label>
+        <div class="toggle-group" id="midBreakTransitionGroup">
+          <button class="toggle-btn active" data-transition="none" id="transitionNoneBtn">일반 휴게</button>
+          <button class="toggle-btn" data-transition="home">🏠 재택 전환</button>
+          <button class="toggle-btn" data-transition="office">🏢 출근</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="breakSection" class="break-section hidden">
+      <div class="section-title"><span class="step-num">2</span>휴게 사용</div>
+      <label>휴게 시간</label>
+      <div class="toggle-group" id="breakGroup">
+        <button class="toggle-btn active" data-break="0">0h</button>
+        <button class="toggle-btn" data-break="0.5">0.5h</button>
+        <button class="toggle-btn" data-break="1">1h</button>
+        <button class="toggle-btn" data-break="1.5">1.5h</button>
+        <button class="toggle-btn" data-break="2">2h</button>
+        <button class="toggle-btn" data-break="custom" id="breakCustomBtn">직접</button>
+      </div>
+      <input type="number" id="breakCustomInput" class="custom-input hidden" step="0.5" min="0" placeholder="휴게 시간(h) 입력">
+
+      <div class="toggle-group" id="lunchGroup" style="margin-top:8px;">
+        <button class="toggle-btn active" data-lunch="yes">🍱 점심 포함</button>
+        <button class="toggle-btn" data-lunch="no">🚫 점심 없이</button>
+      </div>
+    </div>
+
+    <div id="nextDaySection" class="next-day-section hidden">
+      <div class="section-title next"><span class="step-num next">3</span>다음 근무 시작</div>
+      <div class="next-day-label" id="nextDayLabel">-</div>
+      <label class="edit-label">날짜 변경도 가능해요! ▼</label>
+      <input type="date" id="nextWorkDateInput" class="custom-input compact-input">
+
+      <label>출근 시간</label>
+      <div class="quick-hours compact" id="quickHoursNext"></div>
       <div class="hour-grid hidden" id="hourGridNext"></div>
       <div class="min-toggle" id="minToggleNext">
         <button type="button" data-min="0">:00</button>
         <button type="button" data-min="30">:30</button>
       </div>
 
-      <label>다음 근무일 근무 형태</label>
+      <label>근무 형태</label>
       <div class="toggle-group" id="locGroupNext">
         <button class="toggle-btn active" data-loc="home">🏠 재택</button>
         <button class="toggle-btn" data-loc="office">🏢 사무실</button>
@@ -293,27 +592,57 @@
     </div>
 
     <hr class="result-divider">
-    <div class="result-label">결과</div>
+    <div class="result-label" id="resultLabel">출근 보고</div>
     <div class="preview" id="preview">-</div>
 
-    <button class="copy-btn" id="copyBtn">문구 복사하기</button>
+    <button class="copy-btn" id="copyBtn">
+      <span class="copy-icon" id="copyIcon"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></span>
+      <span id="copyBtnText">형 나 출근하네...</span>
+    </button>
+  </div>
+
+  <div class="footnote">
+    📱 홈 화면에 추가하면 앱처럼 바로 켤 수 있어요<br>
+    <b>아이폰(사파리)</b> · 공유 버튼(⬆️) → "홈 화면에 추가"<br>
+    <b>안드로이드(크롬)</b> · 오른쪽 위 메뉴(⋮) → "홈 화면에 추가" 또는 "앱 설치"<br>
+    <span class="credit">만든이: 최현정</span>
   </div>
 </div>
 
 <script>
   const days = ['일','월','화','수','목','금','토'];
   const preview = document.getElementById('preview');
+  const resultLabel = document.getElementById('resultLabel');
   const copyBtn = document.getElementById('copyBtn');
+  const copyBtnText = document.getElementById('copyBtnText');
+  const copyIcon = document.getElementById('copyIcon');
   const dateDisplay = document.getElementById('dateDisplay');
+  const mainTimeSection = document.getElementById('mainTimeSection');
+  const mainTimeSectionTitle = document.getElementById('mainTimeSectionTitle');
   const locGroup = document.getElementById('locGroup');
   const dirGroup = document.getElementById('dirGroup');
   const nextDaySection = document.getElementById('nextDaySection');
   const nextDayLabel = document.getElementById('nextDayLabel');
   const locGroupNext = document.getElementById('locGroupNext');
+  const breakSection = document.getElementById('breakSection');
+  const breakGroup = document.getElementById('breakGroup');
+  const lunchGroup = document.getElementById('lunchGroup');
+  const midBreakSection = document.getElementById('midBreakSection');
+  const midBreakTypeGroup = document.getElementById('midBreakTypeGroup');
+  const midBreakDurationWrap = document.getElementById('midBreakDurationWrap');
+  const midBreakDurationGroup = document.getElementById('midBreakDurationGroup');
+  const midBreakCustomInput = document.getElementById('midBreakCustomInput');
+  const midBreakTransitionWrap = document.getElementById('midBreakTransitionWrap');
+  const midBreakTransitionGroup = document.getElementById('midBreakTransitionGroup');
 
   let currentLoc = 'home';   // home | office
-  let currentDir = 'start';  // start | end
+  let currentDir = 'start';  // start | break | end
   let nextLoc = 'home';      // 다음 근무일 근무 형태
+  let breakHours = 0;        // 오늘 휴게 시간(퇴근 시 총합)
+  let noLunch = false;       // 점심 없이 근무 여부(퇴근 시)
+  let midBreakType = 'general';       // general | lunch-home | lunch-office | nolunch (휴게 구분 선택 시)
+  let midBreakHours = 0.5;            // 휴게 시간(일반 휴게일 때)
+  let midBreakTransition = 'none';    // none | home | office (휴게 후 전환)
   const timeState = { hour: 9, min: 0 };
   const nextTimeState = { hour: 9, min: 0 };
 
@@ -331,22 +660,40 @@
     nd.setDate(nd.getDate() + (base.getDay() === 5 ? 3 : 1));
     return nd;
   }
-  const nextWorkDate = getNextWorkDate(today);
-  const nm = nextWorkDate.getMonth() + 1;
-  const nd_ = nextWorkDate.getDate();
-  const nDayName = days[nextWorkDate.getDay()];
-  nextDayLabel.textContent = `다음 근무일: ${nm}/${nd_}(${nDayName})${today.getDay()===5 ? ' — 금요일이라 다음 주 월요일로 자동 계산' : ''}`;
+  function toDateInputValue(date){
+    const yy = date.getFullYear();
+    const mm = String(date.getMonth()+1).padStart(2,'0');
+    const dd = String(date.getDate()).padStart(2,'0');
+    return `${yy}-${mm}-${dd}`;
+  }
+  let nextWorkDate = getNextWorkDate(today);
+  const wasFridayAuto = today.getDay() === 5;
+
+  const nextWorkDateInput = document.getElementById('nextWorkDateInput');
+  nextWorkDateInput.value = toDateInputValue(nextWorkDate);
+
+  function updateNextDayLabel(isAutoUnchanged){
+    const nDayName2 = days[nextWorkDate.getDay()];
+    nextDayLabel.textContent = `${nextWorkDate.getMonth()+1}/${nextWorkDate.getDate()}(${nDayName2})${(isAutoUnchanged && wasFridayAuto) ? ' — 금요일이라 다음 주 월요일로 자동 계산' : ''}`;
+  }
+  updateNextDayLabel(true);
+
+  nextWorkDateInput.addEventListener('change', () => {
+    if(!nextWorkDateInput.value) return;
+    nextWorkDate = new Date(nextWorkDateInput.value + 'T00:00:00');
+    updateNextDayLabel(false);
+    buildText();
+  });
 
   // 시간 선택기(자주 쓰는 시간 + 더보기 그리드 + 분 토글)를 세팅하는 공용 함수
-  function setupTimePicker(quickHoursEl, hourGridEl, minToggleEl, state, onChange){
-    const QUICK_GROUPS = [[8,9,10], [17,18,19]];
+  function setupTimePicker(quickHoursEl, hourGridEl, minToggleEl, state, onChange, quickGroups){
     function selectHour(h){
       state.hour = h;
       quickHoursEl.querySelectorAll('button[data-hour]').forEach(b=> b.classList.toggle('active', parseInt(b.dataset.hour) === h));
       hourGridEl.querySelectorAll('button[data-hour]').forEach(b=> b.classList.toggle('active', parseInt(b.dataset.hour) === h));
       onChange();
     }
-    QUICK_GROUPS.forEach(hours=>{
+    quickGroups.forEach(hours=>{
       hours.forEach(h=>{
         const btn = document.createElement('button');
         btn.type = 'button';
@@ -385,15 +732,16 @@
         onChange();
       });
     });
+    return selectHour;
   }
 
-  setupTimePicker(
+  const selectMainHour = setupTimePicker(
     document.getElementById('quickHours'), document.getElementById('hourGrid'), document.getElementById('minToggle'),
-    timeState, buildText
+    timeState, buildText, [[8,9,10], [17,18,19]]
   );
   setupTimePicker(
     document.getElementById('quickHoursNext'), document.getElementById('hourGridNext'), document.getElementById('minToggleNext'),
-    nextTimeState, buildText
+    nextTimeState, buildText, [[8,9,10]]
   );
 
   function typeLabel(loc, dir) {
@@ -407,14 +755,62 @@
     return `${h}:${String(m).padStart(2,'0')}`;
   }
 
+  function formatH(n){
+    return (n % 1 === 0) ? String(n) : n.toFixed(1);
+  }
+
+  function midBreakLabel(){
+    if(midBreakType === 'lunch'){
+      if(midBreakTransition === 'home') return '점심시간 사용해 재택 전환합니다';
+      if(midBreakTransition === 'office') return '점심시간 사용해 출근합니다';
+      return '점심시간 없이 근무합니다'; // transition 'none' = 점심 자체를 안 씀
+    }
+    // general: 시간 + 전환(없음/재택/출근) 조합
+    const prefix = `${formatH(midBreakHours)}h 휴게`;
+    if(midBreakTransition === 'home') return `${prefix} 사용해 재택 전환합니다`;
+    if(midBreakTransition === 'office') return `${prefix} 사용해 출근합니다`;
+    return `${prefix} 사용합니다`;
+  }
+
+  function midBreakCopyText(){
+    if(midBreakType === 'general'){
+      if(midBreakTransition === 'home') return '잘가게 청년...';
+      if(midBreakTransition === 'office') return '륌 방가방가~!';
+      return '쉬었음 직장인 ON';
+    }
+    // lunch
+    if(midBreakTransition === 'none') return '꼬르륵... 꼬르륵...';
+    return '배... 안 고플까나...?'; // home, office 동일
+  }
+
   function buildText() {
     const timeStr = formatTime(timeState.hour, timeState.min);
-    let text = `${m}/${d}(${dayName}) ${timeStr} ${typeLabel(currentLoc, currentDir)}`;
-    if(currentDir === 'end'){
-      const nextTimeStr = formatTime(nextTimeState.hour, nextTimeState.min);
-      text += `\n${nm}/${nd_}(${nDayName}) ${nextTimeStr} ${typeLabel(nextLoc, 'start')}`;
+    resultLabel.textContent = currentDir === 'break' ? '휴게 알림' : (currentDir === 'end' ? '퇴근 보고' : '출근 보고');
+    copyBtnText.textContent = currentDir === 'break' ? midBreakCopyText() : (currentDir === 'end' ? '안녕히 계세요 여러분~!' : '형 나 출근하네...');
+    let text;
+    if(currentDir === 'break'){
+      // 휴게 보고는 날짜·시간 없이 문구만
+      text = midBreakLabel();
+    } else {
+      text = `${m}/${d}(${dayName}) ${timeStr} ${typeLabel(currentLoc, currentDir)}`;
+      if(currentDir === 'end'){
+        const parenParts = [];
+        if(breakHours > 0) parenParts.push(`${formatH(breakHours)}h 휴게`);
+        if(noLunch) parenParts.push('점심 없이 근무');
+        if(parenParts.length > 0) text += ` (${parenParts.join(', ')})`;
+        const nextTimeStr = formatTime(nextTimeState.hour, nextTimeState.min);
+        const nDayName = days[nextWorkDate.getDay()];
+        text += `\n${nextWorkDate.getMonth()+1}/${nextWorkDate.getDate()}(${nDayName}) ${nextTimeStr} ${typeLabel(nextLoc, 'start')}`;
+      }
     }
     preview.textContent = text;
+    preview.classList.remove('dir-start', 'dir-break', 'dir-end');
+    preview.classList.add(`dir-${currentDir}`);
+    preview.classList.remove('animate');
+    void preview.offsetWidth; // 리플로우 강제 — 애니메이션 재시작 트릭
+    preview.classList.add('animate');
+    copyBtn.classList.remove('dir-start', 'dir-break', 'dir-end');
+    copyBtn.classList.add(`dir-${currentDir}`);
     return text;
   }
 
@@ -436,12 +832,98 @@
     });
   });
 
+  const breakCustomInput = document.getElementById('breakCustomInput');
+
+  breakGroup.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      breakGroup.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      if(btn.dataset.break === 'custom'){
+        breakCustomInput.classList.remove('hidden');
+        breakCustomInput.focus();
+        breakHours = parseFloat(breakCustomInput.value) || 0;
+      } else {
+        breakCustomInput.classList.add('hidden');
+        breakHours = parseFloat(btn.dataset.break);
+      }
+      buildText();
+    });
+  });
+
+  breakCustomInput.addEventListener('input', () => {
+    breakHours = parseFloat(breakCustomInput.value) || 0;
+    buildText();
+  });
+
+  lunchGroup.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      lunchGroup.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      noLunch = btn.dataset.lunch === 'no';
+      buildText();
+    });
+  });
+
   dirGroup.querySelectorAll('.toggle-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       dirGroup.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       currentDir = btn.dataset.dir;
-      nextDaySection.classList.toggle('hidden', currentDir !== 'end');
+      const isEnd = currentDir === 'end';
+      const isBreakDir = currentDir === 'break';
+      mainTimeSection.classList.toggle('hidden', isBreakDir);
+      midBreakSection.classList.toggle('hidden', !isBreakDir);
+      breakSection.classList.toggle('hidden', !isEnd);
+      nextDaySection.classList.toggle('hidden', !isEnd);
+      mainTimeSectionTitle.innerHTML = isEnd
+        ? '<span class="step-num">1</span>근무 종료'
+        : '<span class="step-num">1</span>출근 시간';
+      if(!isBreakDir) selectMainHour(isEnd ? 18 : 9);
+      buildText();
+    });
+  });
+
+  const transitionNoneBtn = document.getElementById('transitionNoneBtn');
+
+  midBreakTypeGroup.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      midBreakTypeGroup.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      midBreakType = btn.dataset.type;
+      // 시간 선택은 "휴게"일 때만 필요, 전환(위치) 선택은 종류와 무관하게 항상 필요
+      const isGeneral = midBreakType === 'general';
+      midBreakDurationWrap.classList.toggle('hidden', !isGeneral);
+      transitionNoneBtn.textContent = isGeneral ? '일반 휴게' : '점심 없이';
+      buildText();
+    });
+  });
+
+  midBreakDurationGroup.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      midBreakDurationGroup.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      if(btn.dataset.break === 'custom'){
+        midBreakCustomInput.classList.remove('hidden');
+        midBreakCustomInput.focus();
+        midBreakHours = parseFloat(midBreakCustomInput.value) || 0;
+      } else {
+        midBreakCustomInput.classList.add('hidden');
+        midBreakHours = parseFloat(btn.dataset.break);
+      }
+      buildText();
+    });
+  });
+
+  midBreakCustomInput.addEventListener('input', () => {
+    midBreakHours = parseFloat(midBreakCustomInput.value) || 0;
+    buildText();
+  });
+
+  midBreakTransitionGroup.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      midBreakTransitionGroup.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      midBreakTransition = btn.dataset.transition;
       buildText();
     });
   });
@@ -459,13 +941,29 @@
       document.execCommand('copy');
       document.body.removeChild(ta);
     }
-    copyBtn.textContent = '복사됐어요 ✓';
+    copyIcon.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+    copyIcon.classList.add('pop');
+    copyBtnText.textContent = '복사 완! 팀즈에 붙여넣기 고고링~! 🚀';
     copyBtn.classList.add('copied');
     setTimeout(() => {
-      copyBtn.textContent = '문구 복사하기';
+      copyIcon.innerHTML = '<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+      copyIcon.classList.remove('pop');
       copyBtn.classList.remove('copied');
+      buildText(); // 구분에 맞는 복사 버튼 문구로 복귀
     }, 1200);
   });
+
+  // 페이지를 여는 시각 기준으로 구분을 자동 선택
+  // 04:30~10:30 → 시작/출근, 10:30~16:30 → 휴게, 그 외(16:30~04:30) → 종료/퇴근
+  function getAutoDir(date){
+    const totalMin = date.getHours() * 60 + date.getMinutes();
+    const t0430 = 4 * 60 + 30, t1030 = 10 * 60 + 30, t1630 = 16 * 60 + 30;
+    if(totalMin >= t0430 && totalMin < t1030) return 'start';
+    if(totalMin >= t1030 && totalMin < t1630) return 'break';
+    return 'end';
+  }
+  const autoBtn = dirGroup.querySelector(`[data-dir="${getAutoDir(today)}"]`);
+  if(autoBtn) autoBtn.click();
 
   buildText();
 </script>
