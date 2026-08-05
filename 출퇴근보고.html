@@ -498,6 +498,48 @@
     margin-top:8px;
     font-size:10px;
   }
+  .stats-toggle{
+    display:inline-block;
+    margin-top:10px;
+    padding:5px 10px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    background:#fff;
+    color:var(--ink-soft);
+    font-size:10.5px;
+    font-family:inherit;
+    cursor:pointer;
+  }
+  .stats-toggle:hover{ border-color:var(--accent); color:var(--accent); }
+  .stats-panel{
+    margin-top:10px;
+    padding:14px;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:10px;
+  }
+  .stats-panel.hidden{ display:none; }
+  .stats-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:7px 0;
+    border-bottom:1px solid var(--line);
+    font-size:12px;
+  }
+  .stats-row:last-child{ border-bottom:none; }
+  .stats-row .stats-label{ color:var(--ink); }
+  .stats-row .stats-count{
+    font-weight:800;
+    color:var(--accent);
+    font-variant-numeric:tabular-nums;
+  }
+  .stats-empty{
+    text-align:center;
+    font-size:12px;
+    color:var(--ink-soft);
+    padding:10px 0;
+  }
 </style>
 </head>
 <body>
@@ -546,8 +588,8 @@
       <div id="midBreakDurationWrap">
         <label>휴게 시간</label>
         <div class="toggle-group" id="midBreakDurationGroup">
-          <button class="toggle-btn active" data-break="0.5">0.5h</button>
-          <button class="toggle-btn" data-break="1">1h</button>
+          <button class="toggle-btn" data-break="0.5">0.5h</button>
+          <button class="toggle-btn active" data-break="1">1h</button>
           <button class="toggle-btn" data-break="1.5">1.5h</button>
           <button class="toggle-btn" data-break="2">2h</button>
           <button class="toggle-btn" data-break="custom" id="midBreakCustomBtn">직접</button>
@@ -619,12 +661,43 @@
     📱 홈 화면에 추가하면 앱처럼 바로 켤 수 있어요<br>
     <b>아이폰(사파리)</b> · 공유 버튼(⬆️) → "홈 화면에 추가"<br>
     <b>안드로이드(크롬)</b> · 오른쪽 위 메뉴(⋮) → "홈 화면에 추가" 또는 "앱 설치"<br>
-    <span class="credit">만든이: 최현정</span>
+    <span class="credit">만든이: 최현정</span><br>
+    <button type="button" id="statsToggle" class="stats-toggle hidden">📊 사용 통계 보기</button>
   </div>
+  <div id="statsPanel" class="stats-panel hidden"></div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCpFYkfBS0o57Hs2QfqaHSKojRA7xf0mIo",
+    authDomain: "choidea-univ.firebaseapp.com",
+    projectId: "choidea-univ",
+    storageBucket: "choidea-univ.firebasestorage.app",
+    messagingSenderId: "814177175154",
+    appId: "1:814177175154:web:17eb4b40a09074ec93a4eb",
+    measurementId: "G-VS1CCG8GTR"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const statsColRef = db.collection('worklog_usage_stats');
+</script>
 <script>
   const days = ['일','월','화','수','목','금','토'];
+
+  // 익명 클릭 통계 — 개인 식별 정보 없이 "어떤 버튼이 몇 번 눌렸는지"만 집계
+  // 통계 기록이 실패해도 화면 동작(구분 전환 등)엔 절대 영향 없도록 완전히 방어
+  function track(key, label){
+    try{
+      statsColRef.doc(key).set({
+        count: firebase.firestore.FieldValue.increment(1),
+        label: label || key
+      }, { merge: true }).catch(()=>{});
+    }catch(err){
+      console.error('track 실패(무시)', err);
+    }
+  }
   const preview = document.getElementById('preview');
   const resultLabel = document.getElementById('resultLabel');
   const copyBtn = document.getElementById('copyBtn');
@@ -655,7 +728,7 @@
   let breakHours = 0;        // 오늘 휴게 시간(퇴근 시 총합)
   let noLunch = false;       // 점심 없이 근무 여부(퇴근 시)
   let midBreakType = 'general';       // general | lunch-home | lunch-office | nolunch (휴게 구분 선택 시)
-  let midBreakHours = 0.5;            // 휴게 시간(일반 휴게일 때)
+  let midBreakHours = 1;              // 휴게 시간(일반 휴게일 때)
   let midBreakTransition = 'none';    // none | home | office (휴게 후 전환)
   const timeState = { hour: 9, min: 0 };
   const nextTimeState = { hour: 9, min: 0 };
@@ -717,7 +790,7 @@
         btn.textContent = `${h}시`;
         btn.dataset.hour = h;
         if(h === state.hour) btn.classList.add('active');
-        btn.addEventListener('click', ()=> selectHour(h));
+        btn.addEventListener('click', ()=>{ track(`hour_${h}`, `시간 버튼: ${h}시`); selectHour(h); });
         quickHoursEl.appendChild(btn);
       });
     });
@@ -728,7 +801,10 @@
       btn.textContent = spec.label;
       btn.className = spec.className || '';
       if(spec.disabled) btn.disabled = true;
-      if(spec.onClick) btn.addEventListener('click', spec.onClick);
+      if(spec.onClick) btn.addEventListener('click', ()=>{
+        if(!spec.disabled) track(`shortcut_${spec.label}`, `단축버튼: ${spec.label}`);
+        spec.onClick();
+      });
       quickHoursEl.appendChild(btn);
     });
     const moreBtn = document.createElement('button');
@@ -799,12 +875,10 @@
 
   // 자주 쓰는 출근 시각 프리셋 — "오늘 출근"과 "다음 근무 시작" 둘 다 같은 개념(내 출근 시간)이라 동일하게 재사용
   const startPresets = [
-    { label: '👧MH', hour: 7, min: 30 },
+    { label: '👧MH', hour: 7, min: 30, loc: 'home' },
     { label: '👔IC', hour: 8, min: 30, loc: 'office' },
     { empty: true },
   ];
-  // 종료/퇴근은 아직 채워진 프리셋 없이 빈 슬롯만 (필요하면 나중에 채워넣기)
-  const endPresets = [{ empty: true }, { empty: true }, { empty: true }, { empty: true }];
 
   // 출근 시간대 세트(오전+개인화 단축버튼), 종료/퇴근 선택 시 오후 세트로 교체됨
   let selectMainHour = buildHourButtons(
@@ -894,6 +968,7 @@
       locGroup.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       currentLoc = btn.dataset.loc;
+      track(`loc_${currentLoc}`, `근무형태: ${btn.textContent.trim()}`);
       buildText();
     });
   });
@@ -903,6 +978,7 @@
       locGroupNext.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       nextLoc = btn.dataset.loc;
+      track(`loc_next_${nextLoc}`, `다음 근무일 근무형태: ${btn.textContent.trim()}`);
       buildText();
     });
   });
@@ -944,6 +1020,7 @@
       dirGroup.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       currentDir = btn.dataset.dir;
+      track(`dir_${currentDir}`, `구분: ${btn.textContent.trim()}`);
       const isEnd = currentDir === 'end';
       const isBreakDir = currentDir === 'break';
       mainTimeSection.classList.toggle('hidden', isBreakDir);
@@ -957,7 +1034,7 @@
         // 종료/퇴근은 오후 시간대+빈 커스텀 슬롯, 출근은 오전 시간대+개인화 단축버튼으로 시간 버튼 재구성
         const groups = isEnd ? [[17,18,19]] : [[7,8,9,10]];
         const extras = isEnd
-          ? makeShortcutButtons(endPresets, () => selectMainHour, timeState, minToggleEl, (loc)=>{ currentLoc = loc; }, locGroup)
+          ? []
           : makeShortcutButtons(startPresets, () => selectMainHour, timeState, minToggleEl, (loc)=>{ currentLoc = loc; }, locGroup);
         selectMainHour = buildHourButtons(quickHoursEl, hourGridEl, timeState, buildText, groups, extras);
         selectMainHour(isEnd ? 18 : 9);
@@ -973,6 +1050,7 @@
       midBreakTypeGroup.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       midBreakType = btn.dataset.type;
+      track(`break_type_${midBreakType}`, `휴게 종류: ${btn.textContent.trim()}`);
       // 시간 선택은 "휴게"일 때만 필요, 전환(위치) 선택은 종류와 무관하게 항상 필요
       const isGeneral = midBreakType === 'general';
       midBreakDurationWrap.classList.toggle('hidden', !isGeneral);
@@ -1014,6 +1092,7 @@
   copyBtn.addEventListener('click', async () => {
     const text = buildText();
     if (!text) return;
+    track(`copy_${currentDir}`, `복사: ${resultLabel.textContent}`);
     try {
       await navigator.clipboard.writeText(text);
     } catch (e) {
@@ -1049,6 +1128,34 @@
   if(autoBtn) autoBtn.click();
 
   buildText();
+
+  // 사용 통계 패널 — 누를 때만 불러오기 (평소엔 조용히 쌓이기만 함)
+  const statsToggle = document.getElementById('statsToggle');
+  const statsPanel = document.getElementById('statsPanel');
+  let statsLoaded = false;
+
+  statsToggle.addEventListener('click', async () => {
+    const isHidden = statsPanel.classList.toggle('hidden');
+    statsToggle.textContent = isHidden ? '📊 사용 통계 보기' : '📊 사용 통계 접기';
+    if(isHidden || statsLoaded) return;
+
+    statsPanel.innerHTML = '<div class="stats-empty">불러오는 중...</div>';
+    try{
+      const snap = await statsColRef.orderBy('count', 'desc').get();
+      if(snap.empty){
+        statsPanel.innerHTML = '<div class="stats-empty">아직 쌓인 데이터가 없어요</div>';
+      } else {
+        statsPanel.innerHTML = snap.docs.map(doc=>{
+          const d = doc.data();
+          return `<div class="stats-row"><span class="stats-label">${d.label || doc.id}</span><span class="stats-count">${d.count}</span></div>`;
+        }).join('');
+      }
+      statsLoaded = true;
+    }catch(err){
+      console.error(err);
+      statsPanel.innerHTML = '<div class="stats-empty">불러오기 실패 — 인터넷 연결을 확인해주세요</div>';
+    }
+  });
 </script>
 </body>
 </html>
