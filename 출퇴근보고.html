@@ -887,7 +887,7 @@
   // 출근 시간대 세트(오전+개인화 단축버튼), 종료/퇴근 선택 시 오후 세트로 교체됨
   let selectMainHour = buildHourButtons(
     quickHoursEl, hourGridEl, timeState, buildText, [[7,8,9,10]],
-    makeShortcutButtons(startPresets, () => selectMainHour, timeState, minToggleEl, (loc)=>{ currentLoc = loc; }, locGroup)
+    makeShortcutButtons(startPresets, () => selectMainHour, timeState, minToggleEl, (loc)=>{ currentLoc = loc; saveLoc(currentDir, loc); }, locGroup)
   );
   bindMinToggle(minToggleEl, timeState, buildText);
 
@@ -967,11 +967,20 @@
     return text;
   }
 
+  // 탭(구분)별로 마지막에 고른 근무 형태를 이 브라우저에 기억해뒀다가 다음에 그 탭 열 때 그대로 세팅
+  function getSavedLoc(dir){
+    try{ return localStorage.getItem(`wf_loc_${dir}`); }catch(e){ return null; }
+  }
+  function saveLoc(dir, loc){
+    try{ localStorage.setItem(`wf_loc_${dir}`, loc); }catch(e){}
+  }
+
   locGroup.querySelectorAll('.toggle-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       locGroup.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       currentLoc = btn.dataset.loc;
+      saveLoc(currentDir, currentLoc);
       track(`loc_${currentLoc}`, `근무형태: ${btn.textContent.trim()}`);
       buildText();
     });
@@ -1035,11 +1044,15 @@
         ? '<span class="step-num">1</span>근무 종료'
         : '<span class="step-num">1</span>출근 시간';
       if(!isBreakDir){
+        // 이 탭(출근/종료)에서 마지막으로 골랐던 근무 형태를 복원, 없으면 재택 기본값
+        currentLoc = getSavedLoc(currentDir) || 'home';
+        locGroup.querySelectorAll('.toggle-btn').forEach(b=> b.classList.toggle('active', b.dataset.loc === currentLoc));
+
         // 종료/퇴근은 오후 시간대+빈 커스텀 슬롯, 출근은 오전 시간대+개인화 단축버튼으로 시간 버튼 재구성
         const groups = isEnd ? [[17,18,19]] : [[7,8,9,10]];
         const extras = isEnd
           ? []
-          : makeShortcutButtons(startPresets, () => selectMainHour, timeState, minToggleEl, (loc)=>{ currentLoc = loc; }, locGroup);
+          : makeShortcutButtons(startPresets, () => selectMainHour, timeState, minToggleEl, (loc)=>{ currentLoc = loc; saveLoc(currentDir, loc); }, locGroup);
         selectMainHour = buildHourButtons(quickHoursEl, hourGridEl, timeState, buildText, groups, extras);
         selectMainHour(isEnd ? 18 : 9);
         timeState.min = 0;
