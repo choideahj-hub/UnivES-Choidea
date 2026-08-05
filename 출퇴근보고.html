@@ -877,7 +877,7 @@
   const startPresets = [
     { label: '👧MH', hour: 7, min: 30, loc: 'home' },
     { label: '👔IC', hour: 8, min: 30, loc: 'office' },
-    { empty: true },
+    { label: '🐣J', hour: 9, min: 30, loc: 'office' },
   ];
 
   // 출근 시간대 세트(오전+개인화 단축버튼), 종료/퇴근 선택 시 오후 세트로 교체됨
@@ -1038,6 +1038,8 @@
           : makeShortcutButtons(startPresets, () => selectMainHour, timeState, minToggleEl, (loc)=>{ currentLoc = loc; }, locGroup);
         selectMainHour = buildHourButtons(quickHoursEl, hourGridEl, timeState, buildText, groups, extras);
         selectMainHour(isEnd ? 18 : 9);
+        timeState.min = 0;
+        minToggleEl.querySelectorAll('button').forEach(b=> b.classList.toggle('active', parseInt(b.dataset.min) === 0));
       }
       buildText();
     });
