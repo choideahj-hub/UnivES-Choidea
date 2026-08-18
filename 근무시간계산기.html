@@ -1071,12 +1071,24 @@
       if(/휴일/.test(line)) d.isHoliday = true;
 
       const parenGroups = [...line.matchAll(/\(([^)]*)\)/g)].map(m=>m[1]);
-      const p = parenGroups.find(g=> /시작|휴게|추가|없이|점없근|휴일/.test(g));
+      const p = parenGroups.find(g=> /시작|출근|휴게|추가|없이|점없근|휴일/.test(g));
       if(p){
-        const startInParen = p.match(/(\d{1,2}):(\d{2})\s*시작/);
+        const startInParen = p.match(/(\d{1,2}):(\d{2})\s*(?:시작|출근)/);
         if(startInParen) d.startTime = `${parseInt(startInParen[1])}:${startInParen[2]}`;
-        const breakInParen = p.match(/(\d+(?:\.\d+)?)\s*(?:시간)?\s*휴게/);
-        if(breakInParen) d.breakH += parseFloat(breakInParen[1]);
+        // 휴게 표기 형태 다 인식: "1시간", "30분", "2시간 30분"(신형 한글 표기), "1h"(구형 표기)
+        const breakSegMatch = p.match(/((?:\d+\s*시간\s*)?(?:\d+\s*분\s*)?)휴게/);
+        if(breakSegMatch && breakSegMatch[1].trim()){
+          const seg = breakSegMatch[1];
+          const hMatch = seg.match(/(\d+)\s*시간/);
+          const mMatch = seg.match(/(\d+)\s*분/);
+          let addH = 0;
+          if(hMatch) addH += parseInt(hMatch[1]);
+          if(mMatch) addH += parseInt(mMatch[1]) / 60;
+          if(addH > 0) d.breakH += addH;
+        } else {
+          const breakInParenOld = p.match(/(\d+(?:\.\d+)?)\s*h\s*휴게/); // 구형 "1h 휴게" 표기 대비
+          if(breakInParenOld) d.breakH += parseFloat(breakInParenOld[1]);
+        }
         const extraMatch = p.match(/(\d{1,2}):(\d{2})\s*[~\-]\s*(\d{1,2}):(\d{2})\s*추가\s*근무/);
         if(extraMatch){
           d.extraSegs.push([`${parseInt(extraMatch[1])}:${extraMatch[2]}`, `${parseInt(extraMatch[3])}:${extraMatch[4]}`]);
@@ -1644,7 +1656,7 @@
     if(groupsFormed > 0) await save();
 
     // 2순위(최후): 남은 것 중 주말·심야·공휴일까지 포함해야 맞는 조합은 수당 배율이 다를 수 있어
-    // 자동 확정하지 않고, 체크박스도 자동으로 선택하지 않음 — 필요하면 사용자가 직접 골라서 확정
+    // 자동으로 "확정"까지는 하지 않되, 체크박스는 미리 선택해둬서 사용자가 확인만 하고 확정/취소를 누르면 되게 함
     const remainingAll = entries.filter(e=> !e.groupId && e.diffH !== 0);
     const specialMatch = findZeroSumSubset(remainingAll, 4);
 
@@ -1654,7 +1666,9 @@
     }
     if(specialMatch){
       const dateList = specialMatch.map(e=> formatMDDay(e.date)).join(', ');
-      msg += (msg ? ' · ' : '') + `주말/심야/공휴일 포함 조합 발견(${dateList}) — 수당 배율이 다를 수 있어 자동 선택하지 않았어요, 필요하면 체크박스로 직접 선택해 확정해주세요`;
+      selectedDates.clear();
+      specialMatch.forEach(e=> selectedDates.add(e.date));
+      msg += (msg ? ' · ' : '') + `주말/심야/공휴일 포함 조합 발견(${dateList}) — 수당 배율이 다를 수 있어 미리 체크만 해뒀어요, 확인하고 아래 확정/취소를 눌러주세요`;
     } else if(groupsFormed === 0){
       msg = '합이 0이 되는 조합을 찾지 못했습니다';
     }
