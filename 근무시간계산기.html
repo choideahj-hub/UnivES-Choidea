@@ -17,6 +17,7 @@
     --danger-soft: #F5E9E5;
   }
   *{ box-sizing:border-box; }
+  .hidden{ display:none !important; }
   body{
     margin:0;
     font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
@@ -52,6 +53,32 @@
     border-radius:14px;
     padding:22px;
     margin-bottom:16px;
+  }
+  .step-header{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    margin-bottom:18px;
+    padding-bottom:14px;
+    border-bottom:1px solid var(--line);
+  }
+  .step-header .step-num{
+    width:24px;
+    height:24px;
+    border-radius:50%;
+    background:var(--accent);
+    color:#fff;
+    font-size:12px;
+    font-weight:800;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+  }
+  .step-header .step-title{
+    font-size:15px;
+    font-weight:700;
+    color:var(--ink);
   }
   .field{ margin-bottom:16px; }
   .field:last-child{ margin-bottom:0; }
@@ -524,52 +551,119 @@
     background:var(--danger);
     border-color:var(--danger);
   }
-  .group-summary-toggle{
-    width:100%;
-    padding:8px 0;
-    margin-bottom:8px;
-    border:1px solid var(--line);
-    border-radius:7px;
-    background:#fff;
-    color:var(--ink-soft);
-    font-size:12px;
-    font-weight:600;
-    cursor:pointer;
-    font-family:inherit;
-  }
-  .group-summary-toggle:hover{ border-color:var(--accent); }
-  .group-summary{
-    display:none;
-    margin-bottom:12px;
-  }
-  .group-summary.show{ display:block; }
-  .group-summary-item{
-    background:var(--accent-soft);
-    border-radius:8px;
-    padding:9px 12px;
-    margin-bottom:6px;
-    font-size:12px;
-  }
-  .group-summary-item .gsum-members{
-    color:var(--ink);
-  }
-  .group-summary-item .gsum-total{
-    margin-top:3px;
-    font-weight:700;
-    color:#2F9E5B;
-    font-size:11.5px;
-  }
   .group-summary-empty{
     font-size:12px;
     color:var(--ink-soft);
     text-align:center;
     padding:12px 0;
   }
-  .group-summary-item.pending{
-    background:var(--danger-soft);
+  .final-result{
+    display:none;
+    margin-bottom:12px;
   }
-  .gsum-total.pending{
-    color:var(--danger);
+  .final-result.show{ display:block; }
+  .final-result-item{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:9px 12px;
+    margin-bottom:6px;
+    font-size:12px;
+  }
+  .final-result-item .fr-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .final-result-item .fr-date{
+    font-weight:700;
+    color:var(--ink);
+  }
+  .final-result-item .fr-status{
+    font-weight:700;
+    font-size:11.5px;
+  }
+  .final-result-item .fr-status.over{ color:#D9822B; }
+  .final-result-item .fr-status.under{ color:var(--danger); }
+  .final-result-item .fr-status.zero{ color:var(--ink-soft); }
+  .final-result-item .fr-ew{
+    margin-top:5px;
+    color:#6C5CC4;
+    font-variant-numeric:tabular-nums;
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+  .fr-copy-btn{
+    padding:2px 9px;
+    border-radius:999px;
+    border:1px solid #6C5CC4;
+    background:rgba(139,127,214,0.08);
+    color:#6C5CC4;
+    font-size:10.5px;
+    font-weight:700;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .fr-copy-btn.copied{
+    background:#2F9E5B;
+    border-color:#2F9E5B;
+    color:#fff;
+  }
+  .final-result-item .fr-actual{
+    margin-top:2px;
+    font-size:11px;
+    color:var(--ink-soft);
+  }
+  .final-result-item .fr-merged{
+    margin-top:6px;
+    font-size:11px;
+    color:#6C5CC4;
+    background:rgba(139,127,214,0.08);
+    border-radius:6px;
+    padding:5px 8px;
+  }
+  .final-result-item .entry-reason{
+    margin-top:8px;
+    padding-top:8px;
+    border-top:1px dashed var(--line);
+  }
+  .final-result-item .entry-actions{
+    margin-top:6px;
+  }
+  .final-result-group{
+    border:1.5px dashed var(--line);
+    border-radius:10px;
+    padding:10px;
+    margin-bottom:10px;
+  }
+  .frg-title{
+    font-size:12px;
+    font-weight:700;
+    color:var(--ink);
+    margin-bottom:8px;
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+  .frg-check{
+    font-size:10.5px;
+    font-weight:700;
+    padding:2px 7px;
+    border-radius:999px;
+  }
+  .frg-check.ok{ background:#E4F5EA; color:#2F9E5B; }
+  .frg-check.bad{ background:var(--danger-soft); color:var(--danger); }
+  .frg-option-label{
+    font-size:11px;
+    font-weight:700;
+    color:var(--ink-soft);
+    margin:8px 0 4px;
+  }
+  .final-result-group .final-result-item{
+    margin-bottom:5px;
   }
   .auto-match-btn{
     width:100%;
@@ -583,6 +677,62 @@
     font-weight:600;
     cursor:pointer;
     font-family:inherit;
+  }
+  .final-result-toggle{
+    width:100%;
+    padding:12px;
+    margin-bottom:10px;
+    border-radius:8px;
+    border:none;
+    background:var(--accent);
+    color:#fff;
+    font-size:13.5px;
+    font-weight:700;
+    cursor:pointer;
+    font-family:inherit;
+    box-shadow:0 2px 8px rgba(0,0,0,0.12);
+  }
+  .final-result-toggle:active{ transform:scale(0.98); }
+  .fr-toolbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:10px;
+    flex-wrap:wrap;
+  }
+  .fr-toolbar.hidden{ display:none; }
+  .hide-uploaded-toggle{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:11.5px;
+    color:var(--ink-soft);
+    cursor:pointer;
+    user-select:none;
+  }
+  .copy-all-btn{
+    padding:6px 12px;
+    border-radius:999px;
+    border:1px solid var(--accent);
+    background:var(--accent-soft);
+    color:var(--accent);
+    font-size:11.5px;
+    font-weight:700;
+    cursor:pointer;
+    font-family:inherit;
+    white-space:nowrap;
+  }
+  .copy-all-btn.copied{
+    background:#2F9E5B;
+    border-color:#2F9E5B;
+    color:#fff;
+  }
+  .hide-uploaded-toggle input{
+    width:14px;
+    height:14px;
+    accent-color:var(--accent);
+    cursor:pointer;
   }
   .auto-match-btn:hover{ opacity:0.85; }
 
@@ -654,6 +804,18 @@
     font-size:11.5px;
     color:var(--ink-soft);
     margin-top:2px;
+  }
+  .entry .detail .ew-suggest{
+    font-size:11.5px;
+    color:#6C5CC4;
+    background:#F1EEFB;
+    border-radius:6px;
+    padding:4px 8px;
+    margin-top:5px;
+    display:inline-block;
+  }
+  .entry .detail .ew-suggest b{
+    font-variant-numeric:tabular-nums;
   }
   .entry .diff{
     font-size:15px;
@@ -804,6 +966,7 @@
   <p class="sub">일 8시간 기준 +/- 를 날짜별로 쌓아서 상쇄 확인</p>
 
   <div class="card">
+    <div class="step-header"><span class="step-num">1</span><span class="step-title">일정 등록하기</span></div>
     <div class="field">
       <label>📋 근무 내역을 알려주세요</label>
       <textarea id="pasteInput" rows="5" placeholder="예시&#10;7/1(수) 24:00 재택근무 종료합니다 (9:30 시작, 1시간 휴게)&#10;7/2(목) 18:00 퇴근합니다 (9:30 시작, 22:00~24:30 추가 근무)&#10;7/4(토) 11:00 재택근무 시작합니다&#10;7/4(토) 12:00 재택근무 종료합니다"></textarea>
@@ -813,28 +976,42 @@
   </div>
 
   <div class="card" id="listCard">
-    <div class="month-nav">
-      <button type="button" id="monthPrev">‹</button>
-      <div class="month-label" id="monthLabel">–</div>
-      <button type="button" id="monthNext">›</button>
-      <button type="button" id="monthAllBtn">전체보기</button>
-    </div>
-    <button class="auto-match-btn" id="autoMatchBtn">🔍 자동으로 상쇄 짝 찾기</button>
-    <div class="pair-bar" id="pairBar">
-      <div class="pair-status" id="pairStatus">0건 선택 · 합계 0h</div>
-      <div class="pair-actions">
-        <button type="button" id="pairCancelBtn">선택 해제</button>
-        <button type="button" class="confirm" id="pairConfirmBtn" disabled>짝으로 확정</button>
+    <div class="step-header"><span class="step-num">2</span><span class="step-title">상쇄 짝짓기</span></div>
+    <div id="listControls">
+      <div class="month-nav">
+        <button type="button" id="monthPrev">‹</button>
+        <div class="month-label" id="monthLabel">–</div>
+        <button type="button" id="monthNext">›</button>
+        <button type="button" id="monthAllBtn">전체보기</button>
+      </div>
+      <button class="auto-match-btn" id="autoMatchBtn">🔍 자동으로 상쇄 짝 찾기</button>
+      <div class="pair-bar" id="pairBar">
+        <div class="pair-status" id="pairStatus">0건 선택 · 합계 0h</div>
+        <div class="pair-actions">
+          <button type="button" id="pairCancelBtn">선택 해제</button>
+          <button type="button" class="confirm" id="pairConfirmBtn" disabled>짝으로 확정</button>
+        </div>
+      </div>
+      <div class="diff-filter" id="diffFilter">
+        <button type="button" data-filter="all" class="active">전체</button>
+        <button type="button" data-filter="over">초과만</button>
+        <button type="button" data-filter="under">단축만</button>
       </div>
     </div>
-    <div class="diff-filter" id="diffFilter">
-      <button type="button" data-filter="all" class="active">전체</button>
-      <button type="button" data-filter="over">초과만</button>
-      <button type="button" data-filter="under">단축만</button>
-    </div>
-    <button type="button" id="groupSummaryToggle" class="group-summary-toggle">🧮 상쇄 내역 보기(검산용)</button>
-    <div id="groupSummary" class="group-summary"></div>
     <div id="entryList"><div class="empty">기록이 없습니다</div></div>
+  </div>
+
+  <div class="card" id="finalResultCard">
+    <div class="step-header"><span class="step-num">3</span><span class="step-title">최종 결과값 보기</span></div>
+    <button type="button" id="finalResultToggle" class="final-result-toggle">📋 펼쳐서 보기 — EW에 이대로 입력하세요</button>
+    <div class="fr-toolbar hidden" id="frToolbar">
+      <label class="hide-uploaded-toggle" id="hideUploadedWrap">
+        <input type="checkbox" id="hideUploadedCheck">
+        <span>완료된 날 숨기고 등록할 날만 보기</span>
+      </label>
+      <button type="button" id="copyAllResultBtn" class="copy-all-btn">📄 전체 결과 텍스트로 복사</button>
+    </div>
+    <div id="finalResult" class="final-result"></div>
   </div>
 
   <div class="status" id="statusMsg"></div>
@@ -866,6 +1043,8 @@
 <script>
 
   const entryList = document.getElementById('entryList');
+  const listControls = document.getElementById('listControls');
+  const finalResultCard = document.getElementById('finalResultCard');
   const statusMsg = document.getElementById('statusMsg');
   const clearAllBtn = document.getElementById('clearAllBtn');
   const autoMatchBtn = document.getElementById('autoMatchBtn');
@@ -887,62 +1066,286 @@
     });
   });
 
-  const groupSummaryToggle = document.getElementById('groupSummaryToggle');
-  const groupSummaryEl = document.getElementById('groupSummary');
-  let groupSummaryOpen = false;
-  groupSummaryToggle.addEventListener('click', ()=>{
-    groupSummaryOpen = !groupSummaryOpen;
+  const finalResultToggle = document.getElementById('finalResultToggle');
+  const finalResultEl = document.getElementById('finalResult');
+  const hideUploadedWrap = document.getElementById('hideUploadedWrap');
+  const frToolbar = document.getElementById('frToolbar');
+  const copyAllResultBtn = document.getElementById('copyAllResultBtn');
+  const hideUploadedCheck = document.getElementById('hideUploadedCheck');
+  let finalResultOpen = false;
+  let hideUploadedInFinal = false;
+  finalResultToggle.addEventListener('click', ()=>{
+    finalResultOpen = !finalResultOpen;
     render();
   });
+  hideUploadedCheck.addEventListener('change', ()=>{
+    hideUploadedInFinal = hideUploadedCheck.checked;
+    renderFinalResult();
+  });
+  copyAllResultBtn.addEventListener('click', async ()=>{
+    const text = buildFinalResultText();
+    try{
+      await navigator.clipboard.writeText(text);
+    }catch(err){
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    const original = copyAllResultBtn.textContent;
+    copyAllResultBtn.textContent = '✓ 복사됨';
+    copyAllResultBtn.classList.add('copied');
+    setTimeout(()=>{ copyAllResultBtn.textContent = original; copyAllResultBtn.classList.remove('copied'); }, 1500);
+  });
 
-  function renderGroupSummary(){
-    groupSummaryToggle.textContent = groupSummaryOpen ? '🧮 상쇄 내역 접기' : '🧮 상쇄 내역 보기(검산용)';
-    groupSummaryEl.classList.toggle('show', groupSummaryOpen);
-    if(!groupSummaryOpen) return;
+  function ewLineFor(e){
+    const ew = computeEwTime(e);
+    const start = ew ? ew.start : e.start;
+    const end = ew ? ew.end : e.end;
+    const note = ew ? '' : ' (실제 시각 그대로)';
+    return `📋 EW 등록: <b>${start} ~ ${end}</b>${note} <button type="button" class="fr-copy-btn" data-start="${start}" data-end="${end}">복사</button>`;
+  }
+  function statusOf(diffH){
+    const cls = diffH > 0 ? 'over' : (diffH < 0 ? 'under' : 'zero');
+    const label = diffH > 0 ? `초과 ${formatDiff(diffH)}` : (diffH < 0 ? `단축 ${formatDiff(diffH)}` : '정상(그대로)');
+    return { cls, label };
+  }
+  function commitReason(inp){
+    const d = inp.dataset.date;
+    const e = entries.find(en=>en.date===d);
+    if(e){
+      let val = inp.value;
+      if(!val.startsWith('[초과 근무] ')) val = '[초과 근무] ' + val.replace(/^\[초과 근무\]\s*/, '');
+      e.reason = val;
+      save();
+    }
+    editingReasonDates.delete(d);
+    render();
+  }
+  // 초과/단축 사유 입력 + EW 업로드 완료 체크 — "합쳐서 올릴지" 결정이 끝난 뒤(STEP3)에 적는 게 자연스러워서 여기로 옮김
+  function reasonRowFor(e){
+    if(e.diffH === 0) return '';
+    const doneBtnHtml = `<button type="button" class="upload-done-btn${e.uploaded ? ' active' : ''}" data-date="${e.date}">${e.uploaded ? '완료 ✓' : '완료'}</button>`;
+    if(e.diffH > 0){
+      const isEditing = editingReasonDates.has(e.date);
+      if(isEditing){
+        return `<div class="entry-reason editing">
+          <input type="text" class="reason-input" data-date="${e.date}" value="${escapeHtml(e.reason || '[초과 근무] ')}">
+          <button type="button" class="reason-save-btn" data-date="${e.date}">저장</button>
+        </div>`;
+      }
+      return `<div class="entry-reason">
+          <div class="reason-preview">${e.reason ? escapeHtml(e.reason) : '업무 내역 미입력'}</div>
+        </div>
+        <div class="entry-actions">
+          <button type="button" class="reason-edit-btn" data-date="${e.date}">입력·수정</button>
+          <button type="button" class="copy-reason-btn" data-date="${e.date}">복사</button>
+          ${doneBtnHtml}
+        </div>`;
+    }
+    return `<div class="entry-actions">
+        <button type="button" class="copy-reason-btn" data-date="${e.date}">복사</button>
+        ${doneBtnHtml}
+      </div>`;
+  }
+  function singleItemHtml(e, extraNote, mergedLabel, editable){
+    const { cls, label } = statusOf(e.diffH);
+    const mergedNote = mergedLabel ? `<div class="fr-merged">🗓️ 관련 날짜: ${mergedLabel} — 사유 적을 때 이 날들 캘린더 같이 참고하세요</div>` : '';
+    const reasonPart = editable === false
+      ? (e.reason ? `<div class="entry-reason"><div class="reason-preview">${escapeHtml(e.reason)}</div></div>` : '')
+      : reasonRowFor(e);
+    return `<div class="final-result-item">
+      <div class="fr-top">
+        <div class="fr-date">${formatMDDay(e.date)}</div>
+        <div class="fr-status ${cls}">${label}</div>
+      </div>
+      <div class="fr-ew">${ewLineFor(e)}</div>
+      <div class="fr-actual">실제 근무: ${e.start} ~ ${e.end}${extraNote ? ' · ' + extraNote : ''}</div>
+      ${mergedNote}
+      ${reasonPart}
+    </div>`;
+  }
+  // "물어보기 쉽게" 지금 보이는 최종 결과값 전체를 평문 텍스트로 뽑아줌 (Claude한테 붙여넣어 사유 도움받기 등 용도)
+  function buildFinalResultText(){
+    let scoped = (monthFilter === 'all' ? entries : entries.filter(e=> monthKey(e.date) === monthFilter))
+      .slice().sort((a,b)=> a.date.localeCompare(b.date));
+    if(hideUploadedInFinal) scoped = scoped.filter(e=> !e.uploaded);
+    if(scoped.length === 0) return '등록할 기록이 없습니다.';
 
-    const scoped = monthFilter === 'all' ? entries : entries.filter(e=> monthKey(e.date) === monthFilter);
-    const grouped = scoped.filter(e=> e.groupId);
     const byGroup = {};
-    grouped.forEach(e=> { (byGroup[e.groupId] = byGroup[e.groupId] || []).push(e); });
+    const ungrouped = [];
+    scoped.forEach(e=>{
+      if(e.groupId){ (byGroup[e.groupId] = byGroup[e.groupId] || []).push(e); }
+      else ungrouped.push(e);
+    });
     const groups = Object.values(byGroup)
       .map(g=> g.slice().sort((a,b)=> a.date.localeCompare(b.date)))
       .sort((a,b)=> a[0].date.localeCompare(b[0].date));
 
-    let html = groups.map(g=>{
+    const lineFor = (e, note)=>{
+      const ew = computeEwTime(e);
+      const start = ew ? ew.start : e.start;
+      const end = ew ? ew.end : e.end;
+      const { label } = statusOf(e.diffH);
+      const reasonPart = e.reason ? ` / 사유: ${e.reason}` : '';
+      return `${formatMDDay(e.date)} — ${label} — EW 등록: ${start}~${end}${note ? ' (' + note + ')' : ''}${reasonPart}`;
+    };
+
+    const monthTitle = monthFilter === 'all' ? '전체 기간' : monthLabel.textContent;
+    let lines = [`📋 최종 결과값 (${monthTitle})`, ''];
+
+    groups.forEach(g=>{
+      const memberLabel = g.map(e=> formatMDDay(e.date)).join(' + ');
+      const collector = g.slice().sort((a,b)=> Math.abs(b.diffH) - Math.abs(a.diffH))[0];
       const sum = Math.round(g.reduce((s,e)=> s+e.diffH, 0) * 2) / 2;
-      const members = g.map(e=> `${formatMDDay(e.date)} ${formatDiff(e.diffH)}`).join(' + ');
-      return `<div class="group-summary-item">
-        <div class="gsum-members">${members}</div>
-        <div class="gsum-total">= ${formatDiff(sum)} ${sum === 0 ? '✓' : '⚠️ 검산 불일치'}</div>
-      </div>`;
-    }).join('');
-
-    // 합은 0이 되지만 주말/심야/공휴일이 껴서 아직 확정하지 않은 조합도 찾아서 보여줌 (검산용)
-    let remainingPool = scoped.filter(e=> !e.groupId && e.diffH !== 0);
-    let possible;
-    while((possible = findZeroSumSubset(remainingPool, 4))){
-      const sum = Math.round(possible.reduce((s,e)=> s+e.diffH, 0) * 2) / 2;
-      const members = possible.map(e=> `${formatMDDay(e.date)} ${formatDiff(e.diffH)}`).join(' + ');
-      const reasonTags = new Set();
-      possible.forEach(e=>{
-        if(isWeekend(e.date)) reasonTags.add('주말');
-        if(isNightShift(e)) reasonTags.add('심야');
-        if(e.isHoliday) reasonTags.add('공휴일');
+      lines.push(`🔗 묶음: ${memberLabel} (검산 ${sum === 0 ? '완료' : '불일치 ' + formatDiff(sum)})`);
+      lines.push('[옵션1 각자 등록]');
+      g.forEach(e=> lines.push('- ' + lineFor(e)));
+      lines.push(`[옵션2 ${formatMDDay(collector.date)}에 몰아서 등록]`);
+      g.forEach(e=>{
+        if(e.date === collector.date) lines.push('- ' + lineFor(e, '묶음 전체 몰아받음'));
+        else lines.push('- ' + lineFor({ ...e, diffH: 0, start: '9:00', end: '18:00' }));
       });
-      const reasonText = reasonTags.size > 0 ? [...reasonTags].join('/') + '근무라' : '수당 배율이 달라서';
-      html += `<div class="group-summary-item pending">
-        <div class="gsum-members">${members}</div>
-        <div class="gsum-total pending">= ${formatDiff(sum)} · 🔸 ${reasonText} 합산하지 않았어요 — 확인 후 직접 확정해주세요</div>
-      </div>`;
-      remainingPool = remainingPool.filter(e=> !possible.some(p=> p.date === e.date));
-    }
+      lines.push('');
+    });
 
-    if(!html){
-      groupSummaryEl.innerHTML = '<div class="group-summary-empty">확정된 상쇄 묶음이 없습니다</div>';
+    ungrouped.forEach(e=> lines.push('- ' + lineFor(e)));
+
+    return lines.join('\n').trim();
+  }
+
+  function renderFinalResult(){
+    finalResultToggle.textContent = finalResultOpen ? '📋 접기' : '📋 펼쳐서 보기 — EW에 이대로 입력하세요';
+    finalResultEl.classList.toggle('show', finalResultOpen);
+    frToolbar.classList.toggle('hidden', !finalResultOpen);
+    if(!finalResultOpen) return;
+
+    let scoped = (monthFilter === 'all' ? entries : entries.filter(e=> monthKey(e.date) === monthFilter))
+      .slice().sort((a,b)=> a.date.localeCompare(b.date));
+
+    if(scoped.length === 0){
+      finalResultEl.innerHTML = '<div class="group-summary-empty">기록이 없습니다</div>';
       return;
     }
-    groupSummaryEl.innerHTML = html;
+
+    if(hideUploadedInFinal){
+      scoped = scoped.filter(e=> !e.uploaded);
+      if(scoped.length === 0){
+        finalResultEl.innerHTML = '<div class="group-summary-empty">✓ 등록할 날이 다 완료됐어요</div>';
+        return;
+      }
+    }
+
+    const byGroup = {};
+    const ungrouped = [];
+    scoped.forEach(e=>{
+      if(e.groupId){ (byGroup[e.groupId] = byGroup[e.groupId] || []).push(e); }
+      else ungrouped.push(e);
+    });
+    const groups = Object.values(byGroup)
+      .map(g=> g.slice().sort((a,b)=> a.date.localeCompare(b.date)))
+      .sort((a,b)=> a[0].date.localeCompare(b[0].date));
+
+    let html = '';
+
+    // 상쇄 묶음: "각자 등록" vs "하나로 몰아서 등록" 두 옵션을 나란히 + 검산 배지
+    groups.forEach(g=>{
+      const memberLabel = g.map(e=> formatMDDay(e.date)).join(' + ');
+      const collector = g.slice().sort((a,b)=> Math.abs(b.diffH) - Math.abs(a.diffH))[0]; // |diffH|가 가장 큰 날이 다 떠안음
+      const sum = Math.round(g.reduce((s,e)=> s+e.diffH, 0) * 2) / 2;
+      const checkBadge = sum === 0
+        ? `<span class="frg-check ok">✓ 검산 완료</span>`
+        : `<span class="frg-check bad">⚠️ 검산 불일치 (합계 ${formatDiff(sum)})</span>`;
+      html += `<div class="final-result-group">
+        <div class="frg-title">🔗 묶음: ${memberLabel} (상쇄 완료) ${checkBadge}</div>
+        <div class="frg-option-label">옵션 1 · 각자 등록</div>
+        ${g.map(e=> singleItemHtml(e, '상쇄 묶음', memberLabel)).join('')}
+        <div class="frg-option-label">옵션 2 · ${formatMDDay(collector.date)}에 몰아서 등록 (나머지는 정상 9~18로)</div>
+        ${g.map(e=>{
+          if(e.date === collector.date) return singleItemHtml(e, '묶음 전체 몰아받음 · 사유는 위 옵션1에서 입력', memberLabel, false);
+          const clean = { ...e, diffH: 0, start: '9:00', end: '18:00' };
+          return singleItemHtml(clean, '원래 ' + formatDiff(e.diffH) + ' → 몰아주기로 0 처리');
+        }).join('')}
+      </div>`;
+    });
+
+    html += ungrouped.map(e=> singleItemHtml(e)).join('');
+
+    finalResultEl.innerHTML = html;
+    finalResultEl.querySelectorAll('.reason-input').forEach(inp=>{
+      inp.focus();
+      inp.setSelectionRange(inp.value.length, inp.value.length);
+    });
   }
+
+  // 최종결과값 카드 안 버튼들 — 매번 다시 그려지는 목록이라 위임 방식으로 한 번만 바인딩
+  finalResultEl.addEventListener('click', async (ev)=>{
+    const copyBtn = ev.target.closest('.fr-copy-btn');
+    if(copyBtn){
+      const text = `${copyBtn.dataset.start} ~ ${copyBtn.dataset.end}`;
+      try{
+        await navigator.clipboard.writeText(text);
+      }catch(err){
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      const original = copyBtn.textContent;
+      copyBtn.textContent = '✓ 복사됨';
+      copyBtn.classList.add('copied');
+      setTimeout(()=>{ copyBtn.textContent = original; copyBtn.classList.remove('copied'); }, 1200);
+      return;
+    }
+    const editBtn = ev.target.closest('.reason-edit-btn');
+    if(editBtn){
+      editingReasonDates.add(editBtn.dataset.date);
+      render();
+      return;
+    }
+    const saveBtn = ev.target.closest('.reason-save-btn');
+    if(saveBtn){
+      const row = saveBtn.closest('.entry-reason');
+      commitReason(row.querySelector('.reason-input'));
+      return;
+    }
+    const doneBtn = ev.target.closest('.upload-done-btn');
+    if(doneBtn){
+      const e = entries.find(en=> en.date === doneBtn.dataset.date);
+      if(e){ e.uploaded = !e.uploaded; await save(); render(); }
+      return;
+    }
+    const copyReasonBtn = ev.target.closest('.copy-reason-btn');
+    if(copyReasonBtn){
+      const e = entries.find(en=> en.date === copyReasonBtn.dataset.date);
+      if(!e) return;
+      const text = e.diffH > 0 ? (e.reason || '[초과 근무] ') : '[단축 근무]';
+      try{
+        await navigator.clipboard.writeText(text);
+      }catch(err){
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      const original = copyReasonBtn.textContent;
+      copyReasonBtn.textContent = '복사됨 ✓';
+      copyReasonBtn.classList.add('copied');
+      setTimeout(()=>{ copyReasonBtn.textContent = original; copyReasonBtn.classList.remove('copied'); }, 1200);
+    }
+  });
+  finalResultEl.addEventListener('keydown', (ev)=>{
+    if(ev.key === 'Enter' && ev.target.classList.contains('reason-input')){
+      ev.preventDefault();
+      commitReason(ev.target);
+    }
+  });
 
   let entries = [];
   let selectedDates = new Set();
@@ -1004,6 +1407,30 @@
     const h = Math.floor(min/60);
     const m = Math.round(min%60);
     return m === 0 ? `${h}시간` : `${h}시간 ${m}분`;
+  }
+
+  // ===== EW(사내 인트라) 등록용 시작~종료 시각 계산 =====
+  // 코어타임(10~15시)을 지키려면 실제 출근이 10시를 넘겼어도 등록은 10시부터로,
+  // 실제 퇴근이 15시 전이어도 등록은 15시까지로 — 그 외엔 실제 시각 그대로 사용
+  const CORE_START_MIN = 10 * 60;
+  const CORE_END_MIN = 15 * 60;
+  function timeToMin(t){
+    const [h, m] = t.split(':').map(Number);
+    return h * 60 + m;
+  }
+  function minToTimeStr(min){
+    const h = Math.floor(min / 60), m = min % 60;
+    return `${h}:${String(m).padStart(2,'0')}`;
+  }
+  function computeEwTime(e){
+    // 주말/공휴일은 코어타임 규정 대상이 아니라고 보고 실제 시각 그대로 둠
+    if(isWeekend(e.date) || e.isHoliday) return null;
+    const startMin = timeToMin(e.start);
+    const endMin = timeToMin(e.end);
+    const ewStart = Math.min(startMin, CORE_START_MIN);
+    const ewEnd = Math.max(endMin, CORE_END_MIN);
+    if(ewStart === startMin && ewEnd === endMin) return null; // 조정 필요 없으면 따로 안 보여줌
+    return { start: minToTimeStr(ewStart), end: minToTimeStr(ewEnd) };
   }
 
   // ===== 텍스트 붙여넣기 파싱 =====
@@ -1348,6 +1775,7 @@
           const ok = confirm(`${conflictCount}건은 기존 기록을 덮어씁니다. 계속할까요?`);
           if(!ok) return;
         }
+        const addedMonths = new Set(parsedResults.map(r=> monthKey(r.date)));
         parsedResults.forEach(r=>{
           const idx = entries.findIndex(e=> e.date === r.date);
           if(idx >= 0){
@@ -1358,12 +1786,23 @@
           }
         });
         await save();
+        const addedCount = parsedResults.length;
         parsedResults = [];
         missingDates = [];
         unparsedItems = [];
         leaveMarks = [];
         pasteInput.value = '';
         parsePreview.innerHTML = '';
+        // 방금 추가한 기록이 지금 보고 있는 달이랑 다르면, 목록에서 "사라진 것처럼" 보이지 않게 자동으로 전환
+        if(monthFilter !== 'all' && !addedMonths.has(monthFilter)){
+          if(addedMonths.size === 1){
+            monthFilter = [...addedMonths][0];
+            statusMsg.textContent = `${addedCount}건 추가됨 — 다른 달이라 자동으로 해당 월로 이동했어요`;
+          } else {
+            monthFilter = 'all';
+            statusMsg.textContent = `${addedCount}건 추가됨 — 여러 달에 걸쳐있어 전체보기로 전환했어요`;
+          }
+        }
         render();
       });
       container.appendChild(confirmBtn);
@@ -1401,6 +1840,14 @@
     // 선택 상태 중 삭제된 날짜 정리
     selectedDates.forEach(d=>{ if(!entries.find(e=>e.date===d)) selectedDates.delete(d); });
     editingReasonDates.forEach(d=>{ if(!entries.find(e=>e.date===d)) editingReasonDates.delete(d); });
+
+    // 기록이 하나도 없으면 필터·자동상쇄·최종결과값 같은 컨트롤은 다 숨겨서 첫 화면이 깔끔하게
+    listControls.classList.toggle('hidden', entries.length === 0);
+    finalResultCard.classList.toggle('hidden', entries.length === 0);
+    if(entries.length === 0){
+      entryList.innerHTML = '<div class="empty">아직 기록이 없어요 — 위 상자에 근무 내역을 붙여넣어주세요</div>';
+      return;
+    }
 
     // 월 라벨 갱신
     if(monthFilter === 'all'){
@@ -1441,38 +1888,6 @@
           ? `<span class="group-badge">묶음 상쇄완료</span><button class="ungroup" data-date="${e.date}">해제</button>`
           : '';
 
-        const doneBtnHtml = (!isGrouped && e.diffH !== 0)
-          ? `<button type="button" class="upload-done-btn${e.uploaded ? ' active' : ''}" data-date="${e.date}">${e.uploaded ? '완료 ✓' : '완료'}</button>`
-          : '';
-
-        let reasonRowHtml = '';
-        if(e.diffH > 0){
-          const isEditing = editingReasonDates.has(e.date);
-          if(isEditing){
-            reasonRowHtml = `
-              <div class="entry-reason editing">
-                <input type="text" class="reason-input" data-date="${e.date}" value="${escapeHtml(e.reason || '[초과 근무] ')}">
-                <button type="button" class="reason-save-btn" data-date="${e.date}">저장</button>
-              </div>`;
-          } else {
-            reasonRowHtml = `
-              <div class="entry-reason">
-                <div class="reason-preview">${e.reason ? escapeHtml(e.reason) : '업무 내역 미입력'}</div>
-              </div>
-              <div class="entry-actions">
-                <button type="button" class="reason-edit-btn" data-date="${e.date}">입력·수정</button>
-                <button type="button" class="copy-reason-btn" data-date="${e.date}">복사</button>
-                ${doneBtnHtml}
-              </div>`;
-          }
-        } else if(e.diffH < 0){
-          reasonRowHtml = `
-            <div class="entry-actions">
-              <button type="button" class="copy-reason-btn" data-date="${e.date}">복사</button>
-              ${doneBtnHtml}
-            </div>`;
-        }
-
         div.innerHTML = `
           <div class="entry-main">
             ${checkboxHtml}
@@ -1487,7 +1902,6 @@
             </div>
             ${groupBadgeHtml}
           </div>
-          ${reasonRowHtml}
         `;
         entryList.appendChild(div);
       });
@@ -1498,66 +1912,6 @@
           entries = entries.filter(e=> e.date !== d);
           await save();
           render();
-        });
-      });
-      const commitReason = async (inp)=>{
-        const d = inp.dataset.date;
-        const e = entries.find(en=>en.date===d);
-        if(e){
-          let val = inp.value;
-          if(!val.startsWith('[초과 근무] ')) val = '[초과 근무] ' + val.replace(/^\[초과 근무\]\s*/, '');
-          e.reason = val;
-          await save();
-        }
-        editingReasonDates.delete(d);
-        render();
-      };
-      entryList.querySelectorAll('.reason-input').forEach(inp=>{
-        // 자동 포커스 + 커서를 맨 끝으로 (편집 모드로 막 전환된 입력창)
-        inp.focus();
-        inp.setSelectionRange(inp.value.length, inp.value.length);
-        inp.addEventListener('keydown', (ev)=>{ if(ev.key === 'Enter'){ ev.preventDefault(); commitReason(inp); } });
-      });
-      entryList.querySelectorAll('.reason-edit-btn').forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          editingReasonDates.add(btn.dataset.date);
-          render();
-        });
-      });
-      entryList.querySelectorAll('.reason-save-btn').forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          const row = btn.closest('.entry-reason');
-          const inp = row.querySelector('.reason-input');
-          commitReason(inp);
-        });
-      });
-      entryList.querySelectorAll('.upload-done-btn').forEach(btn=>{
-        btn.addEventListener('click', async ()=>{
-          const d = btn.dataset.date;
-          const e = entries.find(en=>en.date===d);
-          if(e){ e.uploaded = !e.uploaded; await save(); render(); }
-        });
-      });
-      entryList.querySelectorAll('.copy-reason-btn').forEach(btn=>{
-        btn.addEventListener('click', async ()=>{
-          const d = btn.dataset.date;
-          const e = entries.find(en=>en.date===d);
-          if(!e) return;
-          const text = e.diffH > 0 ? (e.reason || '[초과 근무] ') : '[단축 근무]';
-          try{
-            await navigator.clipboard.writeText(text);
-          }catch(err){
-            const ta = document.createElement('textarea');
-            ta.value = text;
-            document.body.appendChild(ta);
-            ta.select();
-            document.execCommand('copy');
-            document.body.removeChild(ta);
-          }
-          const original = btn.textContent;
-          btn.textContent = '복사됨 ✓';
-          btn.classList.add('copied');
-          setTimeout(()=>{ btn.textContent = original; btn.classList.remove('copied'); }, 1200);
         });
       });
       entryList.querySelectorAll('.pair-check').forEach(cb=>{
@@ -1593,7 +1947,7 @@
     diffFilterEl.querySelector('[data-filter="under"]').textContent = `단축만 (${undertimeDates.length})`;
 
     updatePairBar();
-    renderGroupSummary();
+    renderFinalResult();
   }
 
   function updatePairBar(){
