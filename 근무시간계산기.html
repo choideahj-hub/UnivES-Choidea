@@ -47,6 +47,17 @@
     color:var(--ink-soft);
     margin:0 0 24px 0;
   }
+  .latest-date-banner{
+    background:var(--accent-soft);
+    color:var(--accent);
+    font-size:12.5px;
+    font-weight:700;
+    padding:9px 14px;
+    border-radius:999px;
+    display:inline-block;
+    margin:-14px 0 20px 0;
+  }
+  .latest-date-banner.hidden{ display:none; }
   .card{
     background:var(--card);
     border:1px solid var(--line);
@@ -80,6 +91,26 @@
     font-weight:700;
     color:var(--ink);
   }
+  .daily-calc-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:9px 4px;
+    border-bottom:1px solid var(--line);
+    font-size:13px;
+  }
+  .daily-calc-row:last-child{ border-bottom:none; }
+  .daily-calc-row .dc-date{
+    color:var(--ink);
+    font-weight:600;
+  }
+  .daily-calc-row .dc-diff{
+    font-weight:800;
+    font-variant-numeric:tabular-nums;
+  }
+  .daily-calc-row .dc-diff.plus{ color:#D9822B; }
+  .daily-calc-row .dc-diff.minus{ color:var(--danger); }
+  .daily-calc-row .dc-diff.zero{ color:var(--ink-soft); }
   .field{ margin-bottom:16px; }
   .field:last-child{ margin-bottom:0; }
   label{
@@ -656,6 +687,7 @@
   }
   .frg-check.ok{ background:#E4F5EA; color:#2F9E5B; }
   .frg-check.bad{ background:var(--danger-soft); color:var(--danger); }
+  .frg-check.partial{ background:#FFF1DC; color:#B5720C; }
   .frg-option-label{
     font-size:11px;
     font-weight:700;
@@ -755,8 +787,27 @@
     gap:8px;
     padding-left:27px;
   }
+  .entry-group-wrap{
+    border:1.5px dashed var(--accent);
+    border-radius:12px;
+    padding:10px;
+    margin-bottom:10px;
+    background:var(--accent-soft);
+  }
+  .entry-group-header{
+    font-size:11.5px;
+    font-weight:800;
+    color:var(--accent);
+    margin-bottom:8px;
+    padding:0 2px;
+  }
+  .entry-group-wrap .entry{
+    background:#fff;
+    margin-bottom:6px;
+  }
+  .entry-group-wrap .entry:last-child{ margin-bottom:0; }
   .entry.grouped{
-    opacity:0.55;
+    opacity:1;
   }
   .entry .pair-check{
     width:17px;
@@ -964,6 +1015,7 @@
   <div class="eyebrow">대학내일</div>
   <h1>순 근무 시간 체크</h1>
   <p class="sub">일 8시간 기준 +/- 를 날짜별로 쌓아서 상쇄 확인</p>
+  <div id="latestDateBanner" class="latest-date-banner hidden"></div>
 
   <div class="card">
     <div class="step-header"><span class="step-num">1</span><span class="step-title">일정 등록하기</span></div>
@@ -975,8 +1027,13 @@
     <div id="parsePreview"></div>
   </div>
 
+  <div class="card" id="dailyCalcCard">
+    <div class="step-header"><span class="step-num">2</span><span class="step-title">일별 근무시간 계산</span></div>
+    <div id="dailyCalcList"><div class="empty">기록이 없습니다</div></div>
+  </div>
+
   <div class="card" id="listCard">
-    <div class="step-header"><span class="step-num">2</span><span class="step-title">상쇄 짝짓기</span></div>
+    <div class="step-header"><span class="step-num">3</span><span class="step-title">상쇄 짝짓기</span></div>
     <div id="listControls">
       <div class="month-nav">
         <button type="button" id="monthPrev">‹</button>
@@ -1002,7 +1059,7 @@
   </div>
 
   <div class="card" id="finalResultCard">
-    <div class="step-header"><span class="step-num">3</span><span class="step-title">최종 결과값 보기</span></div>
+    <div class="step-header"><span class="step-num">4</span><span class="step-title">최종 결과값 보기</span></div>
     <button type="button" id="finalResultToggle" class="final-result-toggle">📋 펼쳐서 보기 — EW에 이대로 입력하세요</button>
     <div class="fr-toolbar hidden" id="frToolbar">
       <label class="hide-uploaded-toggle" id="hideUploadedWrap">
@@ -1043,8 +1100,11 @@
 <script>
 
   const entryList = document.getElementById('entryList');
+  const dailyCalcList = document.getElementById('dailyCalcList');
+  const latestDateBanner = document.getElementById('latestDateBanner');
   const listControls = document.getElementById('listControls');
   const finalResultCard = document.getElementById('finalResultCard');
+  const dailyCalcCard = document.getElementById('dailyCalcCard');
   const statusMsg = document.getElementById('statusMsg');
   const clearAllBtn = document.getElementById('clearAllBtn');
   const autoMatchBtn = document.getElementById('autoMatchBtn');
@@ -1200,12 +1260,17 @@
       const memberLabel = g.map(e=> formatMDDay(e.date)).join(' + ');
       const collector = g.slice().sort((a,b)=> Math.abs(b.diffH) - Math.abs(a.diffH))[0];
       const sum = Math.round(g.reduce((s,e)=> s+e.diffH, 0) * 2) / 2;
-      lines.push(`🔗 묶음: ${memberLabel} (검산 ${sum === 0 ? '완료' : '불일치 ' + formatDiff(sum)})`);
+      const isExact = sum === 0;
+      lines.push(`🔗 묶음: ${memberLabel} (${isExact ? '완전 상쇄' : '근접 상쇄 · 잔여 ' + formatDiff(sum)})`);
       lines.push('[옵션1 각자 등록]');
       g.forEach(e=> lines.push('- ' + lineFor(e)));
       lines.push(`[옵션2 ${formatMDDay(collector.date)}에 몰아서 등록]`);
       g.forEach(e=>{
-        if(e.date === collector.date) lines.push('- ' + lineFor(e, '묶음 전체 몰아받음'));
+        if(e.date === collector.date){
+          const otherSum = Math.round((sum - collector.diffH) * 2) / 2;
+          const boosted = otherSum === 0 ? e : { ...e, diffH: sum, end: minToTimeStr(Math.round(timeToMin(e.end) + otherSum * 60)) };
+          lines.push('- ' + lineFor(boosted, '묶음 전체 몰아받음'));
+        }
         else lines.push('- ' + lineFor({ ...e, diffH: 0, start: '9:00', end: '18:00' }));
       });
       lines.push('');
@@ -1214,6 +1279,22 @@
     ungrouped.forEach(e=> lines.push('- ' + lineFor(e)));
 
     return lines.join('\n').trim();
+  }
+
+  function renderDailyCalc(){
+    const scoped = (monthFilter === 'all' ? entries : entries.filter(e=> monthKey(e.date) === monthFilter))
+      .slice().sort((a,b)=> a.date.localeCompare(b.date));
+    if(scoped.length === 0){
+      dailyCalcList.innerHTML = '<div class="empty">기록이 없습니다</div>';
+      return;
+    }
+    dailyCalcList.innerHTML = scoped.map(e=>{
+      const cls = e.diffH > 0 ? 'plus' : (e.diffH < 0 ? 'minus' : 'zero');
+      return `<div class="daily-calc-row">
+        <span class="dc-date">${formatMDDay(e.date)}</span>
+        <span class="dc-diff ${cls}">${formatDiff(e.diffH)}</span>
+      </div>`;
+    }).join('');
   }
 
   function renderFinalResult(){
@@ -1255,16 +1336,22 @@
       const memberLabel = g.map(e=> formatMDDay(e.date)).join(' + ');
       const collector = g.slice().sort((a,b)=> Math.abs(b.diffH) - Math.abs(a.diffH))[0]; // |diffH|가 가장 큰 날이 다 떠안음
       const sum = Math.round(g.reduce((s,e)=> s+e.diffH, 0) * 2) / 2;
-      const checkBadge = sum === 0
-        ? `<span class="frg-check ok">✓ 검산 완료</span>`
-        : `<span class="frg-check bad">⚠️ 검산 불일치 (합계 ${formatDiff(sum)})</span>`;
+      const isExact = sum === 0;
+      const checkBadge = isExact
+        ? `<span class="frg-check ok">✓ 완전 상쇄</span>`
+        : `<span class="frg-check partial">🔶 잔여 ${formatDiff(sum)} — 대표 날짜에 몰아줌</span>`;
       html += `<div class="final-result-group">
-        <div class="frg-title">🔗 묶음: ${memberLabel} (상쇄 완료) ${checkBadge}</div>
+        <div class="frg-title">🔗 묶음: ${memberLabel} (${isExact ? '상쇄 완료' : '근접 상쇄'}) ${checkBadge}</div>
         <div class="frg-option-label">옵션 1 · 각자 등록</div>
         ${g.map(e=> singleItemHtml(e, '상쇄 묶음', memberLabel)).join('')}
         <div class="frg-option-label">옵션 2 · ${formatMDDay(collector.date)}에 몰아서 등록 (나머지는 정상 9~18로)</div>
         ${g.map(e=>{
-          if(e.date === collector.date) return singleItemHtml(e, '묶음 전체 몰아받음 · 사유는 위 옵션1에서 입력', memberLabel, false);
+          if(e.date === collector.date){
+            // 완전상쇄면 대표 날짜 자체가 이미 합계와 같지만, 근접상쇄(잔여 있음)면 나머지 멤버들 몫까지 등록시각에 반영해야 함
+            const otherSum = Math.round((sum - collector.diffH) * 2) / 2;
+            const boosted = otherSum === 0 ? e : { ...e, diffH: sum, end: minToTimeStr(Math.round(timeToMin(e.end) + otherSum * 60)) };
+            return singleItemHtml(boosted, '묶음 전체 몰아받음 · 사유는 위 옵션1에서 입력', memberLabel, false);
+          }
           const clean = { ...e, diffH: 0, start: '9:00', end: '18:00' };
           return singleItemHtml(clean, '원래 ' + formatDiff(e.diffH) + ' → 몰아주기로 0 처리');
         }).join('')}
@@ -1840,9 +1927,21 @@
     selectedDates.forEach(d=>{ if(!entries.find(e=>e.date===d)) selectedDates.delete(d); });
     editingReasonDates.forEach(d=>{ if(!entries.find(e=>e.date===d)) editingReasonDates.delete(d); });
 
+    // 지금까지 등록된 것 중 가장 마지막 날짜를 배너로 안내 (별도 "전체보기" 스텝은 이미 있는 월별 전체보기 버튼과 중복돼서 안 만듦)
+    if(entries.length === 0){
+      latestDateBanner.classList.add('hidden');
+    } else {
+      const latestDate = entries[entries.length - 1].date;
+      const [ly, lm, ld] = latestDate.split('-').map(Number);
+      const latestDayName = DAY_NAMES[new Date(latestDate + 'T00:00:00').getDay()];
+      latestDateBanner.textContent = `📅 ${ly}년 ${lm}월 ${ld}일(${latestDayName})자 근무기록까지 계산 완료했어요`;
+      latestDateBanner.classList.remove('hidden');
+    }
+
     // 기록이 하나도 없으면 필터·자동상쇄·최종결과값 같은 컨트롤은 다 숨겨서 첫 화면이 깔끔하게
     listControls.classList.toggle('hidden', entries.length === 0);
     finalResultCard.classList.toggle('hidden', entries.length === 0);
+    dailyCalcCard.classList.toggle('hidden', entries.length === 0);
     if(entries.length === 0){
       entryList.innerHTML = '<div class="empty">아직 기록이 없어요 — 위 상자에 근무 내역을 붙여넣어주세요</div>';
       return;
@@ -1875,7 +1974,7 @@
       entryList.innerHTML = `<div class="empty">${emptyMsg}</div>`;
     } else {
       entryList.innerHTML = '';
-      visibleEntries.forEach(e=>{
+      function buildEntryDiv(e){
         const diffClass = e.diffH === 0 ? 'zero' : (e.diffH > 0 ? 'plus' : 'minus');
         const isGrouped = !!e.groupId;
         const div = document.createElement('div');
@@ -1884,7 +1983,7 @@
           ? `<input type="checkbox" class="pair-check" data-date="${e.date}" ${selectedDates.has(e.date) ? 'checked' : ''}>`
           : '';
         const groupBadgeHtml = isGrouped
-          ? `<span class="group-badge">묶음 상쇄완료</span><button class="ungroup" data-date="${e.date}">해제</button>`
+          ? `<button class="ungroup" data-date="${e.date}">묶음 해제</button>`
           : '';
 
         div.innerHTML = `
@@ -1902,7 +2001,42 @@
             ${groupBadgeHtml}
           </div>
         `;
-        entryList.appendChild(div);
+        return div;
+      }
+
+      // 합산되는 짝(묶음)끼리는 자리를 이동시켜 하나의 그룹 박스로 붙여서 보여줌 — 그룹의 대표 정렬 위치는 그 안 가장 이른 날짜
+      const groupsMapByDate = {};
+      visibleEntries.forEach(e=>{
+        if(e.groupId) (groupsMapByDate[e.groupId] = groupsMapByDate[e.groupId] || []).push(e);
+      });
+      const seenGroupIds = new Set();
+      const displayItems = [];
+      visibleEntries.forEach(e=>{
+        if(e.groupId){
+          if(seenGroupIds.has(e.groupId)) return;
+          seenGroupIds.add(e.groupId);
+          const members = groupsMapByDate[e.groupId].slice().sort((a,b)=> a.date.localeCompare(b.date));
+          displayItems.push({ sortKey: members[0].date, type: 'group', members });
+        } else {
+          displayItems.push({ sortKey: e.date, type: 'single', entry: e });
+        }
+      });
+      displayItems.sort((a,b)=> a.sortKey.localeCompare(b.sortKey));
+
+      displayItems.forEach(item=>{
+        if(item.type === 'single'){
+          entryList.appendChild(buildEntryDiv(item.entry));
+          return;
+        }
+        const sum = Math.round(item.members.reduce((s,e)=> s+e.diffH, 0) * 2) / 2;
+        const wrap = document.createElement('div');
+        wrap.className = 'entry-group-wrap';
+        const header = document.createElement('div');
+        header.className = 'entry-group-header';
+        header.innerHTML = `🔗 상쇄 묶음 (${item.members.length}건) · 합계 ${formatDiff(sum)} ${sum === 0 ? '✓' : '🔶 잔여'}`;
+        wrap.appendChild(header);
+        item.members.forEach(m=> wrap.appendChild(buildEntryDiv(m)));
+        entryList.appendChild(wrap);
       });
       entryList.querySelectorAll('.del').forEach(btn=>{
         btn.addEventListener('click', async ()=>{
@@ -1946,6 +2080,7 @@
     diffFilterEl.querySelector('[data-filter="under"]').textContent = `단축만 (${undertimeDates.length})`;
 
     updatePairBar();
+    renderDailyCalc();
     renderFinalResult();
   }
 
@@ -1957,9 +2092,13 @@
     pairBar.classList.add('show');
     const selectedEntries = entries.filter(e=> selectedDates.has(e.date));
     const sum = Math.round(selectedEntries.reduce((s,e)=> s+e.diffH, 0) * 2) / 2;
-    pairStatus.textContent = `${selectedEntries.length}건 선택 · 합계 ${formatDiff(sum)}`;
-    pairStatus.classList.toggle('ok', sum === 0);
-    pairConfirmBtn.disabled = !(sum === 0 && selectedEntries.length >= 2);
+    const isExact = sum === 0;
+    pairStatus.textContent = isExact
+      ? `${selectedEntries.length}건 선택 · 합계 ${formatDiff(sum)}`
+      : `${selectedEntries.length}건 선택 · 합계 ${formatDiff(sum)} (완전 상쇄 안 됨 — 묶어서 몰아주기)`;
+    pairStatus.classList.toggle('ok', isExact);
+    pairConfirmBtn.textContent = isExact ? '짝으로 확정' : '묶어서 확정(몰아주기)';
+    pairConfirmBtn.disabled = selectedEntries.length < 2;
   }
 
   pairCancelBtn.addEventListener('click', ()=>{
@@ -2008,10 +2147,16 @@
     }
     if(groupsFormed > 0) await save();
 
-    // 2순위(최후): 남은 것 중 주말·심야·공휴일까지 포함해야 맞는 조합은 수당 배율이 다를 수 있어
+    // 2순위: 남은 것 중 주말·심야·공휴일까지 포함해야 맞는 조합은 수당 배율이 다를 수 있어
     // 자동으로 "확정"까지는 하지 않되, 체크박스는 미리 선택해둬서 사용자가 확인만 하고 확정/취소를 누르면 되게 함
     const remainingAll = entries.filter(e=> !e.groupId && e.diffH !== 0);
     const specialMatch = findZeroSumSubset(remainingAll, 4);
+
+    // 3순위(최후): 정확히 0은 안 되지만, 남은 것들 중 가장 0에 가깝게 묶이는 조합 — 잔여분은 제일 큰 날에 몰아줄 예정
+    let closestMatch = null;
+    if(!specialMatch){
+      closestMatch = findClosestSumSubset(remainingAll, 6);
+    }
 
     let msg = '';
     if(groupsFormed > 0){
@@ -2022,6 +2167,12 @@
       selectedDates.clear();
       specialMatch.forEach(e=> selectedDates.add(e.date));
       msg += (msg ? ' · ' : '') + `주말/심야/공휴일 포함 조합 발견(${dateList}) — 수당 배율이 다를 수 있어 미리 체크만 해뒀어요, 확인하고 아래 확정/취소를 눌러주세요`;
+    } else if(closestMatch){
+      const sum = Math.round(closestMatch.reduce((s,e)=> s+e.diffH, 0) * 2) / 2;
+      const dateList = closestMatch.map(e=> formatMDDay(e.date)).join(', ');
+      selectedDates.clear();
+      closestMatch.forEach(e=> selectedDates.add(e.date));
+      msg += (msg ? ' · ' : '') + `정확히 0은 안 되지만 가장 가깝게 묶이는 조합 발견(${dateList}, 잔여 ${formatDiff(sum)}) — 미리 체크만 해뒀어요, 확인하고 묶어서 확정해주세요`;
     } else if(groupsFormed === 0){
       msg = '합이 0이 되는 조합을 찾지 못했습니다';
     }
@@ -2029,12 +2180,43 @@
     render();
   });
 
+  // 정확히 0은 안 되지만 "가장 가깝게" 묶이는 조합을 찾음 — 남는 만큼은 나중에 제일 큰 날에 몰아줌
+  function findClosestSumSubset(list, maxSize){
+    const n = list.length;
+    if(n < 2) return null;
+    let best = null, bestAbsSum = Infinity, bestSize = 0;
+    const upper = Math.min(maxSize, n);
+    for(let size=2; size<=upper; size++){
+      const combo = [];
+      function backtrack(start){
+        if(combo.length === size){
+          const sum = Math.round(combo.reduce((s,e)=> s+e.diffH, 0) * 2) / 2;
+          const absSum = Math.abs(sum);
+          // 0에 더 가까운 쪽 우선, 근접도가 같으면 더 많은 항목을 해소하는 큰 조합 우선
+          if(absSum < bestAbsSum || (absSum === bestAbsSum && size > bestSize)){
+            bestAbsSum = absSum;
+            bestSize = size;
+            best = combo.slice();
+          }
+          return;
+        }
+        for(let i=start; i<n; i++){
+          combo.push(list[i]);
+          backtrack(i+1);
+          combo.pop();
+        }
+      }
+      backtrack(0);
+    }
+    return best;
+  }
+
   // 최대 maxSize개까지의 조합 중 diffH 합이 0인 첫 조합을 찾는 간단한 탐색 (기록 수가 적어 브루트포스로 충분)
   function findZeroSumSubset(list, maxSize){
     const n = list.length;
-    // 작은 조합부터 찾으면 우연히 합이 0인 2개짜리가 먼저 걸려서, 실제로 필요한
-    // "1개+2개"처럼 더 많은 항목을 해소하는 조합을 놓칠 수 있음 → 큰 조합부터 우선 탐색
-    for(let size=Math.min(maxSize, n); size>=2; size--){
+    // 같은 크기끼리(1대1 정확히 맞는 플러스/마이너스)를 최우선으로 매칭하고,
+    // 그걸로 안 맞는 것들만 남겨서 1대다 → 다대다 순으로 점점 넓혀가며 탐색
+    for(let size=2; size<=Math.min(maxSize, n); size++){
       const combo = [];
       function backtrack(start){
         if(combo.length === size){
