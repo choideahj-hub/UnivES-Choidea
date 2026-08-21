@@ -734,6 +734,15 @@
     text-align:center;
     padding:12px 0;
   }
+  .hidden-exact-note{
+    font-size:11px;
+    color:#2F9E5B;
+    background:#E4F5EA;
+    border-radius:8px;
+    padding:8px 10px;
+    margin-bottom:10px;
+    text-align:center;
+  }
   .final-result{
     display:none;
     margin-bottom:12px;
@@ -1477,7 +1486,8 @@
       else if(finalDiffFilter === 'all' || (finalDiffFilter === 'over' && e.diffH > 0) || (finalDiffFilter === 'under' && e.diffH < 0)) ungrouped.push(e);
     });
     const groups = Object.values(byGroup)
-      .map(g=> g.slice().sort((a,b)=> a.date.localeCompare(b.date)));
+      .map(g=> g.slice().sort((a,b)=> a.date.localeCompare(b.date)))
+      .filter(g=> Math.round(g.reduce((s,e)=> s+e.diffH, 0) * 2) / 2 !== 0); // 완전 상쇄(합계 0)된 세트는 이미 끝난 일로 보고 제외
 
     if(groups.length === 0 && ungrouped.length === 0) return '해당하는 기록이 없습니다.';
 
@@ -1612,11 +1622,13 @@
       // 묶음은 이미 확정된 세트라 초과/단축 필터와 무관하게 항상 보여줌(짝짓기 STEP3와 동일 원칙), 개별 항목만 필터링
       else if(finalDiffFilter === 'all' || (finalDiffFilter === 'over' && e.diffH > 0) || (finalDiffFilter === 'under' && e.diffH < 0)) ungrouped.push(e);
     });
-    const groups = Object.values(byGroup)
-      .map(g=> g.slice().sort((a,b)=> a.date.localeCompare(b.date)));
+    const allGroupsForCount = Object.values(byGroup).map(g=> g.slice().sort((a,b)=> a.date.localeCompare(b.date)));
+    const groups = allGroupsForCount
+      .filter(g=> Math.round(g.reduce((s,e)=> s+e.diffH, 0) * 2) / 2 !== 0); // 완전 상쇄(합계 0)된 세트는 이미 끝난 일로 보고 제외
+    const hiddenExactCount = allGroupsForCount.length - groups.length;
 
     if(groups.length === 0 && ungrouped.length === 0){
-      const emptyMsg = finalDiffFilter === 'over' ? '초과 근무 기록이 없습니다' : finalDiffFilter === 'under' ? '단축 근무 기록이 없습니다' : '기록이 없습니다';
+      const emptyMsg = finalDiffFilter === 'over' ? '초과 근무 기록이 없습니다' : finalDiffFilter === 'under' ? '단축 근무 기록이 없습니다' : (hiddenExactCount > 0 ? `✓ 완전 상쇄된 ${hiddenExactCount}세트는 등록 필요 없어서 숨겼어요 — 등록할 게 더는 없어요` : '기록이 없습니다');
       finalResultEl.innerHTML = `<div class="group-summary-empty">${emptyMsg}</div>`;
       return;
     }
@@ -1628,7 +1640,9 @@
     ];
     displayItems.sort((a,b)=> finalSortOrder === 'asc' ? a.sortKey.localeCompare(b.sortKey) : b.sortKey.localeCompare(a.sortKey));
 
-    let html = '';
+    let html = hiddenExactCount > 0
+      ? `<div class="hidden-exact-note">✓ 완전 상쇄된 ${hiddenExactCount}세트는 등록 필요 없어서 숨겼어요</div>`
+      : '';
 
     // 상쇄 묶음: "각자 등록" vs "하나로 몰아서 등록" 두 옵션을 나란히 + 검산 배지
     displayItems.forEach(item=>{
