@@ -111,6 +111,99 @@
   .daily-calc-row .dc-diff.plus{ color:#D9822B; }
   .daily-calc-row .dc-diff.minus{ color:var(--danger); }
   .daily-calc-row .dc-diff.zero{ color:var(--ink-soft); }
+  .daily-calc-row.is-session{
+    background:var(--danger-soft);
+    margin:0 -8px;
+    padding:9px 8px;
+    border-radius:6px;
+    border-bottom:none;
+  }
+  .daily-calc-view-toggle{
+    display:flex;
+    gap:6px;
+    margin-bottom:12px;
+  }
+  .daily-calc-view-toggle button{
+    flex:1;
+    padding:7px;
+    border-radius:7px;
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--ink-soft);
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .daily-calc-view-toggle button.active{
+    background:var(--accent-soft);
+    border-color:var(--accent);
+    color:var(--accent);
+  }
+  .calendar-month{ margin-bottom:18px; }
+  .calendar-month:last-child{ margin-bottom:0; }
+  .cal-month-title{
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--ink);
+    margin-bottom:8px;
+  }
+  .cal-grid{
+    display:grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap:4px;
+  }
+  .cal-dow{
+    text-align:center;
+    font-size:10px;
+    font-weight:700;
+    color:var(--ink-soft);
+    padding-bottom:2px;
+  }
+  .cal-cell{
+    aspect-ratio:1;
+    border-radius:7px;
+    background:var(--neutral-bg);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    font-size:9.5px;
+  }
+  .cal-cell.empty{ background:none; }
+  .cal-cell .cal-day{
+    font-size:10px;
+    color:var(--ink-soft);
+    font-weight:600;
+  }
+  .cal-cell.has-entry{ border:1.5px solid var(--line); }
+  .cal-cell.has-entry .cal-day{ color:var(--ink); }
+  .cal-cell.has-entry .cal-diff{
+    font-weight:800;
+    font-variant-numeric:tabular-nums;
+    margin-top:1px;
+  }
+  .cal-cell.plus{ background:#FDF0E1; border-color:#D9822B; }
+  .cal-cell.plus .cal-diff{ color:#D9822B; }
+  .cal-cell.minus{ background:var(--danger-soft); border-color:var(--danger); }
+  .cal-cell.minus .cal-diff{ color:var(--danger); }
+  .cal-cell.zero{ background:var(--neutral-bg); }
+  .cal-cell.zero .cal-diff{ color:var(--ink-soft); }
+  .cal-cell.is-session{ box-shadow: 0 0 0 2px var(--danger) inset; }
+  .go-next-btn{
+    width:100%;
+    margin-top:14px;
+    padding:11px;
+    border-radius:8px;
+    border:none;
+    background:var(--accent);
+    color:#fff;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .go-next-btn:active{ transform:scale(0.98); }
   .field{ margin-bottom:16px; }
   .field:last-child{ margin-bottom:0; }
   label{
@@ -510,6 +603,59 @@
     opacity:0.4;
     cursor:not-allowed;
   }
+  .shared-month-filter{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:14px 16px 2px;
+    margin-bottom:16px;
+  }
+  .shared-month-filter.hidden{ display:none; }
+  .smf-label{
+    font-size:11px;
+    font-weight:700;
+    color:var(--ink-soft);
+    margin-bottom:8px;
+  }
+  .view-mode-toggle{
+    display:flex;
+    gap:6px;
+    margin-bottom:10px;
+  }
+  .view-mode-toggle button{
+    flex:1;
+    padding:9px 6px;
+    border-radius:8px;
+    border:1.5px solid var(--line);
+    background:#fff;
+    color:var(--ink-soft);
+    font-size:12px;
+    font-weight:700;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .view-mode-toggle button.active{
+    background:var(--danger-soft);
+    border-color:var(--danger);
+    color:var(--danger);
+  }
+  .view-mode-toggle button[data-mode="all"].active{
+    background:var(--accent-soft);
+    border-color:var(--accent);
+    color:var(--accent);
+  }
+  .month-nav.hidden{ display:none; }
+  .reset-session-btn{
+    width:100%;
+    padding:7px;
+    border:none;
+    background:none;
+    color:var(--ink-soft);
+    font-size:11px;
+    text-decoration:underline;
+    cursor:pointer;
+    font-family:inherit;
+  }
   .month-nav{
     display:flex;
     align-items:center;
@@ -727,13 +873,33 @@
   .final-result-toggle:active{ transform:scale(0.98); }
   .fr-toolbar{
     display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
+    flex-direction:column;
+    gap:8px;
     margin-bottom:10px;
-    flex-wrap:wrap;
   }
+  .fr-toolbar .diff-filter{ margin-bottom:0; }
   .fr-toolbar.hidden{ display:none; }
+  .sort-order-toggle{
+    display:flex;
+    gap:6px;
+  }
+  .sort-order-toggle button{
+    flex:1;
+    padding:8px 0;
+    border:1px solid var(--line);
+    border-radius:7px;
+    background:#fff;
+    color:var(--ink-soft);
+    font-size:11.5px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .sort-order-toggle button.active{
+    background:var(--accent-soft);
+    border-color:var(--accent);
+    color:var(--accent);
+  }
   .hide-uploaded-toggle{
     display:flex;
     align-items:center;
@@ -788,16 +954,16 @@
     padding-left:27px;
   }
   .entry-group-wrap{
-    border:1.5px dashed var(--accent);
+    border:1.5px dashed var(--group-border, var(--accent));
     border-radius:12px;
     padding:10px;
     margin-bottom:10px;
-    background:var(--accent-soft);
+    background:var(--group-bg, var(--accent-soft));
   }
   .entry-group-header{
     font-size:11.5px;
     font-weight:800;
-    color:var(--accent);
+    color:var(--group-text, var(--accent));
     margin-bottom:8px;
     padding:0 2px;
   }
@@ -808,6 +974,10 @@
   .entry-group-wrap .entry:last-child{ margin-bottom:0; }
   .entry.grouped{
     opacity:1;
+  }
+  .entry.is-session{
+    border-left:3px solid var(--danger);
+    background:var(--danger-soft);
   }
   .entry .pair-check{
     width:17px;
@@ -1008,6 +1178,23 @@
     color:var(--ink-soft);
     padding:8px 0;
   }
+  .scroll-top-btn{
+    position:fixed;
+    right:18px;
+    bottom:22px;
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    border:none;
+    background:var(--accent);
+    color:#fff;
+    font-size:18px;
+    font-weight:700;
+    cursor:pointer;
+    box-shadow:0 3px 10px rgba(0,0,0,0.25);
+    z-index:50;
+  }
+  .scroll-top-btn.hidden{ display:none; }
 </style>
 </head>
 <body>
@@ -1027,20 +1214,34 @@
     <div id="parsePreview"></div>
   </div>
 
+  <div id="sharedMonthFilter" class="shared-month-filter hidden">
+    <div class="smf-label">🗓️ 보고 있는 범위 (2~4단계 공통)</div>
+    <div class="view-mode-toggle" id="viewModeToggle">
+      <button type="button" data-mode="session" class="active">🔴 지금 등록한 것만 (<span id="sessionCount">0</span>건)</button>
+      <button type="button" data-mode="all">전체 누적 보기</button>
+    </div>
+    <div class="month-nav hidden" id="monthNavWrap">
+      <button type="button" id="monthPrev">‹</button>
+      <div class="month-label" id="monthLabel">–</div>
+      <button type="button" id="monthNext">›</button>
+      <button type="button" id="monthAllBtn">전체 기간</button>
+    </div>
+    <button type="button" id="resetSessionBtn" class="reset-session-btn">🔄 세션 초기화 — 지금부터 새로 등록하는 것만 추적</button>
+  </div>
+
   <div class="card" id="dailyCalcCard">
     <div class="step-header"><span class="step-num">2</span><span class="step-title">일별 근무시간 계산</span></div>
+    <div class="daily-calc-view-toggle" id="dailyCalcViewToggle">
+      <button type="button" data-view="list" class="active">📋 목록</button>
+      <button type="button" data-view="calendar">📅 캘린더</button>
+    </div>
     <div id="dailyCalcList"><div class="empty">기록이 없습니다</div></div>
+    <button type="button" id="goToMatchBtn" class="go-next-btn">↓ STEP3 상쇄 짝짓기로 이동</button>
   </div>
 
   <div class="card" id="listCard">
     <div class="step-header"><span class="step-num">3</span><span class="step-title">상쇄 짝짓기</span></div>
     <div id="listControls">
-      <div class="month-nav">
-        <button type="button" id="monthPrev">‹</button>
-        <div class="month-label" id="monthLabel">–</div>
-        <button type="button" id="monthNext">›</button>
-        <button type="button" id="monthAllBtn">전체보기</button>
-      </div>
       <button class="auto-match-btn" id="autoMatchBtn">🔍 자동으로 상쇄 짝 찾기</button>
       <div class="pair-bar" id="pairBar">
         <div class="pair-status" id="pairStatus">0건 선택 · 합계 0h</div>
@@ -1062,6 +1263,15 @@
     <div class="step-header"><span class="step-num">4</span><span class="step-title">최종 결과값 보기</span></div>
     <button type="button" id="finalResultToggle" class="final-result-toggle">📋 펼쳐서 보기 — EW에 이대로 입력하세요</button>
     <div class="fr-toolbar hidden" id="frToolbar">
+      <div class="diff-filter" id="finalDiffFilterEl">
+        <button type="button" data-filter="all" class="active">전체</button>
+        <button type="button" data-filter="over">초과만</button>
+        <button type="button" data-filter="under">단축만</button>
+      </div>
+      <div class="sort-order-toggle" id="sortOrderToggle">
+        <button type="button" data-order="asc" class="active">↑ 오름차순(날짜 빠른순)</button>
+        <button type="button" data-order="desc">↓ 내림차순(최신순)</button>
+      </div>
       <label class="hide-uploaded-toggle" id="hideUploadedWrap">
         <input type="checkbox" id="hideUploadedCheck">
         <span>완료된 날 숨기고 등록할 날만 보기</span>
@@ -1080,6 +1290,8 @@
     <button id="clearAllBtn">전체 기록 초기화</button>
   </div>
 </div>
+
+<button type="button" id="scrollTopBtn" class="scroll-top-btn hidden" title="맨 위로">↑</button>
 
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
@@ -1101,9 +1313,18 @@
 
   const entryList = document.getElementById('entryList');
   const dailyCalcList = document.getElementById('dailyCalcList');
+  const dailyCalcViewToggle = document.getElementById('dailyCalcViewToggle');
+  dailyCalcViewToggle.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      dailyCalcView = btn.dataset.view;
+      renderDailyCalc();
+    });
+  });
   const latestDateBanner = document.getElementById('latestDateBanner');
   const listControls = document.getElementById('listControls');
+  const sharedMonthFilter = document.getElementById('sharedMonthFilter');
   const finalResultCard = document.getElementById('finalResultCard');
+  const listCard = document.getElementById('listCard');
   const dailyCalcCard = document.getElementById('dailyCalcCard');
   const statusMsg = document.getElementById('statusMsg');
   const clearAllBtn = document.getElementById('clearAllBtn');
@@ -1141,6 +1362,22 @@
   hideUploadedCheck.addEventListener('change', ()=>{
     hideUploadedInFinal = hideUploadedCheck.checked;
     renderFinalResult();
+  });
+  const finalDiffFilterEl = document.getElementById('finalDiffFilterEl');
+  finalDiffFilterEl.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      finalDiffFilter = btn.dataset.filter;
+      finalDiffFilterEl.querySelectorAll('button').forEach(b=> b.classList.toggle('active', b===btn));
+      renderFinalResult();
+    });
+  });
+  const sortOrderToggle = document.getElementById('sortOrderToggle');
+  sortOrderToggle.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      finalSortOrder = btn.dataset.order;
+      sortOrderToggle.querySelectorAll('button').forEach(b=> b.classList.toggle('active', b===btn));
+      renderFinalResult();
+    });
   });
   copyAllResultBtn.addEventListener('click', async ()=>{
     const text = buildFinalResultText();
@@ -1229,8 +1466,7 @@
   }
   // "물어보기 쉽게" 지금 보이는 최종 결과값 전체를 평문 텍스트로 뽑아줌 (Claude한테 붙여넣어 사유 도움받기 등 용도)
   function buildFinalResultText(){
-    let scoped = (monthFilter === 'all' ? entries : entries.filter(e=> monthKey(e.date) === monthFilter))
-      .slice().sort((a,b)=> a.date.localeCompare(b.date));
+    let scoped = getScopedEntries().sort((a,b)=> a.date.localeCompare(b.date));
     if(hideUploadedInFinal) scoped = scoped.filter(e=> !e.uploaded);
     if(scoped.length === 0) return '등록할 기록이 없습니다.';
 
@@ -1238,11 +1474,12 @@
     const ungrouped = [];
     scoped.forEach(e=>{
       if(e.groupId){ (byGroup[e.groupId] = byGroup[e.groupId] || []).push(e); }
-      else ungrouped.push(e);
+      else if(finalDiffFilter === 'all' || (finalDiffFilter === 'over' && e.diffH > 0) || (finalDiffFilter === 'under' && e.diffH < 0)) ungrouped.push(e);
     });
     const groups = Object.values(byGroup)
-      .map(g=> g.slice().sort((a,b)=> a.date.localeCompare(b.date)))
-      .sort((a,b)=> a[0].date.localeCompare(b[0].date));
+      .map(g=> g.slice().sort((a,b)=> a.date.localeCompare(b.date)));
+
+    if(groups.length === 0 && ungrouped.length === 0) return '해당하는 기록이 없습니다.';
 
     const lineFor = (e, note)=>{
       const ew = computeEwTime(e);
@@ -1256,7 +1493,18 @@
     const monthTitle = monthFilter === 'all' ? '전체 기간' : monthLabel.textContent;
     let lines = [`📋 최종 결과값 (${monthTitle})`, ''];
 
-    groups.forEach(g=>{
+    const displayItems = [
+      ...groups.map(g=> ({ sortKey: g[0].date, type: 'group', members: g })),
+      ...ungrouped.map(e=> ({ sortKey: e.date, type: 'single', entry: e })),
+    ];
+    displayItems.sort((a,b)=> finalSortOrder === 'asc' ? a.sortKey.localeCompare(b.sortKey) : b.sortKey.localeCompare(a.sortKey));
+
+    displayItems.forEach(item=>{
+      if(item.type === 'single'){
+        lines.push('- ' + lineFor(item.entry));
+        return;
+      }
+      const g = item.members;
       const memberLabel = g.map(e=> formatMDDay(e.date)).join(' + ');
       const collector = g.slice().sort((a,b)=> Math.abs(b.diffH) - Math.abs(a.diffH))[0];
       const sum = Math.round(g.reduce((s,e)=> s+e.diffH, 0) * 2) / 2;
@@ -1276,26 +1524,65 @@
       lines.push('');
     });
 
-    ungrouped.forEach(e=> lines.push('- ' + lineFor(e)));
-
     return lines.join('\n').trim();
   }
 
+  let dailyCalcView = 'list'; // 'list' | 'calendar'
   function renderDailyCalc(){
-    const scoped = (monthFilter === 'all' ? entries : entries.filter(e=> monthKey(e.date) === monthFilter))
-      .slice().sort((a,b)=> a.date.localeCompare(b.date));
+    const scoped = getScopedEntries().sort((a,b)=> a.date.localeCompare(b.date));
+    dailyCalcViewToggle.querySelectorAll('button').forEach(b=> b.classList.toggle('active', b.dataset.view === dailyCalcView));
     if(scoped.length === 0){
       dailyCalcList.innerHTML = '<div class="empty">기록이 없습니다</div>';
       return;
     }
+    if(dailyCalcView === 'calendar'){
+      dailyCalcList.innerHTML = renderDailyCalcCalendar(scoped);
+      return;
+    }
     dailyCalcList.innerHTML = scoped.map(e=>{
       const cls = e.diffH > 0 ? 'plus' : (e.diffH < 0 ? 'minus' : 'zero');
-      return `<div class="daily-calc-row">
-        <span class="dc-date">${formatMDDay(e.date)}</span>
+      const isSession = viewMode === 'all' && sessionDates.has(e.date);
+      return `<div class="daily-calc-row${isSession ? ' is-session' : ''}">
+        <span class="dc-date">${formatMDDay(e.date)}${isSession ? ' 🆕' : ''}</span>
         <span class="dc-diff ${cls}">${formatDiff(e.diffH)}</span>
       </div>`;
     }).join('');
   }
+
+  function renderDailyCalcCalendar(scoped){
+    const byMonth = {};
+    scoped.forEach(e=>{
+      const mk = monthKey(e.date);
+      (byMonth[mk] = byMonth[mk] || []).push(e);
+    });
+    const months = Object.keys(byMonth).sort();
+    let html = '';
+    months.forEach(mk=>{
+      const [y, m] = mk.split('-').map(Number);
+      const entryByDay = {};
+      byMonth[mk].forEach(e=> entryByDay[parseInt(e.date.split('-')[2])] = e);
+      const firstDow = new Date(y, m-1, 1).getDay();
+      const daysInMonth = new Date(y, m, 0).getDate();
+      html += `<div class="calendar-month"><div class="cal-month-title">${y}년 ${m}월</div><div class="cal-grid">`;
+      ['일','월','화','수','목','금','토'].forEach(d=> html += `<div class="cal-dow">${d}</div>`);
+      for(let i=0; i<firstDow; i++) html += `<div class="cal-cell empty"></div>`;
+      for(let day=1; day<=daysInMonth; day++){
+        const e = entryByDay[day];
+        if(e){
+          const cls = e.diffH > 0 ? 'plus' : (e.diffH < 0 ? 'minus' : 'zero');
+          const isSession = viewMode === 'all' && sessionDates.has(e.date);
+          html += `<div class="cal-cell has-entry ${cls}${isSession ? ' is-session' : ''}"><div class="cal-day">${day}</div><div class="cal-diff">${formatDiff(e.diffH)}</div></div>`;
+        } else {
+          html += `<div class="cal-cell"><div class="cal-day">${day}</div></div>`;
+        }
+      }
+      html += `</div></div>`;
+    });
+    return html;
+  }
+
+  let finalDiffFilter = 'all'; // 'all' | 'over' | 'under'
+  let finalSortOrder = 'asc'; // 'asc' | 'desc'
 
   function renderFinalResult(){
     finalResultToggle.textContent = finalResultOpen ? '📋 접기' : '📋 펼쳐서 보기 — EW에 이대로 입력하세요';
@@ -1303,8 +1590,7 @@
     frToolbar.classList.toggle('hidden', !finalResultOpen);
     if(!finalResultOpen) return;
 
-    let scoped = (monthFilter === 'all' ? entries : entries.filter(e=> monthKey(e.date) === monthFilter))
-      .slice().sort((a,b)=> a.date.localeCompare(b.date));
+    let scoped = getScopedEntries().sort((a,b)=> a.date.localeCompare(b.date));
 
     if(scoped.length === 0){
       finalResultEl.innerHTML = '<div class="group-summary-empty">기록이 없습니다</div>';
@@ -1323,16 +1609,34 @@
     const ungrouped = [];
     scoped.forEach(e=>{
       if(e.groupId){ (byGroup[e.groupId] = byGroup[e.groupId] || []).push(e); }
-      else ungrouped.push(e);
+      // 묶음은 이미 확정된 세트라 초과/단축 필터와 무관하게 항상 보여줌(짝짓기 STEP3와 동일 원칙), 개별 항목만 필터링
+      else if(finalDiffFilter === 'all' || (finalDiffFilter === 'over' && e.diffH > 0) || (finalDiffFilter === 'under' && e.diffH < 0)) ungrouped.push(e);
     });
     const groups = Object.values(byGroup)
-      .map(g=> g.slice().sort((a,b)=> a.date.localeCompare(b.date)))
-      .sort((a,b)=> a[0].date.localeCompare(b[0].date));
+      .map(g=> g.slice().sort((a,b)=> a.date.localeCompare(b.date)));
+
+    if(groups.length === 0 && ungrouped.length === 0){
+      const emptyMsg = finalDiffFilter === 'over' ? '초과 근무 기록이 없습니다' : finalDiffFilter === 'under' ? '단축 근무 기록이 없습니다' : '기록이 없습니다';
+      finalResultEl.innerHTML = `<div class="group-summary-empty">${emptyMsg}</div>`;
+      return;
+    }
+
+    // 그룹과 개별 항목을 날짜 기준으로 한 줄에 섞어서(인터리빙) 정렬 — 오름/내림차순 토글 적용
+    const displayItems = [
+      ...groups.map(g=> ({ sortKey: g[0].date, type: 'group', members: g })),
+      ...ungrouped.map(e=> ({ sortKey: e.date, type: 'single', entry: e })),
+    ];
+    displayItems.sort((a,b)=> finalSortOrder === 'asc' ? a.sortKey.localeCompare(b.sortKey) : b.sortKey.localeCompare(a.sortKey));
 
     let html = '';
 
     // 상쇄 묶음: "각자 등록" vs "하나로 몰아서 등록" 두 옵션을 나란히 + 검산 배지
-    groups.forEach(g=>{
+    displayItems.forEach(item=>{
+      if(item.type === 'single'){
+        html += singleItemHtml(item.entry);
+        return;
+      }
+      const g = item.members;
       const memberLabel = g.map(e=> formatMDDay(e.date)).join(' + ');
       const collector = g.slice().sort((a,b)=> Math.abs(b.diffH) - Math.abs(a.diffH))[0]; // |diffH|가 가장 큰 날이 다 떠안음
       const sum = Math.round(g.reduce((s,e)=> s+e.diffH, 0) * 2) / 2;
@@ -1357,8 +1661,6 @@
         }).join('')}
       </div>`;
     });
-
-    html += ungrouped.map(e=> singleItemHtml(e)).join('');
 
     finalResultEl.innerHTML = html;
     finalResultEl.querySelectorAll('.reason-input').forEach(inp=>{
@@ -1443,20 +1745,59 @@
   }
   const now = new Date();
   let monthFilter = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`; // 'YYYY-MM' or 'all'
+  let lastSpecificMonth = monthFilter; // "전체보기" 껐다 켤 때 여기로 정확히 복귀 (막연히 "이번 달"이 아니라 진짜 마지막으로 보던 달)
+
+  // ===== "지금 등록한 것" vs "전체 누적 데이터" 분리 =====
+  // 월 단위로는 "8월 2주차~3주차만 등록"같은 경우를 못 담아서, 정확히 어떤 날짜들을 방금 등록했는지 자체를 기억해둠
+  function loadSessionDates(){
+    try{
+      const raw = localStorage.getItem('wf2_session_dates');
+      return raw ? new Set(JSON.parse(raw)) : new Set();
+    }catch(e){ return new Set(); }
+  }
+  function saveSessionDates(){
+    try{ localStorage.setItem('wf2_session_dates', JSON.stringify([...sessionDates])); }catch(e){}
+  }
+  let sessionDates = loadSessionDates();
+  let viewMode = 'session'; // 'session'(지금 등록한 것만) | 'all'(전체 누적)
+
+  // STEP2/3/4가 실제로 다룰 범위를 한 곳에서 결정 — session이면 월과 무관하게 방금 등록한 날짜만,
+  // all이면 기존처럼 월 필터(또는 전체) 적용
+  function getScopedEntries(){
+    if(viewMode === 'session'){
+      return entries.filter(e=> sessionDates.has(e.date));
+    }
+    return (monthFilter === 'all' ? entries : entries.filter(e=> monthKey(e.date) === monthFilter)).slice();
+  }
 
   function shiftMonth(delta){
     if(monthFilter === 'all') return;
     const [y, m] = monthFilter.split('-').map(Number);
     const d = new Date(y, m-1+delta, 1);
     monthFilter = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    lastSpecificMonth = monthFilter;
     render();
   }
   monthPrev.addEventListener('click', ()=> shiftMonth(-1));
   monthNext.addEventListener('click', ()=> shiftMonth(1));
   monthAllBtn.addEventListener('click', ()=>{
-    monthFilter = monthFilter === 'all'
-      ? `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`
-      : 'all';
+    monthFilter = monthFilter === 'all' ? lastSpecificMonth : 'all';
+    render();
+  });
+
+  const viewModeToggle = document.getElementById('viewModeToggle');
+  const monthNavWrap = document.getElementById('monthNavWrap');
+  const resetSessionBtn = document.getElementById('resetSessionBtn');
+  viewModeToggle.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      viewMode = btn.dataset.mode;
+      render();
+    });
+  });
+  resetSessionBtn.addEventListener('click', ()=>{
+    if(sessionDates.size > 0 && !confirm('세션을 초기화할까요? (기록 자체는 안 지워지고, "지금 등록한 것" 표시만 초기화돼요)')) return;
+    sessionDates = new Set();
+    saveSessionDates();
     render();
   });
 
@@ -1861,7 +2202,6 @@
           const ok = confirm(`${conflictCount}건은 기존 기록을 덮어씁니다. 계속할까요?`);
           if(!ok) return;
         }
-        const addedMonths = new Set(parsedResults.map(r=> monthKey(r.date)));
         parsedResults.forEach(r=>{
           const idx = entries.findIndex(e=> e.date === r.date);
           if(idx >= 0){
@@ -1870,7 +2210,9 @@
           } else {
             entries.push(r);
           }
+          sessionDates.add(r.date); // 방금 등록한 날짜 — "지금 등록한 것만" 보기에 바로 잡히게
         });
+        saveSessionDates();
         await save();
         const addedCount = parsedResults.length;
         parsedResults = [];
@@ -1879,16 +2221,9 @@
         leaveMarks = [];
         pasteInput.value = '';
         parsePreview.innerHTML = '';
-        // 방금 추가한 기록이 지금 보고 있는 달이랑 다르면, 목록에서 "사라진 것처럼" 보이지 않게 자동으로 전환
-        if(monthFilter !== 'all' && !addedMonths.has(monthFilter)){
-          if(addedMonths.size === 1){
-            monthFilter = [...addedMonths][0];
-            statusMsg.textContent = `${addedCount}건 추가됨 — 다른 달이라 자동으로 해당 월로 이동했어요`;
-          } else {
-            monthFilter = 'all';
-            statusMsg.textContent = `${addedCount}건 추가됨 — 여러 달에 걸쳐있어 전체보기로 전환했어요`;
-          }
-        }
+        // "지금 등록한 것만" 보기로 자동 전환 — 월이 뭐든 상관없이 방금 등록한 날짜들이 바로 보임
+        viewMode = 'session';
+        statusMsg.textContent = `${addedCount}건 추가됨 — 지금 등록한 것만 보기로 표시돼요`;
         render();
       });
       container.appendChild(confirmBtn);
@@ -1940,6 +2275,7 @@
 
     // 기록이 하나도 없으면 필터·자동상쇄·최종결과값 같은 컨트롤은 다 숨겨서 첫 화면이 깔끔하게
     listControls.classList.toggle('hidden', entries.length === 0);
+    sharedMonthFilter.classList.toggle('hidden', entries.length === 0);
     finalResultCard.classList.toggle('hidden', entries.length === 0);
     dailyCalcCard.classList.toggle('hidden', entries.length === 0);
     if(entries.length === 0){
@@ -1947,11 +2283,17 @@
       return;
     }
 
+    // 세션(지금 등록한 것) / 전체 토글 UI 갱신
+    viewModeToggle.querySelectorAll('button').forEach(b=> b.classList.toggle('active', b.dataset.mode === viewMode));
+    monthNavWrap.classList.toggle('hidden', viewMode !== 'all');
+    document.getElementById('sessionCount').textContent = entries.filter(e=> sessionDates.has(e.date)).length;
+
     // 월 라벨 갱신
     if(monthFilter === 'all'){
       monthLabel.textContent = '전체 기간';
       monthAllBtn.classList.add('active');
-      monthAllBtn.textContent = '월별 보기';
+      const [ly, lm] = lastSpecificMonth.split('-').map(Number);
+      monthAllBtn.textContent = `← ${lm}월로 돌아가기`;
       monthPrev.disabled = true;
       monthNext.disabled = true;
     } else {
@@ -1963,7 +2305,7 @@
       monthNext.disabled = false;
     }
 
-    let visibleEntries = monthFilter === 'all' ? entries : entries.filter(e => monthKey(e.date) === monthFilter);
+    let visibleEntries = getScopedEntries();
     if(diffFilter === 'over') visibleEntries = visibleEntries.filter(e=> !e.groupId && e.diffH > 0);
     if(diffFilter === 'under') visibleEntries = visibleEntries.filter(e=> !e.groupId && e.diffH < 0);
 
@@ -1977,8 +2319,9 @@
       function buildEntryDiv(e){
         const diffClass = e.diffH === 0 ? 'zero' : (e.diffH > 0 ? 'plus' : 'minus');
         const isGrouped = !!e.groupId;
+        const isSessionInAllView = viewMode === 'all' && sessionDates.has(e.date);
         const div = document.createElement('div');
-        div.className = 'entry' + (isGrouped ? ' grouped' : '') + (e.uploaded ? ' uploaded-done' : '');
+        div.className = 'entry' + (isGrouped ? ' grouped' : '') + (e.uploaded ? ' uploaded-done' : '') + (isSessionInAllView ? ' is-session' : '');
         const checkboxHtml = (!isGrouped && e.diffH !== 0)
           ? `<input type="checkbox" class="pair-check" data-date="${e.date}" ${selectedDates.has(e.date) ? 'checked' : ''}>`
           : '';
@@ -1989,7 +2332,7 @@
         div.innerHTML = `
           <div class="entry-main">
             ${checkboxHtml}
-            <div class="date">${formatMDDay(e.date)}</div>
+            <div class="date">${formatMDDay(e.date)}${isSessionInAllView ? ' 🆕' : ''}</div>
             <div class="diff ${diffClass}">${formatDiff(e.diffH)}</div>
             <button class="del" data-date="${e.date}" title="삭제">×</button>
           </div>
@@ -2023,17 +2366,35 @@
       });
       displayItems.sort((a,b)=> a.sortKey.localeCompare(b.sortKey));
 
+      // 세트(묶음)마다 다른 색을 순환 적용 — 이게 맞게 짝지어졌는지 눈으로 바로 확인하기 쉽게
+      const groupColors = [
+        { border:'#1565C0', bg:'#E3F0FC', text:'#1565C0' }, // 파랑
+        { border:'#2F9E5B', bg:'#E4F5EA', text:'#2F9E5B' }, // 초록
+        { border:'#6C5CC4', bg:'#EFECFB', text:'#6C5CC4' }, // 보라
+        { border:'#D9822B', bg:'#FDF0E1', text:'#B5720C' }, // 주황
+        { border:'#D6478A', bg:'#FBE7F0', text:'#B5386F' }, // 핑크
+        { border:'#00979D', bg:'#E0F5F6', text:'#00777B' }, // 청록
+        { border:'#8D6E4A', bg:'#F2ECE3', text:'#6E5236' }, // 갈색
+        { border:'#3F51B5', bg:'#E8EAF9', text:'#303F9F' }, // 남색
+      ];
+      let groupColorIdx = 0;
+
       displayItems.forEach(item=>{
         if(item.type === 'single'){
           entryList.appendChild(buildEntryDiv(item.entry));
           return;
         }
         const sum = Math.round(item.members.reduce((s,e)=> s+e.diffH, 0) * 2) / 2;
+        const color = groupColors[groupColorIdx % groupColors.length];
+        groupColorIdx++;
         const wrap = document.createElement('div');
         wrap.className = 'entry-group-wrap';
+        wrap.style.setProperty('--group-border', color.border);
+        wrap.style.setProperty('--group-bg', color.bg);
+        wrap.style.setProperty('--group-text', color.text);
         const header = document.createElement('div');
         header.className = 'entry-group-header';
-        header.innerHTML = `🔗 상쇄 묶음 (${item.members.length}건) · 합계 ${formatDiff(sum)} ${sum === 0 ? '✓' : '🔶 잔여'}`;
+        header.innerHTML = `🔗 세트${groupColorIdx} · 상쇄 묶음 (${item.members.length}건) · 합계 ${formatDiff(sum)} ${sum === 0 ? '✓' : '🔶 잔여'}`;
         wrap.appendChild(header);
         item.members.forEach(m=> wrap.appendChild(buildEntryDiv(m)));
         entryList.appendChild(wrap);
@@ -2070,7 +2431,7 @@
     // 초과/단축 근무는 "묶음(상쇄완료)"로 확정되지 않은 기록 중, 선택한 월 기준 (전체보기 시엔 전체 기간)
     // 짝짓기는 합이 정확히 0인 조합만 확정하므로, 미확정 목록엔 초과분과 단축분이 동시에 남아있을 수 있음
     // → 서로 다른 곳(초과=근태사이트, 단축=휴가등록)에 올려야 해서 각각 gross로 표시
-    const scopedEntries = monthFilter === 'all' ? entries : entries.filter(e => monthKey(e.date) === monthFilter);
+    const scopedEntries = getScopedEntries();
     const unresolved = scopedEntries.filter(e=> !e.groupId);
     const overtimeDates = unresolved.filter(e=> e.diffH > 0).sort((a,b)=> a.date.localeCompare(b.date));
     const undertimeDates = unresolved.filter(e=> e.diffH < 0).sort((a,b)=> a.date.localeCompare(b.date));
@@ -2114,7 +2475,7 @@
     render();
 
     // 확정 후에도 단축 대기분이 남아있으면(초과와 무관하게) 휴가 등록 알림
-    const scoped = monthFilter === 'all' ? entries : entries.filter(e => monthKey(e.date) === monthFilter);
+    const scoped = getScopedEntries();
     const stillUnresolved = scoped.filter(e=> !e.groupId);
     const remainingUndertime = Math.round(stillUnresolved.filter(e=> e.diffH < 0).reduce((sum,e)=> sum+Math.abs(e.diffH), 0) * 2) / 2;
     if(remainingUndertime > 0){
@@ -2127,6 +2488,10 @@
     const endH = parseInt(e.end.split(':')[0]);
     return endH >= 22;
   }
+
+  document.getElementById('goToMatchBtn').addEventListener('click', ()=>{
+    listCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
 
   autoMatchBtn.addEventListener('click', async ()=>{
     // 1순위: 평일 + 심야·공휴일 아닌 일반 근무끼리는 수당 배율 문제가 없으므로,
@@ -2292,6 +2657,15 @@
     entries = [];
     await save();
     render();
+  });
+
+  // 스크롤이 길어지는 전체보기 등에서 빠르게 맨 위로 돌아갈 수 있게
+  const scrollTopBtn = document.getElementById('scrollTopBtn');
+  window.addEventListener('scroll', ()=>{
+    scrollTopBtn.classList.toggle('hidden', window.scrollY < 400);
+  });
+  scrollTopBtn.addEventListener('click', ()=>{
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
   load();
