@@ -1500,22 +1500,21 @@
       const parenGroups = [...line.matchAll(/\(([^)]*)\)/g)].map(m=>m[1]);
       const p = parenGroups.find(g=> /시작|출근|휴게|추가|없이|점없근|휴일/.test(g));
       if(p){
-        const startInParen = p.match(/(\d{1,2}):(\d{2})\s*(?:시작|출근)/);
-        if(startInParen) d.startTime = `${parseInt(startInParen[1])}:${startInParen[2]}`;
-        // 휴게 표기 형태 다 인식: "1시간", "30분", "2시간 30분"(신형 한글 표기), "1h"(구형 표기)
-        const breakSegMatch = p.match(/((?:\d+\s*시간\s*)?(?:\d+\s*분\s*)?)휴게/);
-        if(breakSegMatch && breakSegMatch[1].trim()){
-          const seg = breakSegMatch[1];
-          const hMatch = seg.match(/(\d+)\s*시간/);
-          const mMatch = seg.match(/(\d+)\s*분/);
-          let addH = 0;
-          if(hMatch) addH += parseInt(hMatch[1]);
-          if(mMatch) addH += parseInt(mMatch[1]) / 60;
-          if(addH > 0) d.breakH += addH;
-        } else {
-          const breakInParenOld = p.match(/(\d+(?:\.\d+)?)\s*h\s*휴게/); // 구형 "1h 휴게" 표기 대비
-          if(breakInParenOld) d.breakH += parseFloat(breakInParenOld[1]);
+        // "9:30 시작"처럼 분까지 있어도, "10 출근"처럼 콜론 없이 시(정각)만 있어도 둘 다 인식
+        const startInParen = p.match(/(\d{1,2})(?::(\d{2}))?\s*(?:시작|출근)/);
+        if(startInParen) d.startTime = `${parseInt(startInParen[1])}:${startInParen[2] || '00'}`;
+        // 휴게 표기 형태 다 인식: "1시간", "30분", "2시간 30분", "휴게 3.5시간"(순서 반대·소수점), "1 휴게"(단위 생략, 시간으로 간주), 구형 "1h"
+        let breakAdd = 0;
+        const hMatch = p.match(/(\d+(?:\.\d+)?)\s*(?:시간|h)/);
+        const mMatch = p.match(/(\d+(?:\.\d+)?)\s*분/);
+        if(hMatch) breakAdd += parseFloat(hMatch[1]);
+        if(mMatch) breakAdd += parseFloat(mMatch[1]) / 60;
+        if(breakAdd === 0){
+          // 단위(시간/분)가 전혀 없는 경우 — "휴게" 바로 앞이나 뒤의 숫자를 시간으로 간주
+          const bareMatch = p.match(/(\d+(?:\.\d+)?)\s*휴게|휴게\s*(\d+(?:\.\d+)?)/);
+          if(bareMatch) breakAdd = parseFloat(bareMatch[1] || bareMatch[2]);
         }
+        if(breakAdd > 0) d.breakH += breakAdd;
         const extraMatch = p.match(/(\d{1,2}):(\d{2})\s*[~\-]\s*(\d{1,2}):(\d{2})\s*추가\s*근무/);
         if(extraMatch){
           d.extraSegs.push([`${parseInt(extraMatch[1])}:${extraMatch[2]}`, `${parseInt(extraMatch[3])}:${extraMatch[4]}`]);
