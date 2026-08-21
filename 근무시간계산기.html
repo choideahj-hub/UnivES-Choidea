@@ -1226,7 +1226,7 @@
       <button type="button" id="monthNext">›</button>
       <button type="button" id="monthAllBtn">전체 기간</button>
     </div>
-    <button type="button" id="resetSessionBtn" class="reset-session-btn">🔄 세션 초기화 — 지금부터 새로 등록하는 것만 추적</button>
+    <button type="button" id="resetSessionBtn" class="reset-session-btn">🔄 지금 바로 세션 새로 시작 (매일 자동으로도 초기화돼요)</button>
   </div>
 
   <div class="card" id="dailyCalcCard">
@@ -1748,15 +1748,28 @@
   let lastSpecificMonth = monthFilter; // "전체보기" 껐다 켤 때 여기로 정확히 복귀 (막연히 "이번 달"이 아니라 진짜 마지막으로 보던 달)
 
   // ===== "지금 등록한 것" vs "전체 누적 데이터" 분리 =====
-  // 월 단위로는 "8월 2주차~3주차만 등록"같은 경우를 못 담아서, 정확히 어떤 날짜들을 방금 등록했는지 자체를 기억해둠
+  // 월 단위로는 "8월 2주차~3주차만 등록"같은 경우를 못 담아서, 정확히 어떤 날짜들을 방금 등록했는지 자체를 기억해둠.
+  // "오늘" 안에서는 여러 번 나눠 붙여넣어도 계속 누적되지만, 날짜가 바뀌면(=새 작업 세션) 자동으로 예전 세션은 비움
+  function todayStr(){
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
   function loadSessionDates(){
     try{
+      const lastActive = localStorage.getItem('wf2_session_active_date');
+      if(lastActive !== todayStr()){
+        // 오늘 처음 쓰는 세션 — 예전 세션은 자동으로 비움(수동 초기화 안 눌러도 됨)
+        return new Set();
+      }
       const raw = localStorage.getItem('wf2_session_dates');
       return raw ? new Set(JSON.parse(raw)) : new Set();
     }catch(e){ return new Set(); }
   }
   function saveSessionDates(){
-    try{ localStorage.setItem('wf2_session_dates', JSON.stringify([...sessionDates])); }catch(e){}
+    try{
+      localStorage.setItem('wf2_session_dates', JSON.stringify([...sessionDates]));
+      localStorage.setItem('wf2_session_active_date', todayStr());
+    }catch(e){}
   }
   let sessionDates = loadSessionDates();
   let viewMode = 'session'; // 'session'(지금 등록한 것만) | 'all'(전체 누적)
