@@ -219,6 +219,18 @@
     font-family:inherit;
   }
   .go-next-btn:active{ transform:scale(0.98); }
+  .entry-list-toggle{
+    width:100%;
+    padding:11px;
+    border-radius:8px;
+    border:1.5px solid var(--accent);
+    background:var(--accent-soft);
+    color:var(--accent);
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+    font-family:inherit;
+  }
   .field{ margin-bottom:16px; }
   .field:last-child{ margin-bottom:0; }
   label{
@@ -1266,7 +1278,8 @@
         <button type="button" data-filter="under">단축만</button>
       </div>
     </div>
-    <div id="entryList"><div class="empty">기록이 없습니다</div></div>
+    <button type="button" id="entryListToggle" class="entry-list-toggle">📋 <span id="entryListToggleLabel">목록 열기</span> (<span id="entryListCount">0</span>건)</button>
+    <div id="entryList" class="hidden"><div class="empty">기록이 없습니다</div></div>
   </div>
 
   <div class="card" id="finalResultCard">
@@ -1321,6 +1334,15 @@
 <script>
 
   const entryList = document.getElementById('entryList');
+  const entryListToggle = document.getElementById('entryListToggle');
+  const entryListToggleLabel = document.getElementById('entryListToggleLabel');
+  const entryListCount = document.getElementById('entryListCount');
+  let entryListOpen = false; // 기본 접힘
+  entryListToggle.addEventListener('click', ()=>{
+    entryListOpen = !entryListOpen;
+    entryList.classList.toggle('hidden', !entryListOpen);
+    entryListToggleLabel.textContent = entryListOpen ? '목록 접기' : '목록 열기';
+  });
   const dailyCalcList = document.getElementById('dailyCalcList');
   const dailyCalcViewToggle = document.getElementById('dailyCalcViewToggle');
   dailyCalcViewToggle.querySelectorAll('button').forEach(btn=>{
@@ -2237,6 +2259,7 @@
     let visibleEntries = getScopedEntries();
     if(diffFilter === 'over') visibleEntries = visibleEntries.filter(e=> !e.groupId && e.diffH > 0);
     if(diffFilter === 'under') visibleEntries = visibleEntries.filter(e=> !e.groupId && e.diffH < 0);
+    entryListCount.textContent = visibleEntries.length;
 
     if(visibleEntries.length === 0){
       const emptyMsg = diffFilter === 'over' ? '초과 근무 기록이 없습니다'
