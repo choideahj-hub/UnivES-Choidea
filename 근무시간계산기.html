@@ -2481,16 +2481,24 @@
     const selectedEntries = entries.filter(e=> selectedDates.has(e.date));
     const sum = Math.round(selectedEntries.reduce((s,e)=> s+e.diffH, 0) * 2) / 2;
     const isExact = sum === 0;
-    pairStatus.textContent = isExact
-      ? `${selectedEntries.length}건 선택 · 합계 ${formatDiff(sum)}`
-      : `${selectedEntries.length}건 선택 · 합계 ${formatDiff(sum)} (완전 상쇄 안 됨 — 묶어서 몰아주기)`;
-    pairStatus.classList.toggle('ok', isExact);
+    if(selectedEntries.length === 1){
+      // 1건만 골랐을 땐 아직 "짝"이 아니라 그냥 혼자 있는 상태라, 완전상쇄/몰아주기 같은 계산 완료 문구를 보여주면 어색함
+      pairStatus.textContent = `1건 선택(${formatDiff(sum)}) — 짝지을 다른 날짜를 더 골라주세요`;
+      pairStatus.classList.remove('ok');
+    } else {
+      pairStatus.textContent = isExact
+        ? `${selectedEntries.length}건 선택 · 합계 ${formatDiff(sum)}`
+        : `${selectedEntries.length}건 선택 · 합계 ${formatDiff(sum)} (완전 상쇄 안 됨 — 묶어서 몰아주기)`;
+      pairStatus.classList.toggle('ok', isExact);
+    }
     pairConfirmBtn.textContent = isExact ? '짝으로 확정' : '묶어서 확정(몰아주기)';
     pairConfirmBtn.disabled = selectedEntries.length < 2;
   }
 
   pairCancelBtn.addEventListener('click', ()=>{
     selectedDates.clear();
+    // render() 재렌더링에만 의존하지 않고, 화면에 남아있는 체크박스를 직접 다 해제 — 확실하게 반영되도록
+    entryList.querySelectorAll('.pair-check').forEach(cb=> { cb.checked = false; });
     render();
   });
 
@@ -2527,7 +2535,7 @@
     let groupsFormed = 0;
     let entriesResolved = 0;
     let match;
-    while((match = findZeroSumSubset(normalPool, 4))){
+    while((match = findZeroSumSubset(normalPool, 8))){
       const gid = 'g' + Date.now() + Math.random().toString(36).slice(2, 6);
       match.forEach(m=>{
         const e = entries.find(en=> en.date === m.date);
@@ -2542,7 +2550,7 @@
     // 2순위: 남은 것 중 주말·심야·공휴일까지 포함해야 맞는 조합은 수당 배율이 다를 수 있어
     // 자동으로 "확정"까지는 하지 않되, 체크박스는 미리 선택해둬서 사용자가 확인만 하고 확정/취소를 누르면 되게 함
     const remainingAll = entries.filter(e=> !e.groupId && e.diffH !== 0);
-    const specialMatch = findZeroSumSubset(remainingAll, 4);
+    const specialMatch = findZeroSumSubset(remainingAll, 8);
 
     // 3순위(최후): 정확히 0은 안 되지만, 남은 것들 중 가장 0에 가깝게 묶이는 조합 — 잔여분은 제일 큰 날에 몰아줄 예정
     let closestMatch = null;
