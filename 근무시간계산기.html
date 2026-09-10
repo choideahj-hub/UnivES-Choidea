@@ -133,78 +133,6 @@
     border-radius:6px;
     border-bottom:none;
   }
-  .daily-calc-view-toggle{
-    display:flex;
-    gap:6px;
-    margin-bottom:12px;
-  }
-  .daily-calc-view-toggle button{
-    flex:1;
-    padding:7px;
-    border-radius:7px;
-    border:1px solid var(--line);
-    background:#fff;
-    color:var(--ink-soft);
-    font-size:12px;
-    font-weight:600;
-    cursor:pointer;
-    font-family:inherit;
-  }
-  .daily-calc-view-toggle button.active{
-    background:var(--accent-soft);
-    border-color:var(--accent);
-    color:var(--accent);
-  }
-  .calendar-month{ margin-bottom:18px; }
-  .calendar-month:last-child{ margin-bottom:0; }
-  .cal-month-title{
-    font-size:12.5px;
-    font-weight:700;
-    color:var(--ink);
-    margin-bottom:8px;
-  }
-  .cal-grid{
-    display:grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap:4px;
-  }
-  .cal-dow{
-    text-align:center;
-    font-size:10px;
-    font-weight:700;
-    color:var(--ink-soft);
-    padding-bottom:2px;
-  }
-  .cal-cell{
-    aspect-ratio:1;
-    border-radius:7px;
-    background:var(--neutral-bg);
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    font-size:9.5px;
-  }
-  .cal-cell.empty{ background:none; }
-  .cal-cell .cal-day{
-    font-size:10px;
-    color:var(--ink-soft);
-    font-weight:600;
-  }
-  .cal-cell.has-entry{ border:1.5px solid var(--line); }
-  .cal-cell.has-entry .cal-day{ color:var(--ink); }
-  .cal-cell.has-entry .cal-diff{
-    font-weight:800;
-    font-variant-numeric:tabular-nums;
-    margin-top:1px;
-  }
-  .cal-cell.plus{ background:#FDF0E1; border-color:#D9822B; }
-  .cal-cell.plus .cal-diff{ color:#D9822B; }
-  .cal-cell.minus{ background:var(--danger-soft); border-color:var(--danger); }
-  .cal-cell.minus .cal-diff{ color:var(--danger); }
-  .cal-cell.zero{ background:var(--neutral-bg); }
-  .cal-cell.zero .cal-diff{ color:var(--ink-soft); }
-  .cal-cell.is-session{ box-shadow: 0 0 0 2px var(--danger) inset; }
   .go-next-btn{
     width:100%;
     margin-top:14px;
@@ -1253,10 +1181,6 @@
 
   <div class="card" id="dailyCalcCard">
     <div class="step-header"><span class="step-num">2</span><span class="step-title">일별 근무시간 계산</span></div>
-    <div class="daily-calc-view-toggle" id="dailyCalcViewToggle">
-      <button type="button" data-view="list" class="active">📋 목록</button>
-      <button type="button" data-view="calendar">📅 캘린더</button>
-    </div>
     <div id="dailyCalcList"><div class="empty">기록이 없습니다</div></div>
     <button type="button" id="goToMatchBtn" class="go-next-btn">↓ STEP3 상쇄 짝짓기로 이동</button>
   </div>
@@ -1344,13 +1268,6 @@
     entryListToggleLabel.textContent = entryListOpen ? '목록 접기' : '목록 열기';
   });
   const dailyCalcList = document.getElementById('dailyCalcList');
-  const dailyCalcViewToggle = document.getElementById('dailyCalcViewToggle');
-  dailyCalcViewToggle.querySelectorAll('button').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      dailyCalcView = btn.dataset.view;
-      renderDailyCalc();
-    });
-  });
   const latestDateBanner = document.getElementById('latestDateBanner');
   const listControls = document.getElementById('listControls');
   const finalResultCard = document.getElementById('finalResultCard');
@@ -1479,13 +1396,16 @@
     const reasonPart = editable === false
       ? (e.reason ? `<div class="entry-reason"><div class="reason-preview">${escapeHtml(e.reason)}</div></div>` : '')
       : reasonRowFor(e);
+    const detailBits = [formatWorked(e.workedMin)];
+    if(e.noLunch) detailBits.push('점심 미차감');
+    if(e.breakTime > 0) detailBits.push(`휴게 ${e.breakTime}h`);
     return `<div class="final-result-item">
       <div class="fr-top">
         <div class="fr-date">${formatMDDay(e.date)}</div>
         <div class="fr-status ${cls}">${label}</div>
       </div>
       <div class="fr-ew">${ewLineFor(e)}</div>
-      <div class="fr-actual">실제 근무: ${e.start} ~ ${e.end}${extraNote ? ' · ' + extraNote : ''}</div>
+      <div class="fr-actual">실제 근무: ${e.start} ~ ${e.end} (${detailBits.join(' · ')})${extraNote ? ' · ' + extraNote : ''}</div>
       ${mergedNote}
       ${reasonPart}
     </div>`;
@@ -1554,16 +1474,10 @@
     return lines.join('\n').trim();
   }
 
-  let dailyCalcView = 'list'; // 'list' | 'calendar'
   function renderDailyCalc(){
     const scoped = getScopedEntries().sort((a,b)=> a.date.localeCompare(b.date));
-    dailyCalcViewToggle.querySelectorAll('button').forEach(b=> b.classList.toggle('active', b.dataset.view === dailyCalcView));
     if(scoped.length === 0){
       dailyCalcList.innerHTML = '<div class="empty">기록이 없습니다</div>';
-      return;
-    }
-    if(dailyCalcView === 'calendar'){
-      dailyCalcList.innerHTML = renderDailyCalcCalendar(scoped);
       return;
     }
     dailyCalcList.innerHTML = scoped.map(e=>{
@@ -1573,37 +1487,6 @@
         <span class="dc-diff ${cls}">${formatDiff(e.diffH)}</span>
       </div>`;
     }).join('');
-  }
-
-  function renderDailyCalcCalendar(scoped){
-    const byMonth = {};
-    scoped.forEach(e=>{
-      const mk = monthKey(e.date);
-      (byMonth[mk] = byMonth[mk] || []).push(e);
-    });
-    const months = Object.keys(byMonth).sort();
-    let html = '';
-    months.forEach(mk=>{
-      const [y, m] = mk.split('-').map(Number);
-      const entryByDay = {};
-      byMonth[mk].forEach(e=> entryByDay[parseInt(e.date.split('-')[2])] = e);
-      const firstDow = new Date(y, m-1, 1).getDay();
-      const daysInMonth = new Date(y, m, 0).getDate();
-      html += `<div class="calendar-month"><div class="cal-month-title">${y}년 ${m}월</div><div class="cal-grid">`;
-      ['일','월','화','수','목','금','토'].forEach(d=> html += `<div class="cal-dow">${d}</div>`);
-      for(let i=0; i<firstDow; i++) html += `<div class="cal-cell empty"></div>`;
-      for(let day=1; day<=daysInMonth; day++){
-        const e = entryByDay[day];
-        if(e){
-          const cls = e.diffH > 0 ? 'plus' : (e.diffH < 0 ? 'minus' : 'zero');
-          html += `<div class="cal-cell has-entry ${cls}"><div class="cal-day">${day}</div><div class="cal-diff">${formatDiff(e.diffH)}</div></div>`;
-        } else {
-          html += `<div class="cal-cell"><div class="cal-day">${day}</div></div>`;
-        }
-      }
-      html += `</div></div>`;
-    });
-    return html;
   }
 
   let finalDiffFilter = 'all'; // 'all' | 'over' | 'under'
@@ -1682,10 +1565,10 @@
           if(e.date === collector.date){
             // 완전상쇄면 대표 날짜 자체가 이미 합계와 같지만, 근접상쇄(잔여 있음)면 나머지 멤버들 몫까지 등록시각에 반영해야 함
             const otherSum = Math.round((sum - collector.diffH) * 2) / 2;
-            const boosted = otherSum === 0 ? e : { ...e, diffH: sum, end: minToTimeStr(Math.round(timeToMin(e.end) + otherSum * 60)) };
+            const boosted = otherSum === 0 ? e : { ...e, diffH: sum, end: minToTimeStr(Math.round(timeToMin(e.end) + otherSum * 60)), workedMin: e.workedMin + otherSum * 60 };
             return singleItemHtml(boosted, '묶음 전체 몰아받음 · 사유는 위 옵션1에서 입력', memberLabel, false);
           }
-          const clean = { ...e, diffH: 0, start: '9:00', end: '18:00' };
+          const clean = { ...e, diffH: 0, start: '9:00', end: '18:00', workedMin: 480, breakTime: 0, noLunch: false };
           return singleItemHtml(clean, '원래 ' + formatDiff(e.diffH) + ' → 몰아주기로 0 처리');
         }).join('')}
       </div>`;
@@ -1833,8 +1716,13 @@
     if(isWeekend(e.date) || e.isHoliday) return null;
     const startMin = timeToMin(e.start);
     const endMin = timeToMin(e.end);
-    const ewStart = Math.min(startMin, CORE_START_MIN);
-    const ewEnd = Math.max(endMin, CORE_END_MIN);
+    const breakMin = Math.round((e.breakTime || 0) * 60);
+    // 1) 코어타임 보정 — 시작/종료 각각 독립적으로 경계만 당기거나 늘림(기존 로직, 코어타임 크레딧 유지)
+    let ewStart = Math.min(startMin, CORE_START_MIN);
+    let ewEnd = Math.max(endMin, CORE_END_MIN);
+    // 2) 그 다음, 명시된 휴게시간만큼 타임라인을 압축(종료를 당김) — 점심은 EW가 알아서 자동 차감한다고 보고 안 건드림
+    ewEnd -= breakMin;
+    if(ewEnd < CORE_END_MIN) ewEnd = CORE_END_MIN; // 압축해도 코어타임 하한(15시)은 지켜야 함
     if(ewStart === startMin && ewEnd === endMin) return null; // 조정 필요 없으면 따로 안 보여줌
     return { start: minToTimeStr(ewStart), end: minToTimeStr(ewEnd) };
   }
