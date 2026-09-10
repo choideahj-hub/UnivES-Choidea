@@ -58,6 +58,21 @@
     margin:-14px 0 20px 0;
   }
   .latest-date-banner.hidden{ display:none; }
+  .clear-all-top-btn{
+    display:block;
+    width:100%;
+    padding:10px;
+    margin-bottom:20px;
+    border-radius:10px;
+    border:1.5px dashed var(--danger);
+    background:var(--danger-soft);
+    color:var(--danger);
+    font-size:12.5px;
+    font-weight:700;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .clear-all-top-btn:hover{ opacity:0.85; }
   .card{
     background:var(--card);
     border:1px solid var(--line);
@@ -1212,6 +1227,7 @@
   <h1>순 근무 시간 체크</h1>
   <p class="sub">일 8시간 기준 +/- 를 날짜별로 쌓아서 상쇄 확인</p>
   <div id="latestDateBanner" class="latest-date-banner hidden"></div>
+  <button id="clearAllBtn" class="clear-all-top-btn">🗑️ 전체 기록 초기화 — 새로 시작하려면 여기부터 누르세요</button>
 
   <div class="card">
     <div class="step-header"><span class="step-num">1</span><span class="step-title">일정 등록하기</span></div>
@@ -1221,21 +1237,6 @@
     </div>
     <button class="primary" id="parseBtn" type="button">EW 올릴 준비 완료!</button>
     <div id="parsePreview"></div>
-  </div>
-
-  <div id="sharedMonthFilter" class="shared-month-filter hidden">
-    <div class="smf-label">🗓️ 보고 있는 범위 (2~4단계 공통)</div>
-    <div class="view-mode-toggle" id="viewModeToggle">
-      <button type="button" data-mode="session" class="active">🔴 지금 등록한 것만 (<span id="sessionCount">0</span>건)</button>
-      <button type="button" data-mode="all">전체 누적 보기</button>
-    </div>
-    <div class="month-nav hidden" id="monthNavWrap">
-      <button type="button" id="monthPrev">‹</button>
-      <div class="month-label" id="monthLabel">–</div>
-      <button type="button" id="monthNext">›</button>
-      <button type="button" id="monthAllBtn">전체 기간</button>
-    </div>
-    <button type="button" id="resetSessionBtn" class="reset-session-btn">🔄 지금 바로 세션 새로 시작 (매일 자동으로도 초기화돼요)</button>
   </div>
 
   <div class="card" id="dailyCalcCard">
@@ -1295,8 +1296,7 @@
   <div class="footnote">
     계산식 · 근무시간 = 종료−시작 − 점심 1시간(기본, "점심 없이"/"점없근" 있으면 미차감) − 휴게시간 · 시작 시각 없으면 9:00 시작<br>
     주말·"공휴일" 표기는 점심 자동 미차감 + 자동 짝짓기 후순위 + 8시간 기준 비교 없이 일한 시간 전체가 그대로 초과근무로 계산<br>
-    체크박스로 날짜를 골라 합이 0이 되면 "짝으로 확정" — 확정된 묶음은 위 초과/단축 합계에서 빠집니다.<br>
-    <button id="clearAllBtn">전체 기록 초기화</button>
+    체크박스로 날짜를 골라 합이 0이 되면 "짝으로 확정" — 확정된 묶음은 위 초과/단축 합계에서 빠집니다.
   </div>
 </div>
 
@@ -1331,7 +1331,6 @@
   });
   const latestDateBanner = document.getElementById('latestDateBanner');
   const listControls = document.getElementById('listControls');
-  const sharedMonthFilter = document.getElementById('sharedMonthFilter');
   const finalResultCard = document.getElementById('finalResultCard');
   const listCard = document.getElementById('listCard');
   const dailyCalcCard = document.getElementById('dailyCalcCard');
@@ -1342,10 +1341,6 @@
   const pairStatus = document.getElementById('pairStatus');
   const pairCancelBtn = document.getElementById('pairCancelBtn');
   const pairConfirmBtn = document.getElementById('pairConfirmBtn');
-  const monthPrev = document.getElementById('monthPrev');
-  const monthNext = document.getElementById('monthNext');
-  const monthLabel = document.getElementById('monthLabel');
-  const monthAllBtn = document.getElementById('monthAllBtn');
   const diffFilterEl = document.getElementById('diffFilter');
   let diffFilter = 'all'; // 'all' | 'over' | 'under'
   diffFilterEl.querySelectorAll('button').forEach(btn=>{
@@ -1500,7 +1495,7 @@
       return `${formatMDDay(e.date)} — ${label} — EW 등록: ${start}~${end}${note ? ' (' + note + ')' : ''}${reasonPart}`;
     };
 
-    const monthTitle = monthFilter === 'all' ? '전체 기간' : monthLabel.textContent;
+    const monthTitle = '전체';
     let lines = [`📋 최종 결과값 (${monthTitle})`, ''];
 
     const displayItems = [
@@ -1551,9 +1546,8 @@
     }
     dailyCalcList.innerHTML = scoped.map(e=>{
       const cls = e.diffH > 0 ? 'plus' : (e.diffH < 0 ? 'minus' : 'zero');
-      const isSession = viewMode === 'all' && sessionDates.has(e.date);
-      return `<div class="daily-calc-row${isSession ? ' is-session' : ''}">
-        <span class="dc-date">${formatMDDay(e.date)}${isSession ? ' 🆕' : ''}</span>
+      return `<div class="daily-calc-row">
+        <span class="dc-date">${formatMDDay(e.date)}</span>
         <span class="dc-diff ${cls}">${formatDiff(e.diffH)}</span>
       </div>`;
     }).join('');
@@ -1580,8 +1574,7 @@
         const e = entryByDay[day];
         if(e){
           const cls = e.diffH > 0 ? 'plus' : (e.diffH < 0 ? 'minus' : 'zero');
-          const isSession = viewMode === 'all' && sessionDates.has(e.date);
-          html += `<div class="cal-cell has-entry ${cls}${isSession ? ' is-session' : ''}"><div class="cal-day">${day}</div><div class="cal-diff">${formatDiff(e.diffH)}</div></div>`;
+          html += `<div class="cal-cell has-entry ${cls}"><div class="cal-day">${day}</div><div class="cal-diff">${formatDiff(e.diffH)}</div></div>`;
         } else {
           html += `<div class="cal-cell"><div class="cal-day">${day}</div></div>`;
         }
@@ -1758,75 +1751,11 @@
     return String(str).replace(/[&<>"']/g, ch=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
   }
   const now = new Date();
-  let monthFilter = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`; // 'YYYY-MM' or 'all'
-  let lastSpecificMonth = monthFilter; // "전체보기" 껐다 켤 때 여기로 정확히 복귀 (막연히 "이번 달"이 아니라 진짜 마지막으로 보던 달)
 
-  // ===== "지금 등록한 것" vs "전체 누적 데이터" 분리 =====
-  // 월 단위로는 "8월 2주차~3주차만 등록"같은 경우를 못 담아서, 정확히 어떤 날짜들을 방금 등록했는지 자체를 기억해둠.
-  // "오늘" 안에서는 여러 번 나눠 붙여넣어도 계속 누적되지만, 날짜가 바뀌면(=새 작업 세션) 자동으로 예전 세션은 비움
-  function todayStr(){
-    const d = new Date();
-    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-  }
-  function loadSessionDates(){
-    try{
-      const lastActive = localStorage.getItem('wf2_session_active_date');
-      if(lastActive !== todayStr()){
-        // 오늘 처음 쓰는 세션 — 예전 세션은 자동으로 비움(수동 초기화 안 눌러도 됨)
-        return new Set();
-      }
-      const raw = localStorage.getItem('wf2_session_dates');
-      return raw ? new Set(JSON.parse(raw)) : new Set();
-    }catch(e){ return new Set(); }
-  }
-  function saveSessionDates(){
-    try{
-      localStorage.setItem('wf2_session_dates', JSON.stringify([...sessionDates]));
-      localStorage.setItem('wf2_session_active_date', todayStr());
-    }catch(e){}
-  }
-  let sessionDates = loadSessionDates();
-  let viewMode = 'session'; // 'session'(지금 등록한 것만) | 'all'(전체 누적)
-
-  // STEP2/3/4가 실제로 다룰 범위를 한 곳에서 결정 — session이면 월과 무관하게 방금 등록한 날짜만,
-  // all이면 기존처럼 월 필터(또는 전체) 적용
+  // 일회성 사용이라 "세션 vs 전체 누적" 구분 자체를 없애고, 등록된 걸 그냥 다 바로 보여줌
   function getScopedEntries(){
-    if(viewMode === 'session'){
-      return entries.filter(e=> sessionDates.has(e.date));
-    }
-    return (monthFilter === 'all' ? entries : entries.filter(e=> monthKey(e.date) === monthFilter)).slice();
+    return entries.slice();
   }
-
-  function shiftMonth(delta){
-    if(monthFilter === 'all') return;
-    const [y, m] = monthFilter.split('-').map(Number);
-    const d = new Date(y, m-1+delta, 1);
-    monthFilter = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-    lastSpecificMonth = monthFilter;
-    render();
-  }
-  monthPrev.addEventListener('click', ()=> shiftMonth(-1));
-  monthNext.addEventListener('click', ()=> shiftMonth(1));
-  monthAllBtn.addEventListener('click', ()=>{
-    monthFilter = monthFilter === 'all' ? lastSpecificMonth : 'all';
-    render();
-  });
-
-  const viewModeToggle = document.getElementById('viewModeToggle');
-  const monthNavWrap = document.getElementById('monthNavWrap');
-  const resetSessionBtn = document.getElementById('resetSessionBtn');
-  viewModeToggle.querySelectorAll('button').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      viewMode = btn.dataset.mode;
-      render();
-    });
-  });
-  resetSessionBtn.addEventListener('click', ()=>{
-    if(sessionDates.size > 0 && !confirm('세션을 초기화할까요? (기록 자체는 안 지워지고, "지금 등록한 것" 표시만 초기화돼요)')) return;
-    sessionDates = new Set();
-    saveSessionDates();
-    render();
-  });
 
   function toMinutes(t){
     const [h,m] = t.split(':').map(Number);
@@ -2237,9 +2166,7 @@
           } else {
             entries.push(r);
           }
-          sessionDates.add(r.date); // 방금 등록한 날짜 — "지금 등록한 것만" 보기에 바로 잡히게
         });
-        saveSessionDates();
         await save();
         const addedCount = parsedResults.length;
         parsedResults = [];
@@ -2248,9 +2175,7 @@
         leaveMarks = [];
         pasteInput.value = '';
         parsePreview.innerHTML = '';
-        // "지금 등록한 것만" 보기로 자동 전환 — 월이 뭐든 상관없이 방금 등록한 날짜들이 바로 보임
-        viewMode = 'session';
-        statusMsg.textContent = `${addedCount}건 추가됨 — 지금 등록한 것만 보기로 표시돼요`;
+        statusMsg.textContent = `${addedCount}건 추가됨`;
         render();
       });
       container.appendChild(confirmBtn);
@@ -2302,34 +2227,11 @@
 
     // 기록이 하나도 없으면 필터·자동상쇄·최종결과값 같은 컨트롤은 다 숨겨서 첫 화면이 깔끔하게
     listControls.classList.toggle('hidden', entries.length === 0);
-    sharedMonthFilter.classList.toggle('hidden', entries.length === 0);
     finalResultCard.classList.toggle('hidden', entries.length === 0);
     dailyCalcCard.classList.toggle('hidden', entries.length === 0);
     if(entries.length === 0){
       entryList.innerHTML = '<div class="empty">아직 기록이 없어요 — 위 상자에 근무 내역을 붙여넣어주세요</div>';
       return;
-    }
-
-    // 세션(지금 등록한 것) / 전체 토글 UI 갱신
-    viewModeToggle.querySelectorAll('button').forEach(b=> b.classList.toggle('active', b.dataset.mode === viewMode));
-    monthNavWrap.classList.toggle('hidden', viewMode !== 'all');
-    document.getElementById('sessionCount').textContent = entries.filter(e=> sessionDates.has(e.date)).length;
-
-    // 월 라벨 갱신
-    if(monthFilter === 'all'){
-      monthLabel.textContent = '전체 기간';
-      monthAllBtn.classList.add('active');
-      const [ly, lm] = lastSpecificMonth.split('-').map(Number);
-      monthAllBtn.textContent = `← ${lm}월로 돌아가기`;
-      monthPrev.disabled = true;
-      monthNext.disabled = true;
-    } else {
-      const [y, m] = monthFilter.split('-').map(Number);
-      monthLabel.textContent = `${y}년 ${m}월`;
-      monthAllBtn.classList.remove('active');
-      monthAllBtn.textContent = '전체보기';
-      monthPrev.disabled = false;
-      monthNext.disabled = false;
     }
 
     let visibleEntries = getScopedEntries();
@@ -2346,9 +2248,8 @@
       function buildEntryDiv(e){
         const diffClass = e.diffH === 0 ? 'zero' : (e.diffH > 0 ? 'plus' : 'minus');
         const isGrouped = !!e.groupId;
-        const isSessionInAllView = viewMode === 'all' && sessionDates.has(e.date);
         const div = document.createElement('div');
-        div.className = 'entry' + (isGrouped ? ' grouped' : '') + (e.uploaded ? ' uploaded-done' : '') + (isSessionInAllView ? ' is-session' : '');
+        div.className = 'entry' + (isGrouped ? ' grouped' : '') + (e.uploaded ? ' uploaded-done' : '');
         const checkboxHtml = (!isGrouped && e.diffH !== 0)
           ? `<input type="checkbox" class="pair-check" data-date="${e.date}" ${selectedDates.has(e.date) ? 'checked' : ''}>`
           : '';
@@ -2359,7 +2260,7 @@
         div.innerHTML = `
           <div class="entry-main">
             ${checkboxHtml}
-            <div class="date">${formatMDDay(e.date)}${isSessionInAllView ? ' 🆕' : ''}</div>
+            <div class="date">${formatMDDay(e.date)}</div>
             <div class="diff ${diffClass}">${formatDiff(e.diffH)}</div>
             <button class="del" data-date="${e.date}" title="삭제">×</button>
           </div>
